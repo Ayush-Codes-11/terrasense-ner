@@ -1,0 +1,85 @@
+{
+  "type": "FeatureCollection",
+  "data_type": "SAMPLE_MOCK",
+  "disclaimer": "FOR UI/API TESTING ONLY. Not real OSM or survey data. Road alignments are fictitious.",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R01",
+        "name": "NH-306 Segment (Sample)",
+        "road_type": "national_highway",
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [92.6850, 23.7130], [92.6950, 23.7160], [92.7050, 23.7200],
+          [92.7150, 23.7270], [92.7250, 23.7290], [92.7380, 23.7260], [92.7500, 23.7220]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R02",
+        "name": "Aizawl-Lunglei Road (Sample)",
+        "road_type": "state_highway",
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [92.7130, 23.7046], [92.7150, 23.7100], [92.7180, 23.7200],
+          [92.7170, 23.7300], [92.7150, 23.7400], [92.7130, 23.7496]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R03",
+        "name": "Western Local Road (Sample)",
+        "road_type": "local_road",
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [92.6850, 23.7346], [92.6900, 23.7400], [92.6950, 23.7460]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R04",
+        "name": "Eastern Link Road (Sample)",
+        "road_type": "local_road",
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [92.7320, 23.7100], [92.7380, 23.7200], [92.7420, 23.7300]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R05",
+        "name": "District Connector Road (Sample)",
+        "road_type": "district_road",
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [92.7050, 23.7046], [92.7100, 23.6980], [92.7200, 23.6950],
+          [92.7320, 23.7046], [92.7380, 23.7150]
+        ]
+      }
+    }
+  ]
+}

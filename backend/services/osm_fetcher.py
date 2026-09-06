@@ -19,8 +19,10 @@ from typing import Dict, List, Optional, Tuple
 
 import httpx
 
-_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-_GRID_RISK_PATH = _REPO_ROOT / "data" / "sample" / "grid-risk.geojson"
+_BACKEND_DIR = Path(__file__).resolve().parent.parent
+_REPO_ROOT = _BACKEND_DIR.parent
+_DATA_DIR = _REPO_ROOT / "data" if (_REPO_ROOT / "data").exists() else _BACKEND_DIR / "data"
+_GRID_RISK_PATH = _DATA_DIR / "sample" / "grid-risk.geojson"
 
 OVERPASS_ENDPOINTS = [
     "https://overpass-api.de/api/interpreter",

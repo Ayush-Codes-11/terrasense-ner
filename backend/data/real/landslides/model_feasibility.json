@@ -1,0 +1,149 @@
+{
+  "feasibility_outcome": "TEMPORAL_RAINFALL_TRIGGER_MODEL_NOT_FEASIBLE_WITH_CURRENT_PUBLIC_GSI_INVENTORY",
+  "rationale": "The complete GSI BhooSanket Landslide_Public inventory for Mizoram contains 2046 geolocated landslide occurrence records (including 457 in Aizawl district and 60 within the pilot bounding box), but 0 records contain usable event dates (0 exact-date, 0 partial-date, 2046 no-date across all 6 date/time fields in the schema). Without landslide occurrence timestamps, dynamic antecedent rainfall accumulation at the time of failure cannot be linked to the landslide locations. Therefore, a temporally validated dynamic rainfall-trigger model (such as an event-linked XGBoost or logistic threshold model) is NOT feasible with the current public GSI inventory. However, static susceptibility modeling (predicting spatial landslide susceptibility from static topographic, geological, and morphological covariates via defensible background/non-landslide sampling and spatial cross-validation) remains conceptually feasible for future exploration. For operational decision support, the transparent prototype scorer remains the appropriate model at this stage.",
+  "static_susceptibility_feasibility": "Static susceptibility ML may still be feasible later using geolocated inventory labels, static covariates (Copernicus DEM slope, aspect, elevation, geology), defensible background sampling, and spatial cross-validation. No model is trained in Phase 7.",
+  "data_source": {
+    "name": "GSI BhooSanket Landslide_Public inventory",
+    "url": "https://bhusanket.gsi.gov.in/gisserver/rest/services/Hosted/Public_Portal_Dashboard_Map/FeatureServer/0",
+    "access": "Public \u2014 no authentication required for this layer",
+    "pagination_method": "ArcGIS REST query with resultOffset (page size 1,000, 3 pages retrieved: 1,000 + 1,000 + 46)"
+  },
+  "record_counts": {
+    "total_mizoram": 2046,
+    "by_district": {
+      "Aizawl": 457,
+      "Lunglei": 431,
+      "Serchhip": 149,
+      "Mamit": 136,
+      "Kolasib": 94,
+      "Champhai": 447,
+      "Saiha": 106,
+      "Lawngtlai": 226
+    },
+    "aizawl_district": 457,
+    "pilot_bbox": 60,
+    "coordinate_completeness": "2046/2046 (100.0%)",
+    "duplicate_coordinate_pairs": 108,
+    "duplicate_records_total": 165
+  },
+  "date_quality_summary": {
+    "exact_date_records": 0,
+    "partial_date_records": 0,
+    "no_date_records": 2046,
+    "reactivation_year_tagged_records": 157
+  },
+  "date_fields_audit": {
+    "date": {
+      "arcgis_type": "esriFieldTypeString",
+      "alias": "date",
+      "description": "Landslide event date timestamp",
+      "non_null_count": 0,
+      "sample_values": [],
+      "role": "Event date (null in public layer)"
+    },
+    "date_acc": {
+      "arcgis_type": "esriFieldTypeString",
+      "alias": "date_acc",
+      "description": "Date accuracy flag (Day, Month, Year)",
+      "non_null_count": 0,
+      "sample_values": [],
+      "role": "Precision flag"
+    },
+    "date_and_t": {
+      "arcgis_type": "esriFieldTypeString",
+      "alias": "Date_and_t",
+      "description": "Combined date and time field",
+      "non_null_count": 0,
+      "sample_values": [],
+      "role": "Combined date/time"
+    },
+    "datetimety": {
+      "arcgis_type": "esriFieldTypeString",
+      "alias": "DateTimeTy",
+      "description": "Date time type classification",
+      "non_null_count": 0,
+      "sample_values": [],
+      "role": "Precision / type classification"
+    },
+    "exactdatei": {
+      "arcgis_type": "esriFieldTypeString",
+      "alias": "ExactDateI",
+      "description": "Exact date indicator flag",
+      "non_null_count": 0,
+      "sample_values": [],
+      "role": "Indicator flag"
+    },
+    "history_da": {
+      "arcgis_type": "esriFieldTypeString",
+      "alias": "History_da",
+      "description": "Historical date of occurrence",
+      "non_null_count": 0,
+      "sample_values": [],
+      "role": "Historical date"
+    },
+    "reactivati": {
+      "arcgis_type": "esriFieldTypeDouble",
+      "alias": "REACTIVATI",
+      "description": "First reactivation year (survey/occurrence year)",
+      "non_null_count": 157,
+      "sample_values": [
+        2013,
+        2007,
+        2012,
+        2016,
+        2016
+      ],
+      "role": "Reactivation survey year tag (not initial event date, not timestamp)"
+    },
+    "reactiva_1": {
+      "arcgis_type": "esriFieldTypeDouble",
+      "alias": "REACTIVA_1",
+      "description": "Second reactivation year tag",
+      "non_null_count": 2,
+      "sample_values": [
+        2010,
+        20162017
+      ],
+      "role": "Reactivation survey year tag"
+    },
+    "reactiva_2": {
+      "arcgis_type": "esriFieldTypeDouble",
+      "alias": "REACTIVA_2",
+      "description": "Third reactivation year tag",
+      "non_null_count": 2,
+      "sample_values": [
+        2012,
+        2018
+      ],
+      "role": "Reactivation survey year tag"
+    }
+  },
+  "validation_semantics": {
+    "dataset_name": "GSI BhooSanket Landslide_Public inventory",
+    "activity": {
+      "Suspended": 551,
+      "Active": 1127,
+      "Stabilized": 99,
+      "Dormant": 54,
+      "Reactivated": 133,
+      "Relict": 11,
+      "Inactive": 30,
+      "Abandoned": 2
+    },
+    "source": {
+      "PDLS": 4
+    },
+    "check_stat": {},
+    "triggering": {
+      "Rainfall": 1447,
+      "Rainfall and Anthropogenic": 131,
+      "Anthropogenic": 110,
+      "Rainfall, Anthropogenic": 108,
+      "Rainfall and anthropogenic": 16
+    },
+    "validation_note": "Individual records do not contain explicit 'field validated' confirmation flags. Field check_stat is completely null/blank; source contains 'PDLS' for only 4 records. The dataset is appropriately designated 'GSI BhooSanket Landslide_Public inventory'."
+  },
+  "phase": 7,
+  "audit_timestamp": "2026-09-06T16:50:00+05:30",
+  "disclaimer": "This feasibility assessment is based strictly on the complete real data (all 2,046 records) obtained from the official GSI BhooSanket portal. No dates were inferred or fabricated."
+}

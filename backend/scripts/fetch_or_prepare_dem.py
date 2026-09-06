@@ -18,7 +18,7 @@ from pathlib import Path
 import rasterio
 from rasterio.windows import from_bounds
 
-_REPO_ROOT = Path(r"c:\Users\hp\OneDrive\Desktop\TerraSense")
+_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 _TERRAIN_DIR = _REPO_ROOT / "data" / "real" / "terrain"
 
 # Tile covering Aizawl (23°N, 92°E)

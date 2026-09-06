@@ -40,8 +40,10 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Dict, Optional
 
-_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-_SAMPLE_WEATHER_PATH = _REPO_ROOT / "data" / "sample" / "sample_weather.json"
+_BACKEND_DIR = Path(__file__).resolve().parent.parent
+_REPO_ROOT = _BACKEND_DIR.parent
+_DATA_DIR = _REPO_ROOT / "data" if (_REPO_ROOT / "data").exists() else _BACKEND_DIR / "data"
+_SAMPLE_WEATHER_PATH = _DATA_DIR / "sample" / "sample_weather.json"
 
 
 @dataclass

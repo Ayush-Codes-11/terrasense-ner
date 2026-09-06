@@ -16,10 +16,12 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-# Ensure repository root is on sys.path so ml module can be imported
-_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-if str(_REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(_REPO_ROOT))
+# Ensure repository root and backend directory are on sys.path so ml module can be imported
+_BACKEND_DIR = Path(__file__).resolve().parent.parent
+_REPO_ROOT = _BACKEND_DIR.parent
+for _p in (str(_REPO_ROOT), str(_BACKEND_DIR)):
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
 
 from ml.prototype_scorer import score_zone as _ml_score_zone, RiskResult, Contributor
 

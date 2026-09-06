@@ -44,16 +44,24 @@ app = FastAPI(
 # Allow the Vite dev server and any production frontend origin.
 # Tighten this in production.
 
+import os
+
+# Allowed production and local origins
+_CORS_ORIGINS = [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
+]
+if os.getenv("FRONTEND_URL"):
+    _CORS_ORIGINS.append(os.getenv("FRONTEND_URL").rstrip("/"))
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://localhost:5174",
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:5174",
-    ],
-    allow_credentials=True,
-    allow_methods=["GET"],   # Phase 3 is read-only
+    allow_origins=_CORS_ORIGINS,
+    allow_origin_regex=r"^https://.*\.vercel\.app$",
+    allow_credentials=False,
+    allow_methods=["GET"],
     allow_headers=["*"],
 )
 

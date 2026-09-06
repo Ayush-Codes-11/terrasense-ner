@@ -30,18 +30,29 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-if str(_REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(_REPO_ROOT))
+_BACKEND_DIR = Path(__file__).resolve().parent.parent
+_REPO_ROOT = _BACKEND_DIR.parent
+for _p in (str(_REPO_ROOT), str(_BACKEND_DIR)):
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
 
 from ml.prototype_scorer import score_zone, RiskResult, Contributor
-from backend.services.rainfall import get_rainfall_series, RainfallSeries
-from backend.services.rainfall_accumulator import (
-    compute_zone_rolling_rainfall,
-    HorizonRainfall,
-    RollingAccumulationResult,
-)
-from backend.services.terrain_loader import get_zone_terrain
+try:
+    from backend.services.rainfall import get_rainfall_series, RainfallSeries
+    from backend.services.rainfall_accumulator import (
+        compute_zone_rolling_rainfall,
+        HorizonRainfall,
+        RollingAccumulationResult,
+    )
+    from backend.services.terrain_loader import get_zone_terrain
+except ImportError:
+    from services.rainfall import get_rainfall_series, RainfallSeries
+    from services.rainfall_accumulator import (
+        compute_zone_rolling_rainfall,
+        HorizonRainfall,
+        RollingAccumulationResult,
+    )
+    from services.terrain_loader import get_zone_terrain
 
 
 @dataclass

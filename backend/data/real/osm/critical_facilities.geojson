@@ -1,0 +1,749 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "osm_facility_node_6909859294",
+      "properties": {
+        "osm_type": "node",
+        "osm_id": 6909859294,
+        "facility_id": "OSM_N6909859294",
+        "name": "Greenwood Hospital",
+        "category": "hospital",
+        "amenity": "hospital",
+        "healthcare": null,
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.7310816,
+          23.7555439
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_node_6909859524",
+      "properties": {
+        "osm_type": "node",
+        "osm_id": 6909859524,
+        "facility_id": "OSM_N6909859524",
+        "name": "Alpha Hospital",
+        "category": "hospital",
+        "amenity": "hospital",
+        "healthcare": null,
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.7195313,
+          23.7093053
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_node_6909859549",
+      "properties": {
+        "osm_type": "node",
+        "osm_id": 6909859549,
+        "facility_id": "OSM_N6909859549",
+        "name": "Nazareth Hospitals",
+        "category": "hospital",
+        "amenity": "hospital",
+        "healthcare": null,
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.7224247,
+          23.7489767
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_node_6911271636",
+      "properties": {
+        "osm_type": "node",
+        "osm_id": 6911271636,
+        "facility_id": "OSM_N6911271636",
+        "name": "Bethesda Hospital",
+        "category": "hospital",
+        "amenity": "hospital",
+        "healthcare": null,
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.726619,
+          23.7504614
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_node_7127376526",
+      "properties": {
+        "osm_type": "node",
+        "osm_id": 7127376526,
+        "facility_id": "OSM_N7127376526",
+        "name": "Chawlhhmun,UHC",
+        "category": "clinic",
+        "amenity": null,
+        "healthcare": "centre",
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.6917675,
+          23.7498379
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_node_7127376534",
+      "properties": {
+        "osm_type": "node",
+        "osm_id": 7127376534,
+        "facility_id": "OSM_N7127376534",
+        "name": "Zemabawk UPHC",
+        "category": "clinic",
+        "amenity": null,
+        "healthcare": "centre",
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.7464132,
+          23.7355277
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_node_7127376539",
+      "properties": {
+        "osm_type": "node",
+        "osm_id": 7127376539,
+        "facility_id": "OSM_N7127376539",
+        "name": "Vaivenga Hospital",
+        "category": "hospital",
+        "amenity": "hospital",
+        "healthcare": null,
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.7159388,
+          23.7334106
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_node_7127376542",
+      "properties": {
+        "osm_type": "node",
+        "osm_id": 7127376542,
+        "facility_id": "OSM_N7127376542",
+        "name": "Aizawl Hospital & Research Centre",
+        "category": "hospital",
+        "amenity": "hospital",
+        "healthcare": null,
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.7175467,
+          23.7189081
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_node_7127376544",
+      "properties": {
+        "osm_type": "node",
+        "osm_id": 7127376544,
+        "facility_id": "OSM_N7127376544",
+        "name": "Kulikawn Hospital",
+        "category": "hospital",
+        "amenity": "hospital",
+        "healthcare": null,
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.7154669,
+          23.7085438
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_node_7127376549",
+      "properties": {
+        "osm_type": "node",
+        "osm_id": 7127376549,
+        "facility_id": "OSM_N7127376549",
+        "name": "Lawipu UPHC",
+        "category": "clinic",
+        "amenity": null,
+        "healthcare": "centre",
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.6870687,
+          23.7230233
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_node_7127376552",
+      "properties": {
+        "osm_type": "node",
+        "osm_id": 7127376552,
+        "facility_id": "OSM_N7127376552",
+        "name": "B.N. Hospital,Kulikawn",
+        "category": "hospital",
+        "amenity": "hospital",
+        "healthcare": null,
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.7193766,
+          23.7110935
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_node_7151041326",
+      "properties": {
+        "osm_type": "node",
+        "osm_id": 7151041326,
+        "facility_id": "OSM_N7151041326",
+        "name": "Sub Centre, Tuikual North",
+        "category": "clinic",
+        "amenity": null,
+        "healthcare": "centre",
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.7152492,
+          23.7303709
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_node_7621733288",
+      "properties": {
+        "osm_type": "node",
+        "osm_id": 7621733288,
+        "facility_id": "OSM_N7621733288",
+        "name": "LRM Hospital",
+        "category": "hospital",
+        "amenity": "hospital",
+        "healthcare": null,
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.723445,
+          23.744316
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_node_7621733295",
+      "properties": {
+        "osm_type": "node",
+        "osm_id": 7621733295,
+        "facility_id": "OSM_N7621733295",
+        "name": "Eye Care Centre",
+        "category": "clinic",
+        "amenity": "clinic",
+        "healthcare": null,
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.7171226,
+          23.7297486
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_node_7621733298",
+      "properties": {
+        "osm_type": "node",
+        "osm_id": 7621733298,
+        "facility_id": "OSM_N7621733298",
+        "name": "Rosewood Hospital",
+        "category": "hospital",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.717955,
+          23.7311693
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_node_7621733301",
+      "properties": {
+        "osm_type": "node",
+        "osm_id": 7621733301,
+        "facility_id": "OSM_N7621733301",
+        "name": "City Hospital",
+        "category": "hospital",
+        "amenity": "hospital",
+        "healthcare": null,
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.7164176,
+          23.716618
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_node_8195600928",
+      "properties": {
+        "osm_type": "node",
+        "osm_id": 8195600928,
+        "facility_id": "OSM_N8195600928",
+        "name": "SubCentre, Zuangtui",
+        "category": "clinic",
+        "amenity": null,
+        "healthcare": "centre",
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.7377143,
+          23.7577659
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_node_8195622590",
+      "properties": {
+        "osm_type": "node",
+        "osm_id": 8195622590,
+        "facility_id": "OSM_N8195622590",
+        "name": "SubCentre, Venghlui",
+        "category": "clinic",
+        "amenity": null,
+        "healthcare": "centre",
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.7235915,
+          23.7248398
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_node_8195676863",
+      "properties": {
+        "osm_type": "node",
+        "osm_id": 8195676863,
+        "facility_id": "OSM_N8195676863",
+        "name": "SubCentre, Edenthar",
+        "category": "clinic",
+        "amenity": null,
+        "healthcare": "centre",
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.7184235,
+          23.7577377
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_node_8195734097",
+      "properties": {
+        "osm_type": "node",
+        "osm_id": 8195734097,
+        "facility_id": "OSM_N8195734097",
+        "name": "SubCentre, Zuangtui",
+        "category": "clinic",
+        "amenity": null,
+        "healthcare": "centre",
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.7381163,
+          23.7559195
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_node_8195831304",
+      "properties": {
+        "osm_type": "node",
+        "osm_id": 8195831304,
+        "facility_id": "OSM_N8195831304",
+        "name": "SubCentre, Thuampui",
+        "category": "clinic",
+        "amenity": null,
+        "healthcare": "centre",
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.7366743,
+          23.7470553
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_node_8195864149",
+      "properties": {
+        "osm_type": "node",
+        "osm_id": 8195864149,
+        "facility_id": "OSM_N8195864149",
+        "name": "SubCentre, Hunthar",
+        "category": "clinic",
+        "amenity": null,
+        "healthcare": "centre",
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.7150213,
+          23.7465974
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_node_10807335377",
+      "properties": {
+        "osm_type": "node",
+        "osm_id": 10807335377,
+        "facility_id": "OSM_N10807335377",
+        "name": "Vaivakawn Police Station",
+        "category": "police",
+        "amenity": "police",
+        "healthcare": null,
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.7110831,
+          23.7381258
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_node_10807355550",
+      "properties": {
+        "osm_type": "node",
+        "osm_id": 10807355550,
+        "facility_id": "OSM_N10807355550",
+        "name": "Aizwal Police Station",
+        "category": "police",
+        "amenity": "police",
+        "healthcare": null,
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.7165369,
+          23.7332329
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_node_10807355551",
+      "properties": {
+        "osm_type": "node",
+        "osm_id": 10807355551,
+        "facility_id": "OSM_N10807355551",
+        "name": "Bawngkawn Police Station",
+        "category": "police",
+        "amenity": "police",
+        "healthcare": null,
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.7281,
+          23.7534536
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_node_10807376498",
+      "properties": {
+        "osm_type": "node",
+        "osm_id": 10807376498,
+        "facility_id": "OSM_N10807376498",
+        "name": "Kulikawn Police Station",
+        "category": "police",
+        "amenity": "police",
+        "healthcare": null,
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.7195803,
+          23.7115624
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_node_10807391978",
+      "properties": {
+        "osm_type": "node",
+        "osm_id": 10807391978,
+        "facility_id": "OSM_N10807391978",
+        "name": "Zonuam Police Out Post",
+        "category": "police",
+        "amenity": "police",
+        "healthcare": null,
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.6976527,
+          23.7359677
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_node_11378893230",
+      "properties": {
+        "osm_type": "node",
+        "osm_id": 11378893230,
+        "facility_id": "OSM_N11378893230",
+        "name": "Ebenezar Hospital",
+        "category": "hospital",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.7078441,
+          23.7311933
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_way_487812363",
+      "properties": {
+        "osm_type": "way",
+        "osm_id": 487812363,
+        "facility_id": "OSM_W487812363",
+        "name": "Aizawl Civil Hospital",
+        "category": "hospital",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "operator": "State Governement",
+        "emergency": "yes",
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.7166346,
+          23.7319153
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_way_641625290",
+      "properties": {
+        "osm_type": "way",
+        "osm_id": 641625290,
+        "facility_id": "OSM_W641625290",
+        "name": "Ebenezar Hospital Area",
+        "category": "hospital",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.7078652,
+          23.7313308
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_facility_way_662506631",
+      "properties": {
+        "osm_type": "way",
+        "osm_id": 662506631,
+        "facility_id": "OSM_W662506631",
+        "name": "Aizawl Adventist Hospital",
+        "category": "hospital",
+        "amenity": "hospital",
+        "healthcare": null,
+        "operator": null,
+        "emergency": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.7093596,
+          23.7366289
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,527 @@
+{
+  "A01": {
+    "zone_id": "A01",
+    "data_type": "SAMPLE_MOCK",
+    "observed_daily_mm": {
+      "d_minus_2": 5.8,
+      "d_minus_1": 7.2,
+      "d0": 5.0
+    },
+    "forecast_interval_mm": {
+      "0_24h": 6.0,
+      "24_48h": 4.0,
+      "48_72h": 3.0
+    },
+    "data_meta": {
+      "data_type": "SAMPLE_MOCK",
+      "source": "TerraSense Synthetic Scenario Weather Generator",
+      "timestamp": "2026-09-06T12:00:00Z",
+      "is_live": false,
+      "note": "SAMPLE_MOCK structured non-overlapping rainfall observations and forecasts. Not real IMD/GPM observations."
+    }
+  },
+  "A02": {
+    "zone_id": "A02",
+    "data_type": "SAMPLE_MOCK",
+    "observed_daily_mm": {
+      "d_minus_2": 6.3,
+      "d_minus_1": 7.7,
+      "d0": 6.0
+    },
+    "forecast_interval_mm": {
+      "0_24h": 8.0,
+      "24_48h": 5.0,
+      "48_72h": 4.0
+    },
+    "data_meta": {
+      "data_type": "SAMPLE_MOCK",
+      "source": "TerraSense Synthetic Scenario Weather Generator",
+      "timestamp": "2026-09-06T12:00:00Z",
+      "is_live": false,
+      "note": "SAMPLE_MOCK structured non-overlapping rainfall observations and forecasts. Not real IMD/GPM observations."
+    }
+  },
+  "A03": {
+    "zone_id": "A03",
+    "data_type": "SAMPLE_MOCK",
+    "observed_daily_mm": {
+      "d_minus_2": 12.1,
+      "d_minus_1": 14.9,
+      "d0": 15.0
+    },
+    "forecast_interval_mm": {
+      "0_24h": 20.0,
+      "24_48h": 12.0,
+      "48_72h": 8.0
+    },
+    "data_meta": {
+      "data_type": "SAMPLE_MOCK",
+      "source": "TerraSense Synthetic Scenario Weather Generator",
+      "timestamp": "2026-09-06T12:00:00Z",
+      "is_live": false,
+      "note": "SAMPLE_MOCK structured non-overlapping rainfall observations and forecasts. Not real IMD/GPM observations."
+    }
+  },
+  "A04": {
+    "zone_id": "A04",
+    "data_type": "SAMPLE_MOCK",
+    "observed_daily_mm": {
+      "d_minus_2": 11.7,
+      "d_minus_1": 14.3,
+      "d0": 12.0
+    },
+    "forecast_interval_mm": {
+      "0_24h": 18.0,
+      "24_48h": 10.0,
+      "48_72h": 6.0
+    },
+    "data_meta": {
+      "data_type": "SAMPLE_MOCK",
+      "source": "TerraSense Synthetic Scenario Weather Generator",
+      "timestamp": "2026-09-06T12:00:00Z",
+      "is_live": false,
+      "note": "SAMPLE_MOCK structured non-overlapping rainfall observations and forecasts. Not real IMD/GPM observations."
+    }
+  },
+  "A05": {
+    "zone_id": "A05",
+    "data_type": "SAMPLE_MOCK",
+    "observed_daily_mm": {
+      "d_minus_2": 6.8,
+      "d_minus_1": 8.2,
+      "d0": 7.0
+    },
+    "forecast_interval_mm": {
+      "0_24h": 9.0,
+      "24_48h": 6.0,
+      "48_72h": 4.0
+    },
+    "data_meta": {
+      "data_type": "SAMPLE_MOCK",
+      "source": "TerraSense Synthetic Scenario Weather Generator",
+      "timestamp": "2026-09-06T12:00:00Z",
+      "is_live": false,
+      "note": "SAMPLE_MOCK structured non-overlapping rainfall observations and forecasts. Not real IMD/GPM observations."
+    }
+  },
+  "B01": {
+    "zone_id": "B01",
+    "data_type": "SAMPLE_MOCK",
+    "observed_daily_mm": {
+      "d_minus_2": 4.9,
+      "d_minus_1": 6.1,
+      "d0": 4.0
+    },
+    "forecast_interval_mm": {
+      "0_24h": 5.0,
+      "24_48h": 3.0,
+      "48_72h": 2.0
+    },
+    "data_meta": {
+      "data_type": "SAMPLE_MOCK",
+      "source": "TerraSense Synthetic Scenario Weather Generator",
+      "timestamp": "2026-09-06T12:00:00Z",
+      "is_live": false,
+      "note": "SAMPLE_MOCK structured non-overlapping rainfall observations and forecasts. Not real IMD/GPM observations."
+    }
+  },
+  "B02": {
+    "zone_id": "B02",
+    "data_type": "SAMPLE_MOCK",
+    "observed_daily_mm": {
+      "d_minus_2": 16.6,
+      "d_minus_1": 20.4,
+      "d0": 18.0
+    },
+    "forecast_interval_mm": {
+      "0_24h": 25.0,
+      "24_48h": 15.0,
+      "48_72h": 10.0
+    },
+    "data_meta": {
+      "data_type": "SAMPLE_MOCK",
+      "source": "TerraSense Synthetic Scenario Weather Generator",
+      "timestamp": "2026-09-06T12:00:00Z",
+      "is_live": false,
+      "note": "SAMPLE_MOCK structured non-overlapping rainfall observations and forecasts. Not real IMD/GPM observations."
+    }
+  },
+  "B03": {
+    "zone_id": "B03",
+    "data_type": "SAMPLE_MOCK",
+    "observed_daily_mm": {
+      "d_minus_2": 25.2,
+      "d_minus_1": 30.8,
+      "d0": 32.0
+    },
+    "forecast_interval_mm": {
+      "0_24h": 45.0,
+      "24_48h": 30.0,
+      "48_72h": 15.0
+    },
+    "data_meta": {
+      "data_type": "SAMPLE_MOCK",
+      "source": "TerraSense Synthetic Scenario Weather Generator",
+      "timestamp": "2026-09-06T12:00:00Z",
+      "is_live": false,
+      "note": "SAMPLE_MOCK structured non-overlapping rainfall observations and forecasts. Not real IMD/GPM observations."
+    }
+  },
+  "B04": {
+    "zone_id": "B04",
+    "data_type": "SAMPLE_MOCK",
+    "observed_daily_mm": {
+      "d_minus_2": 27.0,
+      "d_minus_1": 33.0,
+      "d0": 35.0
+    },
+    "forecast_interval_mm": {
+      "0_24h": 48.0,
+      "24_48h": 32.0,
+      "48_72h": 18.0
+    },
+    "data_meta": {
+      "data_type": "SAMPLE_MOCK",
+      "source": "TerraSense Synthetic Scenario Weather Generator",
+      "timestamp": "2026-09-06T12:00:00Z",
+      "is_live": false,
+      "note": "SAMPLE_MOCK structured non-overlapping rainfall observations and forecasts. Not real IMD/GPM observations."
+    }
+  },
+  "B05": {
+    "zone_id": "B05",
+    "data_type": "SAMPLE_MOCK",
+    "observed_daily_mm": {
+      "d_minus_2": 15.3,
+      "d_minus_1": 18.7,
+      "d0": 16.0
+    },
+    "forecast_interval_mm": {
+      "0_24h": 22.0,
+      "24_48h": 14.0,
+      "48_72h": 9.0
+    },
+    "data_meta": {
+      "data_type": "SAMPLE_MOCK",
+      "source": "TerraSense Synthetic Scenario Weather Generator",
+      "timestamp": "2026-09-06T12:00:00Z",
+      "is_live": false,
+      "note": "SAMPLE_MOCK structured non-overlapping rainfall observations and forecasts. Not real IMD/GPM observations."
+    }
+  },
+  "C01": {
+    "zone_id": "C01",
+    "data_type": "SAMPLE_MOCK",
+    "observed_daily_mm": {
+      "d_minus_2": 4.0,
+      "d_minus_1": 5.0,
+      "d0": 3.0
+    },
+    "forecast_interval_mm": {
+      "0_24h": 4.0,
+      "24_48h": 3.0,
+      "48_72h": 2.0
+    },
+    "data_meta": {
+      "data_type": "SAMPLE_MOCK",
+      "source": "TerraSense Synthetic Scenario Weather Generator",
+      "timestamp": "2026-09-06T12:00:00Z",
+      "is_live": false,
+      "note": "SAMPLE_MOCK structured non-overlapping rainfall observations and forecasts. Not real IMD/GPM observations."
+    }
+  },
+  "C02": {
+    "zone_id": "C02",
+    "data_type": "SAMPLE_MOCK",
+    "observed_daily_mm": {
+      "d_minus_2": 19.3,
+      "d_minus_1": 23.7,
+      "d0": 22.0
+    },
+    "forecast_interval_mm": {
+      "0_24h": 28.0,
+      "24_48h": 18.0,
+      "48_72h": 12.0
+    },
+    "data_meta": {
+      "data_type": "SAMPLE_MOCK",
+      "source": "TerraSense Synthetic Scenario Weather Generator",
+      "timestamp": "2026-09-06T12:00:00Z",
+      "is_live": false,
+      "note": "SAMPLE_MOCK structured non-overlapping rainfall observations and forecasts. Not real IMD/GPM observations."
+    }
+  },
+  "C03": {
+    "zone_id": "C03",
+    "data_type": "SAMPLE_MOCK",
+    "observed_daily_mm": {
+      "d_minus_2": 25.0,
+      "d_minus_1": 30.0,
+      "d0": 32.0
+    },
+    "forecast_interval_mm": {
+      "0_24h": 65.0,
+      "24_48h": 45.0,
+      "48_72h": 15.0
+    },
+    "data_meta": {
+      "data_type": "SAMPLE_MOCK",
+      "source": "TerraSense Synthetic Scenario Weather Generator",
+      "timestamp": "2026-09-06T12:00:00Z",
+      "is_live": false,
+      "note": "SAMPLE_MOCK structured non-overlapping rainfall observations and forecasts. Not real IMD/GPM observations."
+    }
+  },
+  "C04": {
+    "zone_id": "C04",
+    "data_type": "SAMPLE_MOCK",
+    "observed_daily_mm": {
+      "d_minus_2": 27.0,
+      "d_minus_1": 33.0,
+      "d0": 38.0
+    },
+    "forecast_interval_mm": {
+      "0_24h": 50.0,
+      "24_48h": 35.0,
+      "48_72h": 20.0
+    },
+    "data_meta": {
+      "data_type": "SAMPLE_MOCK",
+      "source": "TerraSense Synthetic Scenario Weather Generator",
+      "timestamp": "2026-09-06T12:00:00Z",
+      "is_live": false,
+      "note": "SAMPLE_MOCK structured non-overlapping rainfall observations and forecasts. Not real IMD/GPM observations."
+    }
+  },
+  "C05": {
+    "zone_id": "C05",
+    "data_type": "SAMPLE_MOCK",
+    "observed_daily_mm": {
+      "d_minus_2": 17.1,
+      "d_minus_1": 20.9,
+      "d0": 20.0
+    },
+    "forecast_interval_mm": {
+      "0_24h": 26.0,
+      "24_48h": 16.0,
+      "48_72h": 10.0
+    },
+    "data_meta": {
+      "data_type": "SAMPLE_MOCK",
+      "source": "TerraSense Synthetic Scenario Weather Generator",
+      "timestamp": "2026-09-06T12:00:00Z",
+      "is_live": false,
+      "note": "SAMPLE_MOCK structured non-overlapping rainfall observations and forecasts. Not real IMD/GPM observations."
+    }
+  },
+  "D01": {
+    "zone_id": "D01",
+    "data_type": "SAMPLE_MOCK",
+    "observed_daily_mm": {
+      "d_minus_2": 5.4,
+      "d_minus_1": 6.6,
+      "d0": 5.0
+    },
+    "forecast_interval_mm": {
+      "0_24h": 6.0,
+      "24_48h": 4.0,
+      "48_72h": 3.0
+    },
+    "data_meta": {
+      "data_type": "SAMPLE_MOCK",
+      "source": "TerraSense Synthetic Scenario Weather Generator",
+      "timestamp": "2026-09-06T12:00:00Z",
+      "is_live": false,
+      "note": "SAMPLE_MOCK structured non-overlapping rainfall observations and forecasts. Not real IMD/GPM observations."
+    }
+  },
+  "D02": {
+    "zone_id": "D02",
+    "data_type": "SAMPLE_MOCK",
+    "observed_daily_mm": {
+      "d_minus_2": 7.6,
+      "d_minus_1": 9.4,
+      "d0": 8.0
+    },
+    "forecast_interval_mm": {
+      "0_24h": 10.0,
+      "24_48h": 7.0,
+      "48_72h": 5.0
+    },
+    "data_meta": {
+      "data_type": "SAMPLE_MOCK",
+      "source": "TerraSense Synthetic Scenario Weather Generator",
+      "timestamp": "2026-09-06T12:00:00Z",
+      "is_live": false,
+      "note": "SAMPLE_MOCK structured non-overlapping rainfall observations and forecasts. Not real IMD/GPM observations."
+    }
+  },
+  "D03": {
+    "zone_id": "D03",
+    "data_type": "SAMPLE_MOCK",
+    "observed_daily_mm": {
+      "d_minus_2": 23.4,
+      "d_minus_1": 28.6,
+      "d0": 30.0
+    },
+    "forecast_interval_mm": {
+      "0_24h": 35.0,
+      "24_48h": 55.0,
+      "48_72h": 20.0
+    },
+    "data_meta": {
+      "data_type": "SAMPLE_MOCK",
+      "source": "TerraSense Synthetic Scenario Weather Generator",
+      "timestamp": "2026-09-06T12:00:00Z",
+      "is_live": false,
+      "note": "SAMPLE_MOCK structured non-overlapping rainfall observations and forecasts. Not real IMD/GPM observations."
+    }
+  },
+  "D04": {
+    "zone_id": "D04",
+    "data_type": "SAMPLE_MOCK",
+    "observed_daily_mm": {
+      "d_minus_2": 18.4,
+      "d_minus_1": 22.6,
+      "d0": 21.0
+    },
+    "forecast_interval_mm": {
+      "0_24h": 27.0,
+      "24_48h": 17.0,
+      "48_72h": 11.0
+    },
+    "data_meta": {
+      "data_type": "SAMPLE_MOCK",
+      "source": "TerraSense Synthetic Scenario Weather Generator",
+      "timestamp": "2026-09-06T12:00:00Z",
+      "is_live": false,
+      "note": "SAMPLE_MOCK structured non-overlapping rainfall observations and forecasts. Not real IMD/GPM observations."
+    }
+  },
+  "D05": {
+    "zone_id": "D05",
+    "data_type": "SAMPLE_MOCK",
+    "observed_daily_mm": {
+      "d_minus_2": 5.8,
+      "d_minus_1": 7.2,
+      "d0": 6.0
+    },
+    "forecast_interval_mm": {
+      "0_24h": 7.0,
+      "24_48h": 5.0,
+      "48_72h": 3.0
+    },
+    "data_meta": {
+      "data_type": "SAMPLE_MOCK",
+      "source": "TerraSense Synthetic Scenario Weather Generator",
+      "timestamp": "2026-09-06T12:00:00Z",
+      "is_live": false,
+      "note": "SAMPLE_MOCK structured non-overlapping rainfall observations and forecasts. Not real IMD/GPM observations."
+    }
+  },
+  "E01": {
+    "zone_id": "E01",
+    "data_type": "SAMPLE_MOCK",
+    "observed_daily_mm": {
+      "d_minus_2": 3.1,
+      "d_minus_1": 3.9,
+      "d0": 3.0
+    },
+    "forecast_interval_mm": {
+      "0_24h": 4.0,
+      "24_48h": 3.0,
+      "48_72h": 2.0
+    },
+    "data_meta": {
+      "data_type": "SAMPLE_MOCK",
+      "source": "TerraSense Synthetic Scenario Weather Generator",
+      "timestamp": "2026-09-06T12:00:00Z",
+      "is_live": false,
+      "note": "SAMPLE_MOCK structured non-overlapping rainfall observations and forecasts. Not real IMD/GPM observations."
+    }
+  },
+  "E02": {
+    "zone_id": "E02",
+    "data_type": "SAMPLE_MOCK",
+    "observed_daily_mm": {
+      "d_minus_2": 6.8,
+      "d_minus_1": 8.2,
+      "d0": 7.0
+    },
+    "forecast_interval_mm": {
+      "0_24h": 9.0,
+      "24_48h": 6.0,
+      "48_72h": 4.0
+    },
+    "data_meta": {
+      "data_type": "SAMPLE_MOCK",
+      "source": "TerraSense Synthetic Scenario Weather Generator",
+      "timestamp": "2026-09-06T12:00:00Z",
+      "is_live": false,
+      "note": "SAMPLE_MOCK structured non-overlapping rainfall observations and forecasts. Not real IMD/GPM observations."
+    }
+  },
+  "E03": {
+    "zone_id": "E03",
+    "data_type": "SAMPLE_MOCK",
+    "observed_daily_mm": {
+      "d_minus_2": 13.9,
+      "d_minus_1": 17.1,
+      "d0": 17.0
+    },
+    "forecast_interval_mm": {
+      "0_24h": 22.0,
+      "24_48h": 14.0,
+      "48_72h": 9.0
+    },
+    "data_meta": {
+      "data_type": "SAMPLE_MOCK",
+      "source": "TerraSense Synthetic Scenario Weather Generator",
+      "timestamp": "2026-09-06T12:00:00Z",
+      "is_live": false,
+      "note": "SAMPLE_MOCK structured non-overlapping rainfall observations and forecasts. Not real IMD/GPM observations."
+    }
+  },
+  "E04": {
+    "zone_id": "E04",
+    "data_type": "SAMPLE_MOCK",
+    "observed_daily_mm": {
+      "d_minus_2": 9.0,
+      "d_minus_1": 11.0,
+      "d0": 10.0
+    },
+    "forecast_interval_mm": {
+      "0_24h": 12.0,
+      "24_48h": 8.0,
+      "48_72h": 5.0
+    },
+    "data_meta": {
+      "data_type": "SAMPLE_MOCK",
+      "source": "TerraSense Synthetic Scenario Weather Generator",
+      "timestamp": "2026-09-06T12:00:00Z",
+      "is_live": false,
+      "note": "SAMPLE_MOCK structured non-overlapping rainfall observations and forecasts. Not real IMD/GPM observations."
+    }
+  },
+  "E05": {
+    "zone_id": "E05",
+    "data_type": "SAMPLE_MOCK",
+    "observed_daily_mm": {
+      "d_minus_2": 4.9,
+      "d_minus_1": 6.1,
+      "d0": 5.0
+    },
+    "forecast_interval_mm": {
+      "0_24h": 6.0,
+      "24_48h": 4.0,
+      "48_72h": 3.0
+    },
+    "data_meta": {
+      "data_type": "SAMPLE_MOCK",
+      "source": "TerraSense Synthetic Scenario Weather Generator",
+      "timestamp": "2026-09-06T12:00:00Z",
+      "is_live": false,
+      "note": "SAMPLE_MOCK structured non-overlapping rainfall observations and forecasts. Not real IMD/GPM observations."
+    }
+  }
+}

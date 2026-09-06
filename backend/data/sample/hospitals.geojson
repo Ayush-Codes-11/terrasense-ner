@@ -1,0 +1,47 @@
+{
+  "type": "FeatureCollection",
+  "data_type": "SAMPLE_MOCK",
+  "disclaimer": "FOR UI/API TESTING ONLY. Facility locations are fictitious.",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "facility_id": "H01", "name": "Civil Hospital Aizawl (Sample)",
+        "facility_type": "hospital", "zone_id": "C03", "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Point", "coordinates": [92.7195, 23.7285] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "facility_id": "H02", "name": "Durtlang Community Hospital (Sample)",
+        "facility_type": "hospital", "zone_id": "E01", "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Point", "coordinates": [92.6865, 23.7535] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "facility_id": "H03", "name": "PHC Laipuitlang (Sample)",
+        "facility_type": "primary_health_centre", "zone_id": "B01", "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Point", "coordinates": [92.6930, 23.7090] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "facility_id": "H04", "name": "District Emergency Response Centre (Sample)",
+        "facility_type": "emergency_centre", "zone_id": "C03", "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Point", "coordinates": [92.7160, 23.7310] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "facility_id": "H05", "name": "Zemabawk PHC (Sample)",
+        "facility_type": "primary_health_centre", "zone_id": "D05", "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Point", "coordinates": [92.7400, 23.7430] }
+    }
+  ]
+}

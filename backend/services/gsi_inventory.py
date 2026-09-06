@@ -19,8 +19,10 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-_LANDSLIDE_DIR = _REPO_ROOT / "data" / "real" / "landslides"
+_BACKEND_DIR = Path(__file__).resolve().parent.parent
+_REPO_ROOT = _BACKEND_DIR.parent
+_DATA_DIR = _REPO_ROOT / "data" if (_REPO_ROOT / "data").exists() else _BACKEND_DIR / "data"
+_LANDSLIDE_DIR = _DATA_DIR / "real" / "landslides"
 _RAW_FILE = _LANDSLIDE_DIR / "gsi_mizoram_raw.json"
 _FEASIBILITY_FILE = _LANDSLIDE_DIR / "model_feasibility.json"
 

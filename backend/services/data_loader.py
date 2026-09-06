@@ -14,9 +14,11 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Optional
 
-# backend/services/data_loader.py → backend/services → backend → repo root
-_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-_SAMPLE_DIR = _REPO_ROOT / "data" / "sample"
+# Resolves data directory at repo root or bundled within backend
+_BACKEND_DIR = Path(__file__).resolve().parent.parent
+_REPO_ROOT = _BACKEND_DIR.parent
+_DATA_DIR = _REPO_ROOT / "data" if (_REPO_ROOT / "data").exists() else _BACKEND_DIR / "data"
+_SAMPLE_DIR = _DATA_DIR / "sample"
 
 
 def _load_json(name: str) -> dict:

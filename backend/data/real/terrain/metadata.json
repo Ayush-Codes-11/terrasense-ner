@@ -1,0 +1,40 @@
+{
+  "source": "Copernicus DEM GLO-30 Public \u2014 distributed via AWS Open Data/Sinergise",
+  "product": "Copernicus GLO-30 DSM",
+  "data_type": "REAL_DEM",
+  "spatial_resolution": "30m (approx. 1 arc-second)",
+  "crs": "EPSG:4326",
+  "retrieved_at": "2026-09-06T09:57:16.944522+00:00",
+  "tile_name": "Copernicus_DSM_COG_10_N23_00_E092_00_DEM",
+  "original_tile_bounds": [
+    92.0,
+    23.0,
+    93.0,
+    24.0
+  ],
+  "processing_bounds": [
+    92.67009999999999,
+    23.679599999999997,
+    92.7651,
+    23.774600000000003
+  ],
+  "pilot_grid_bounds": [
+    92.6801,
+    23.6896,
+    92.7551,
+    23.7646
+  ],
+  "dimensions": [
+    342,
+    342
+  ],
+  "file_size_bytes": 468656,
+  "nodata_value": -999999.0,
+  "nodata_percentage": 0.0,
+  "elevation_summary": {
+    "min_m": 174.43919372558594,
+    "max_m": 1380.772705078125,
+    "mean_m": 766.0
+  },
+  "attribution": "\u00a9 DLR e.V. 2010-2014 and \u00a9 Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved. Distributed via AWS Open Data/Sinergise."
+}

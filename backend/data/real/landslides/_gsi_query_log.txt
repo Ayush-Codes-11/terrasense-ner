@@ -1,0 +1,211 @@
+============================================================
+1. Layer Metadata
+============================================================
+Layer name: Landslide_Public
+Geometry type: esriGeometryPoint
+Spatial reference (wkid): 4326
+Max record count: 2000
+Capabilities: Query
+Field count: 134
+Field names:
+  abstract (esriFieldTypeString) ù alias: ABSTRACT
+  activity (esriFieldTypeString) ù alias: ACTIVITY
+  alert (esriFieldTypeString) ù alias: ALERT
+  amount_of_ (esriFieldTypeString) ù alias: Amount_of_
+  areainsqme (esriFieldTypeString) ù alias: AreaInSqMe
+  bedding (esriFieldTypeString) ù alias: Bedding
+  causesothe (esriFieldTypeString) ù alias: CausesOthe
+  check_stat (esriFieldTypeString) ù alias: check_Stat
+  citation (esriFieldTypeString) ù alias: CITATION
+  class_numb (esriFieldTypeString) ù alias: class_numb
+  class_type (esriFieldTypeString) ù alias: class_type
+  communicat (esriFieldTypeString) ù alias: COMMUNICAT
+  damsbarr_1 (esriFieldTypeString) ù alias: DamsBarr_1
+  damsbarrag (esriFieldTypeString) ù alias: DamsBarrag
+  date (esriFieldTypeString) ù alias: date
+  date_acc (esriFieldTypeString) ù alias: date_acc
+  date_and_t (esriFieldTypeString) ù alias: Date_and_t
+  datetimety (esriFieldTypeString) ù alias: DateTimeTy
+  depth (esriFieldTypeDouble) ù alias: DEPTH
+  depthinmet (esriFieldTypeString) ù alias: DepthInMet
+  distributi (esriFieldTypeString) ù alias: DISTRIBUTI
+  district (esriFieldTypeString) ù alias: DISTRICT
+  drainage (esriFieldTypeString) ù alias: Drainage
+  duration_o (esriFieldTypeString) ù alias: Duration_o
+  exactdatei (esriFieldTypeString) ù alias: ExactDateI
+  failure_me (esriFieldTypeString) ù alias: FAILURE_ME
+  failuremec (esriFieldTypeString) ù alias: FailureMec
+  geo_acc (esriFieldTypeString) ù alias: geo_acc
+  geological (esriFieldTypeString) ù alias: Geological
+  geology (esriFieldTypeString) ù alias: GEOLOGY
+
+============================================================
+2. Count all records
+============================================================
+Total records in layer: 31545
+
+============================================================
+3. Mizoram records
+============================================================
+Mizoram records: 2000
+Mizoram (uppercase) records: 0
+Mizoram (exact match) records: 2000
+First Mizoram record:
+{
+  "attributes": {
+    "date": null,
+    "landslided": null,
+    "latitude": 23.92294,
+    "u_lat": null,
+    "datetimety": null,
+    "source": null,
+    "geology": "Siltstone rich interbedded Tertiary sequence where a thick soil profile developed",
+    "triggering": "Heavy rainfall",
+    "date_acc": null,
+    "u_long": null,
+    "class_type": null,
+    "landslidet": null,
+    "exactdatei": null,
+    "district": "Aizawl",
+    "slide_name": " ",
+    "landslides": null,
+    "state": "Mizoram",
+    "village": null,
+    "longitude": 92.65703
+  },
+  "geometry": {
+    "x": 92.65703000000008,
+    "y": 23.92294000000004
+  }
+}
+
+============================================================
+4. Aizawl district records
+============================================================
+Aizawl district records: 457
+First Aizawl record:
+{
+  "attributes": {
+    "date": null,
+    "landslided": null,
+    "latitude": 23.92294,
+    "u_lat": null,
+    "datetimety": null,
+    "source": null,
+    "geology": "Siltstone rich interbedded Tertiary sequence where a thick soil profile developed",
+    "triggering": "Heavy rainfall",
+    "date_acc": null,
+    "u_long": null,
+    "class_type": null,
+    "landslidet": null,
+    "exactdatei": null,
+    "district": "Aizawl",
+    "slide_name": " ",
+    "landslides": null,
+    "state": "Mizoram",
+    "village": null,
+    "longitude": 92.65703
+  },
+  "geometry": {
+    "x": 92.65703000000008,
+    "y": 23.92294000000004
+  }
+}
+
+============================================================
+5. Pilot bbox records
+============================================================
+Pilot bbox records: 60
+ - {"date": null, "landslided": null, "latitude": 23.70272, "u_lat": null, "datetimety": null, "source": null, "geology": "Interbedded sequence of grey shale (very thinly bedded) and relatively thick sandstone bed.", "triggering": "Rainfall and slope cutting at the toe", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": "Vengthar", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.71631}
+ - {"date": null, "landslided": null, "latitude": 23.6995, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone (thickly bedded) alternate with  shale (thickly bedded) overlain by weathered rockmass and loose overburden.", "triggering": "Rainfall, toe cutting due to construction coupled with rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": "CP Road", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.71617}
+ - {"date": null, "landslided": null, "latitude": 23.73436, "u_lat": null, "datetimety": null, "source": null, "geology": "Interbedded sequence of sandstone and shales", "triggering": "Slope cutting and rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": "Zemabawk", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.75194}
+ - {"date": null, "landslided": null, "latitude": 23.74372, "u_lat": null, "datetimety": null, "source": null, "geology": "Alternate sequence of sandstone and shale", "triggering": "Overloading of slope, high unguided discharge of monsoon rain", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": "Laiputlang", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.72417}
+ - {"date": null, "landslided": null, "latitude": 23.744167, "u_lat": null, "datetimety": null, "source": null, "geology": "Consists of 50m of shale and minor silt stone with N10\u00b0E-S10\u00b0W dipping 40\u00b0 towards SE", "triggering": " ", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": "Ramhlun Vengther slide", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.730472}
+ - {"date": null, "landslided": null, "latitude": 23.750722, "u_lat": null, "datetimety": null, "source": null, "geology": "Shale", "triggering": " ", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": "Zuangtui slide", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.744}
+ - {"date": null, "landslided": null, "latitude": 23.751694, "u_lat": null, "datetimety": null, "source": null, "geology": "Shale sandwiched between sandstone and siltstone and incompetent beds show warps, minor kinks and strike joints.", "triggering": " ", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": "Bawng Venglai slide", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.731528}
+ - {"date": null, "landslided": null, "latitude": 23.762482, "u_lat": null, "datetimety": null, "source": null, "geology": "Shale with med. bedded Sandstone", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.742799}
+ - {"date": null, "landslided": null, "latitude": 23.750454, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": "Rangamval Landslide", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.69524}
+ - {"date": null, "landslided": null, "latitude": 23.754475, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.722754}
+ - {"date": null, "landslided": null, "latitude": 23.706667, "u_lat": null, "datetimety": null, "source": null, "geology": "Grey sandy splintery shale, siltstone and mudstone", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.714694}
+ - {"date": null, "landslided": null, "latitude": 23.727694, "u_lat": null, "datetimety": null, "source": null, "geology": "Grey sandy splintery shale, siltstone and mudstone", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.736}
+ - {"date": null, "landslided": null, "latitude": 23.732894, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone with subordinate siltstone, mudstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.753033}
+ - {"date": null, "landslided": null, "latitude": 23.710194, "u_lat": null, "datetimety": null, "source": null, "geology": "Grey sandy splintery shale, siltstone and mudstone", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.741167}
+ - {"date": null, "landslided": null, "latitude": 23.747444, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone with subordinate siltstone, mudstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.696194}
+ - {"date": null, "landslided": null, "latitude": 23.737083, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone with subordinate siltstone, mudstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.703889}
+ - {"date": null, "landslided": null, "latitude": 23.741806, "u_lat": null, "datetimety": null, "source": null, "geology": "Grey sandy splintery shale, siltstone and mudstone", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.72525}
+ - {"date": null, "landslided": null, "latitude": 23.742861, "u_lat": null, "datetimety": null, "source": null, "geology": "Grey sandy splintery shale, siltstone and mudstone", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.725389}
+ - {"date": null, "landslided": null, "latitude": 23.744303, "u_lat": null, "datetimety": null, "source": null, "geology": "Grey sandy splintery shale, siltstone and mudstone", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.720114}
+ - {"date": null, "landslided": null, "latitude": 23.704333, "u_lat": null, "datetimety": null, "source": null, "geology": "Grey sandy splintery shale, siltstone and mudstone", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.7145}
+ - {"date": null, "landslided": null, "latitude": 23.700556, "u_lat": null, "datetimety": null, "source": null, "geology": "Grey sandy splintery shale, siltstone and mudstone", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.715972}
+ - {"date": null, "landslided": null, "latitude": 23.699472, "u_lat": null, "datetimety": null, "source": null, "geology": "Grey sandy splintery shale, siltstone and mudstone", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.716167}
+ - {"date": null, "landslided": null, "latitude": 23.693667, "u_lat": null, "datetimety": null, "source": null, "geology": "Grey sandy splintery shale, siltstone and mudstone", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.719056}
+ - {"date": null, "landslided": null, "latitude": 23.754493, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.690145}
+ - {"date": null, "landslided": null, "latitude": 23.754359, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.690207}
+ - {"date": null, "landslided": null, "latitude": 23.716111, "u_lat": null, "datetimety": null, "source": null, "geology": "Grey sandy splintery shale, siltstone and mudstone", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.712611}
+ - {"date": null, "landslided": null, "latitude": 23.717111, "u_lat": null, "datetimety": null, "source": null, "geology": "Grey sandy splintery shale, siltstone and mudstone", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.713972}
+ - {"date": null, "landslided": null, "latitude": 23.716333, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone with subordinate siltstone, mudstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.688639}
+ - {"date": null, "landslided": null, "latitude": 23.739417, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone with subordinate siltstone, mudstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.699917}
+ - {"date": null, "landslided": null, "latitude": 23.735028, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone with subordinate siltstone, mudstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.696028}
+ - {"date": null, "landslided": null, "latitude": 23.735, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone with subordinate siltstone, mudstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.695111}
+ - {"date": null, "landslided": null, "latitude": 23.717028, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone with subordinate siltstone, mudstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.692389}
+ - {"date": null, "landslided": null, "latitude": 23.719972, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone with subordinate siltstone, mudstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.697694}
+ - {"date": null, "landslided": null, "latitude": 23.720417, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone with subordinate siltstone, mudstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.695667}
+ - {"date": null, "landslided": null, "latitude": 23.720611, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone with subordinate siltstone, mudstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.692722}
+ - {"date": null, "landslided": null, "latitude": 23.717222, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone with subordinate siltstone, mudstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.694833}
+ - {"date": null, "landslided": null, "latitude": 23.736778, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone with subordinate siltstone, mudstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.694528}
+ - {"date": null, "landslided": null, "latitude": 23.727639, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone with subordinate siltstone, mudstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.703083}
+ - {"date": null, "landslided": null, "latitude": 23.746722, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone with subordinate siltstone, mudstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.695972}
+ - {"date": null, "landslided": null, "latitude": 23.741389, "u_lat": null, "datetimety": null, "source": null, "geology": "Grey sandy splintery shale, siltstone and mudstone", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.739528}
+ - {"date": null, "landslided": null, "latitude": 23.739306, "u_lat": null, "datetimety": null, "source": null, "geology": "Grey sandy splintery shale, siltstone and mudstone", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.743111}
+ - {"date": null, "landslided": null, "latitude": 23.716278, "u_lat": null, "datetimety": null, "source": null, "geology": "Grey sandy splintery shale, siltstone and mudstone", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.727694}
+ - {"date": null, "landslided": null, "latitude": 23.714694, "u_lat": null, "datetimety": null, "source": null, "geology": "Grey sandy splintery shale, siltstone and mudstone", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.728694}
+ - {"date": null, "landslided": null, "latitude": 23.740028, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone with subordinate siltstone, mudstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.709861}
+ - {"date": null, "landslided": null, "latitude": 23.744972, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone with subordinate siltstone, mudstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.702889}
+ - {"date": null, "landslided": null, "latitude": 23.753417, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.687556}
+ - {"date": null, "landslided": null, "latitude": 23.71, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone with subordinate siltstone, mudstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.692528}
+ - {"date": null, "landslided": null, "latitude": 23.715278, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone with subordinate siltstone, mudstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.697611}
+ - {"date": null, "landslided": null, "latitude": 23.716556, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone with subordinate siltstone, mudstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.699056}
+ - {"date": null, "landslided": null, "latitude": 23.722111, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone with subordinate siltstone, mudstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.681472}
+ - {"date": null, "landslided": null, "latitude": 23.722222, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone with subordinate siltstone, mudstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.682278}
+ - {"date": null, "landslided": null, "latitude": 23.744028, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone with subordinate siltstone, mudstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.698861}
+ - {"date": null, "landslided": null, "latitude": 23.745639, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone with subordinate siltstone, mudstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.694361}
+ - {"date": null, "landslided": null, "latitude": 23.745083, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone with subordinate siltstone, mudstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.6955}
+ - {"date": null, "landslided": null, "latitude": 23.745444, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone with subordinate siltstone, mudstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.749556}
+ - {"date": null, "landslided": null, "latitude": 23.749722, "u_lat": null, "datetimety": null, "source": null, "geology": "Sandstone with subordinate siltstone, mudstone and shale", "triggering": "Rainfall", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": " ", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.693781}
+ - {"date": null, "landslided": null, "latitude": 23.722, "u_lat": null, "datetimety": null, "source": null, "geology": "Variably weathered shales with thin intercalation of siltstone", "triggering": "Rainfall and Anthropogenic activity, extensive slope toe excavation", "date_acc": null, "u_long": null, "class_type": null, "landslidet": null, "exactdatei": null, "district": "Aizawl", "slide_name": "Khatla Sinking/Subsidence", "landslides": null, "state": "Mizoram", "village": null, "longitude": 92.721222}
+ - {"date": " ", "landslided": " ", "latitude": 23.70166667, "u_lat": " ", "datetimety": " ", "source": "PDLS", "geology": "Inter bedded siltstone, shale and sandstone sequence of the middle\nBhuban formation are exposed. The fissile grey coloured shales and siltstones are highly weathered.", "triggering": null, "date_acc": " ", "u_long": " ", "class_type": " ", "landslidet": " ", "exactdatei": " ", "district": "Aizawl", "slide_name": null, "landslides": " ", "state": "Mizoram", "village": " ", "longitude": 92.71944444}
+ - {"date": " ", "landslided": " ", "latitude": 23.74190833, "u_lat": " ", "datetimety": " ", "source": "PDLS", "geology": "Inter bedded siltstone, shale and sandstone sequence of the Middle\nBhuban member of Bhuban Formation are exposed. The fissile grey coloured shales and siltstones are highly weathered.", "triggering": null, "date_acc": " ", "u_long": " ", "class_type": " ", "landslidet": " ", "exactdatei": " ", "district": "Aizawl", "slide_name": null, "landslides": " ", "state": "Mizoram", "village": " ", "longitude": 92.74161389}
+ - {"date": " ", "landslided": " ", "latitude": 23.74150833, "u_lat": " ", "datetimety": " ", "source": "PDLS", "geology": "Grey sandy splintery shale with siltstone and mudstone of Middle Bhuban as well as sandstone with subordinate siltstone, mudstone and shale of the\nUpper Bhuban Member of Bhuban Formation", "triggering": null, "date_acc": " ", "u_long": " ", "class_type": " ", "landslidet": " ", "exactdatei": " ", "district": "Aizawl", "slide_name": null, "landslides": " ", "state": "Mizoram", "village": " ", "longitude": 92.70785833}
+
+============================================================
+6. Date quality analysis (Mizoram)
+============================================================
+Records with usable coordinates: 2000
+Exact-date records: 0
+Year-only / other date records: 0
+No-date records: 2000
+Districts in Mizoram: ['Aizawl', 'Champhai', 'Kolasib', 'Lawngtlai', 'Lawngtlai\r\n', 'Lunglei', 'Mamit', 'Saiha', 'Saiha\r\n', 'Serchhip']
+
+All Mizoram records summary:
+  [1] district='Aizawl' village=None date=None datetimety=None lat=23.9229 lon=92.6570
+  [2] district='Aizawl' village=None date=None datetimety=None lat=23.7027 lon=92.7163
+  [3] district='Aizawl' village=None date=None datetimety=None lat=23.6995 lon=92.7162
+  [4] district='Aizawl' village=None date=None datetimety=None lat=23.7344 lon=92.7519
+  [5] district='Aizawl' village=None date=None datetimety=None lat=23.8985 lon=92.6474
+  [6] district='Lunglei' village=None date=None datetimety=None lat=22.8600 lon=92.7583
+  [7] district='Aizawl' village=None date=None datetimety=None lat=23.7437 lon=92.7242
+  [8] district='Lunglei' village=None date=None datetimety=None lat=22.8365 lon=92.8009
+  [9] district='Lunglei' village=None date=None datetimety=None lat=22.8367 lon=92.7992
+  [10] district='Lunglei' village=None date=None datetimety=None lat=22.8455 lon=92.7994
+  [11] district='Lunglei' village=None date=None datetimety=None lat=22.8353 lon=92.8052
+  [12] district='Lunglei' village=None date=None datetimety=None lat=22.8366 lon=92.8035
+  [13] district='Lunglei' village=None date=None datetimety=None lat=22.8481 lon=92.7983
+  [14] district='Lunglei' village=None date=None datetimety=None lat=22.8556 lon=92.6991
+  [15] district='Lunglei' village=None date=None datetimety=None lat=22.8526 lon=92.7019
+  [16] district='Lunglei' village=None date=None datetimety=None lat=22.8570 lon=92.7076
+  [17] district='Aizawl' village=None date=None datetimety=None lat=23.7442 lon=92.7305
+  [18] district='Lunglei' village=None date=None datetimety=None lat=22.8510 lon=92.6950
+  [19] district='Lunglei' village=None date=None datetimety=None lat=22.8603 lon=92.7078
+  [20] district='Lunglei' village=None date=None datetimety=None lat=22.8643 lon=92.7110
+
+Saved Mizoram records to: C:\Users\hp\.gemini\antigravity\brain\7354ec94-6e59-4035-a5ab-3264f0e09ff4\scratch\..\..\..\data\real\landslides\gsi_mizoram_raw.json
