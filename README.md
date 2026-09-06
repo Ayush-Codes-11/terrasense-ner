@@ -57,12 +57,22 @@ uvicorn main:app --reload
 # → http://localhost:8000
 ```
 
+> **Python Runtime:** Python 3.12 selected for stable Vercel support and broad pre-built binary-wheel compatibility for NumPy, Shapely and PyProj (`backend/.python-version`).
+
 ### ML (Phase 4+)
 ```bash
 cd ml
 pip install -r requirements.txt
 python prototype_scorer.py
 ```
+
+### Mandatory Pre-Push Gate (Deployment Bundle Parity)
+Every future TerraSense coding phase and developer commit must finish with:
+```bash
+python backend/scripts/sync_deployment_bundle.py
+python -m pytest backend/tests/test_deployment_sync.py
+```
+before commit/push. This synchronizes canonical `data/` and `ml/` into `backend/data/` and `backend/ml/` and asserts 100% SHA-256 parity in CI.
 
 ---
 
@@ -71,16 +81,17 @@ python prototype_scorer.py
 | Phase | Status | Description |
 |-------|--------|-------------|
 | 1 | ✅ | Repo structure + React frontend shell |
-| 2 | ⏳ | Leaflet GIS map + sample GeoJSON |
-| 3 | ⏳ | FastAPI backend (sample data) |
-| 4 | ⏳ | Prototype risk scorer + antecedent rainfall |
-| 5 | ⏳ | OSM geodata import |
-| 6 | ⏳ | Exposure engine |
-| 7 | ⏳ | Why Now panel |
-| 8 | ⏳ | Field reporting |
-| 9 | ⏳ | PWA + offline |
+| 2 | ✅ | Leaflet GIS map + sample GeoJSON |
+| 3 | ✅ | FastAPI backend (sample data) |
+| 4 | ✅ | Prototype risk scorer + antecedent rainfall |
+| 5 | ✅ | Rainfall-triggered 24/48/72h landslide-risk outlook |
+| 6 | ✅ | Real OSM exposure engine + decision-support priority |
+| 7 | ✅ | Real DEM terrain (Copernicus GLO-30) + GSI Landslide Inventory |
+| Deployment | ✅ | Vercel Git auto-deployment configuration & Parity CI |
+| 8 | ⏳ | Field reporting & community validation |
+| 9 | ⏳ | PWA + offline capability |
 | 10 | ⏳ | Alerts + charts |
-| 11 | ⏳ | Polish + deploy |
+| 11 | ⏳ | Polish + production handoff |
 
 ---
 
@@ -91,3 +102,5 @@ python prototype_scorer.py
 - **Antecedent rainfall:** forecast windows accumulate prior observed rainfall before scoring
 - **Road exposure ≠ road blocked:** a road is only marked blocked on a verified field report
 - **Priority label:** always shown as "Prototype Decision-Support Priority — not official"
+- **Continuous terrain derivatives:** Horn 3×3 slope/aspect calculated across continuous projected DEM before zonal masking
+
