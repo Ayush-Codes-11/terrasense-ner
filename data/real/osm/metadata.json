@@ -12,12 +12,13 @@
   "attribution": "\u00a9 OpenStreetMap contributors",
   "feature_counts": {
     "roads": 1485,
-    "settlements": 1,
+    "settlements": 2,
     "critical_facilities": 31
   },
   "file_sizes_bytes": {
     "roads.geojson": 6037581,
-    "settlements.geojson": 613,
+    "settlements.geojson": 1259,
     "critical_facilities.geojson": 19588
-  }
+  },
+  "last_updated": "2026-09-06T08:35:19.442803+00:00"
 }

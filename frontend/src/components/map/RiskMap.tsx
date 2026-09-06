@@ -299,6 +299,20 @@ export default function RiskMap({
                 const coords = (
                   f.geometry as GeoJSON.LineString
                 ).coordinates.map(([lon, lat]) => [lat, lon] as [number, number]);
+                const isExcluded = ["steps", "pedestrian", "footway", "path", "cycleway", "corridor", "construction", "proposed"].includes(highwayType);
+                const isTrack = highwayType === "track";
+                const isNoAccess = props.access === "no" || props.vehicle === "no" || props.motor_vehicle === "no";
+                const isPrivate = props.access === "private";
+                const roadCategoryLabel = isTrack
+                  ? "Track (non-priority)"
+                  : isExcluded
+                    ? "Pedestrian / non-motorized"
+                    : isNoAccess
+                      ? "Restricted access (no motor vehicles)"
+                      : isPrivate
+                        ? "Private / restricted access"
+                        : "Motorable-class mapped road";
+
                 return (
                   <Polyline
                     key={props.road_id ?? props.osm_id ?? i}
@@ -308,7 +322,7 @@ export default function RiskMap({
                       weight: roadWeight(highwayType),
                       opacity: 0.8,
                       dashArray:
-                        highwayType === "local_road" || highwayType === "service" || highwayType === "track"
+                        highwayType === "local_road" || highwayType === "service" || highwayType === "track" || isExcluded
                           ? "4 4"
                           : undefined,
                     }}
@@ -317,13 +331,19 @@ export default function RiskMap({
                       <div className="text-xs">
                         <p className="font-semibold">{roadName}</p>
                         <p className="text-slate-500 capitalize">
-                          {highwayType.replace(/_/g, " ")}
+                          {highwayType.replace(/_/g, " ")} · {roadCategoryLabel}
                         </p>
                         {isReal ? (
                           <div className="mt-1 border-t border-slate-700/50 pt-1">
                             <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-mono bg-emerald-950 text-emerald-300 border border-emerald-800">
                               REAL_OSM · © OSM contributors
                             </span>
+                            {props.surface && (
+                              <p className="text-slate-400 text-[10px]">Surface: {props.surface}</p>
+                            )}
+                            {props.access && (
+                              <p className="text-amber-400 text-[10px]">Access: {props.access}</p>
+                            )}
                             <p className="text-slate-400 text-[10px] mt-1 font-mono">
                               Status: EXPOSED_NOT_VERIFIED_BLOCKED
                             </p>
@@ -344,8 +364,8 @@ export default function RiskMap({
             </>
           </LayersControl.Overlay>
 
-          {/* ── Villages / Settlements ── */}
-          <LayersControl.Overlay checked name={geoData.isRealOsm ? "🏘 Settlements (Real OSM)" : "🏘 Villages (sample)"}>
+          {/* ── Villages / Communities / Localities ── */}
+          <LayersControl.Overlay checked name={geoData.isRealOsm ? "🏘 Communities / Localities (Real OSM)" : "🏘 Villages (sample)"}>
             <>
               {villages?.features.map((f, i) => {
                 const props = f.properties as VillageGeoJSONProperties;
@@ -388,6 +408,9 @@ export default function RiskMap({
                             <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-mono bg-emerald-950 text-emerald-300 border border-emerald-800">
                               REAL_OSM · © OSM contributors
                             </span>
+                            <p className="text-[9px] text-slate-400 italic mt-0.5">
+                              OSM locality centre (geographic feature, not population)
+                            </p>
                           </div>
                         ) : (
                           <p className="text-amber-500 text-[10px] mt-1 font-mono">

@@ -196,6 +196,9 @@ class ExposedRoadSchema(BaseModel):
     name: Optional[str] = None
     highway: str
     length_km: float
+    is_motorable: bool = True
+    access: Optional[str] = None
+    access_restricted: bool = False
     blockage_verified: bool = False
     road_status: str = "EXPOSED_NOT_VERIFIED_BLOCKED"
 
@@ -204,20 +207,34 @@ class ExposedSettlementSchema(BaseModel):
     feature_id: str
     name: Optional[str] = None
     place: str
+    community_id: Optional[str] = None
 
 
 class ExposedFacilitySchema(BaseModel):
     feature_id: str
     name: Optional[str] = None
     category: str
+    amenity: Optional[str] = None
+    healthcare: Optional[str] = None
+    is_whitelisted: bool = True
 
 
 class ExposureSummarySchema(BaseModel):
-    roads_exposed: int
-    roads_exposed_km: float
-    villages_exposed: int
-    hospitals_exposed: int
+    osm_road_segments_count: int = 0
+    motorable_road_segments_count: int = 0
+    motorable_road_km: float = 0.0
+    total_road_km: float = 0.0
+    pedestrian_road_km: float = 0.0
+    track_road_km: float = 0.0
+    mapped_communities: int = 0
+    critical_facilities: int = 0
     roads_blocked: int = 0  # Only >0 if verified field report exists
+
+    # Backward compatibility aliases
+    roads_exposed: int = 0
+    roads_exposed_km: float = 0.0
+    villages_exposed: int = 0
+    hospitals_exposed: int = 0
 
 
 class ZoneExposureResponse(BaseModel):

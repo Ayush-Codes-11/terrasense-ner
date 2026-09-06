@@ -39,11 +39,20 @@ def get_zone_exposure_endpoint(zone_id: str):
         raise HTTPException(status_code=500, detail=f"Exposure calculation error: {exc}")
 
     summary = ExposureSummarySchema(
-        roads_exposed=res.road_feature_count,
-        roads_exposed_km=res.road_length_km,
-        villages_exposed=res.settlements_exposed,
-        hospitals_exposed=res.critical_facilities_exposed,
+        osm_road_segments_count=res.osm_road_segments_count,
+        motorable_road_segments_count=res.motorable_road_segments_count,
+        motorable_road_km=res.motorable_road_km,
+        total_road_km=res.total_road_km,
+        pedestrian_road_km=res.pedestrian_road_km,
+        track_road_km=res.track_road_km,
+        mapped_communities=res.communities_exposed,
+        critical_facilities=res.critical_facilities_exposed,
         roads_blocked=0,  # Never inferred; verified field reports only
+        # Backward compatibility aliases
+        roads_exposed=res.osm_road_segments_count,
+        roads_exposed_km=res.motorable_road_km,
+        villages_exposed=res.communities_exposed,
+        hospitals_exposed=res.critical_facilities_exposed,
     )
 
     roads = [
@@ -52,6 +61,9 @@ def get_zone_exposure_endpoint(zone_id: str):
             name=r.name,
             highway=r.highway,
             length_km=r.length_km,
+            is_motorable=r.is_motorable,
+            access=r.access,
+            access_restricted=r.access_restricted,
             blockage_verified=r.blockage_verified,
             road_status=r.road_status,
         )
@@ -63,6 +75,7 @@ def get_zone_exposure_endpoint(zone_id: str):
             feature_id=s.feature_id,
             name=s.name,
             place=s.place,
+            community_id=s.community_id,
         )
         for s in res.exposed_settlements
     ]
@@ -72,6 +85,9 @@ def get_zone_exposure_endpoint(zone_id: str):
             feature_id=f.feature_id,
             name=f.name,
             category=f.category,
+            amenity=f.amenity,
+            healthcare=f.healthcare,
+            is_whitelisted=f.is_whitelisted,
         )
         for f in res.exposed_facilities
     ]

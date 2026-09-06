@@ -121,26 +121,18 @@ def score_single_priority(
         ),
         PriorityContributor(
             component="road_exposure",
-            display_name="Road network exposure",
+            display_name="Mapped motorable road exposure",
             weight=WEIGHT_ROAD_EXPOSURE,
             raw_value=round(road_km, 3),
             normalized_input=round(norm_road, 4),
             contribution=contrib_road,
         ),
         PriorityContributor(
-            component="settlement_exposure",
-            display_name="Settlement proximity",
-            weight=WEIGHT_SETTLEMENT_EXPOSURE,
-            raw_value=float(settlements_count),
-            normalized_input=round(norm_settlements, 4),
-            contribution=contrib_settlements,
-        ),
-        PriorityContributor(
             component="critical_facility_exposure",
             display_name="Critical facility proximity",
             weight=WEIGHT_CRITICAL_FACILITY_EXPOSURE,
             raw_value=float(facilities_count),
-            normalized_input=round(norm_facility := norm_facilities, 4),
+            normalized_input=round(norm_facilities, 4),
             contribution=contrib_facilities,
         ),
     ]
@@ -183,8 +175,8 @@ def compute_zone_priority(
     if risk_outlook is None:
         risk_outlook = compute_zone_risk_outlook(zone_props)
 
-    road_km = exposure_result.road_length_km
-    settlements = exposure_result.settlements_exposed
+    road_km = exposure_result.motorable_road_km
+    settlements = exposure_result.communities_exposed
     facilities = exposure_result.critical_facilities_exposed
 
     now_p = score_single_priority("now", risk_outlook.now.risk_score, risk_outlook.now.risk_category, road_km, settlements, facilities)
@@ -203,12 +195,13 @@ def compute_zone_priority(
         transitions.append(
             f"Priority {verb} at +24h to {h24_p.priority} (score {h24_p.priority_score:.4f}) "
             f"because the landslide-risk outlook increases to {h24_p.landslide_risk_category} ({h24_p.landslide_risk_score:.4f}) "
-            f"while {road_km:.2f} km of mapped roads and {facilities} critical facilities intersect the prototype hazard zone."
+            f"while {road_km:.2f} km of mapped motorable roads and {facilities} critical facilities intersect the prototype hazard zone."
         )
     else:
         transitions.append(
             f"Priority remains {now_p.priority} at +24h (score {h24_p.priority_score:.4f}) "
-            f"as the landslide-risk outlook holds at {h24_p.landslide_risk_category} ({h24_p.landslide_risk_score:.4f})."
+            f"as the landslide-risk outlook holds at {h24_p.landslide_risk_category} ({h24_p.landslide_risk_score:.4f}) "
+            f"while {road_km:.2f} km of mapped motorable roads and {facilities} critical facilities intersect the prototype hazard zone."
         )
 
     # +48h transition
@@ -241,17 +234,26 @@ def compute_zone_priority(
     peak_horiz = "NOW" if peak_p == now_p.priority_score else "+24h" if peak_p == h24_p.priority_score else "+48h" if peak_p == h48_p.priority_score else "+72h"
     summary_explanation = (
         f"Peak decision-support priority is {h24_p.priority if peak_horiz == '+24h' else now_p.priority} ({peak_p:.4f}) at {peak_horiz}, "
-        f"driven by elevated landslide-risk outlook combined with {road_km:.2f} km of exposed roads and "
+        f"driven by elevated landslide-risk outlook combined with {road_km:.2f} km of mapped motorable roads and "
         f"{facilities} critical facilities intersecting the prototype hazard zone."
     )
 
     exposure_summary = {
-        "roads_exposed_count": exposure_result.road_feature_count,
-        "roads_exposed_km": road_km,
-        "settlements_exposed": settlements,
-        "critical_facilities_exposed": facilities,
+        "osm_road_segments_count": exposure_result.osm_road_segments_count,
+        "motorable_road_segments_count": exposure_result.motorable_road_segments_count,
+        "motorable_road_km": exposure_result.motorable_road_km,
+        "total_road_km": exposure_result.total_road_km,
+        "pedestrian_road_km": exposure_result.pedestrian_road_km,
+        "track_road_km": exposure_result.track_road_km,
+        "mapped_communities": exposure_result.communities_exposed,
+        "critical_facilities": exposure_result.critical_facilities_exposed,
         "blockage_verified": False,
         "road_status": "EXPOSED_NOT_VERIFIED_BLOCKED",
+        # Backward compatibility
+        "roads_exposed_count": exposure_result.osm_road_segments_count,
+        "roads_exposed_km": exposure_result.motorable_road_km,
+        "settlements_exposed": exposure_result.communities_exposed,
+        "critical_facilities_exposed": exposure_result.critical_facilities_exposed,
     }
 
     return PriorityOutlookResult(

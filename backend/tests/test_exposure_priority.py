@@ -303,23 +303,23 @@ def test_priority_monotonicity_with_landslide_risk():
 
 
 def test_priority_monotonicity_with_road_exposure():
-    """Increasing road exposure with fixed risk cannot decrease priority."""
-    p_low = score_single_priority("now", 0.60, "HIGH", 0.5, 1, 1)
-    p_high = score_single_priority("now", 0.60, "HIGH", 2.8, 1, 1)
+    """Increasing motorable road exposure with fixed risk strictly increases priority."""
+    p_low = score_single_priority("now", 0.60, "HIGH", 5.0, 1, 1)
+    p_high = score_single_priority("now", 0.60, "HIGH", 25.0, 1, 1)
     assert p_high.priority_score > p_low.priority_score
 
 
-def test_priority_monotonicity_with_settlement_exposure():
-    """Increasing settlement count cannot decrease priority."""
-    p_low = score_single_priority("now", 0.60, "HIGH", 2.0, 0, 1)
-    p_high = score_single_priority("now", 0.60, "HIGH", 2.0, 3, 1)
-    assert p_high.priority_score > p_low.priority_score
+def test_priority_settlement_is_context_metric_only():
+    """Settlement exposure is retained as context only (weight 0.0 in Phase 6 priority)."""
+    p_low = score_single_priority("now", 0.60, "HIGH", 20.0, 0, 1)
+    p_high = score_single_priority("now", 0.60, "HIGH", 20.0, 3, 1)
+    assert p_high.priority_score == p_low.priority_score
 
 
 def test_priority_monotonicity_with_facility_exposure():
     """Increasing critical facility count cannot decrease priority."""
-    p_low = score_single_priority("now", 0.60, "HIGH", 2.0, 1, 0)
-    p_high = score_single_priority("now", 0.60, "HIGH", 2.0, 1, 2)
+    p_low = score_single_priority("now", 0.60, "HIGH", 20.0, 1, 0)
+    p_high = score_single_priority("now", 0.60, "HIGH", 20.0, 1, 2)
     assert p_high.priority_score > p_low.priority_score
 
 
@@ -334,6 +334,178 @@ def test_priority_categories_mapping():
     assert get_priority_category(0.99) == "VERY_HIGH"
 
 
+def test_p90_normalization_references_prevent_premature_saturation():
+    """
+    Validates that P90 references (~38 km road, 3 facilities) prevent widespread saturation:
+    - 10 km of road should not saturate (norm_road < 1.0)
+    - 2 facilities should not saturate (norm_facilities < 1.0)
+    """
+    assert REF_ROAD_EXPOSURE_KM >= 35.0
+    assert REF_CRITICAL_FACILITIES_COUNT >= 3.0
+
+    p_10km = score_single_priority("now", 0.5, "HIGH", 10.0, 1, 2)
+    p_40km = score_single_priority("now", 0.5, "HIGH", 40.0, 1, 2)
+    assert p_40km.priority_score > p_10km.priority_score
+
+
+def test_motorable_whitelist_excludes_pedestrian_and_track():
+    """Steps, footways, paths, and tracks must not contribute to motorable road km."""
+    mock_roads = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "id": "r_motorable",
+                "properties": {"highway": "residential", "name": "Main Street"},
+                "geometry": {"type": "LineString", "coordinates": [[92.715, 23.725], [92.720, 23.725]]},
+            },
+            {
+                "type": "Feature",
+                "id": "r_steps",
+                "properties": {"highway": "steps", "name": "Public Stairs"},
+                "geometry": {"type": "LineString", "coordinates": [[92.715, 23.726], [92.720, 23.726]]},
+            },
+            {
+                "type": "Feature",
+                "id": "r_track",
+                "properties": {"highway": "track", "name": "Forest Track"},
+                "geometry": {"type": "LineString", "coordinates": [[92.715, 23.727], [92.720, 23.727]]},
+            },
+        ],
+    }
+    mock_settlements = {"type": "FeatureCollection", "features": []}
+    mock_facilities = {"type": "FeatureCollection", "features": []}
+
+    res = compute_zone_exposure("C03", mock_roads, mock_settlements, mock_facilities)
+    assert res.osm_road_segments_count == 3
+    assert res.motorable_road_segments_count == 1
+    assert res.pedestrian_road_km > 0.0
+    assert res.track_road_km > 0.0
+    # Motorable road length must only equal the length of the residential road
+    assert res.motorable_road_km < res.total_road_km
+
+
+def test_duplicate_overlapping_ways_do_not_double_count_length():
+    """
+    Two overlapping identical ways in the same zone must be unioned so
+    the motorable network length is counted once, not doubled.
+    """
+    mock_roads = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "id": "r1",
+                "properties": {"highway": "primary", "name": "Highway Seg 1"},
+                "geometry": {"type": "LineString", "coordinates": [[92.715, 23.725], [92.720, 23.725]]},
+            },
+            # Exact duplicate alignment with different OSM way ID
+            {
+                "type": "Feature",
+                "id": "r2",
+                "properties": {"highway": "primary", "name": "Highway Seg 2 Overlap"},
+                "geometry": {"type": "LineString", "coordinates": [[92.715, 23.725], [92.720, 23.725]]},
+            },
+        ],
+    }
+    mock_settlements = {"type": "FeatureCollection", "features": []}
+    mock_facilities = {"type": "FeatureCollection", "features": []}
+
+    res_single = compute_zone_exposure("C03", {"type": "FeatureCollection", "features": [mock_roads["features"][0]]}, mock_settlements, mock_facilities)
+    res_double = compute_zone_exposure("C03", mock_roads, mock_settlements, mock_facilities)
+
+    assert res_double.osm_road_segments_count == 2
+    assert res_double.motorable_road_segments_count == 2
+    # Unary union guarantees unique network length matches the single line length!
+    assert abs(res_double.motorable_road_km - res_single.motorable_road_km) < 0.001
+
+
+def test_explicit_access_restrictions_excluded():
+    """Roads with explicit access=no or motor_vehicle=no must not contribute to motorable km."""
+    mock_roads = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "id": "r_public",
+                "properties": {"highway": "residential", "name": "Public Way"},
+                "geometry": {"type": "LineString", "coordinates": [[92.715, 23.725], [92.720, 23.725]]},
+            },
+            {
+                "type": "Feature",
+                "id": "r_no_access",
+                "properties": {"highway": "residential", "name": "Barred Way", "access": "no"},
+                "geometry": {"type": "LineString", "coordinates": [[92.715, 23.726], [92.720, 23.726]]},
+            },
+            {
+                "type": "Feature",
+                "id": "r_private",
+                "properties": {"highway": "residential", "name": "Private Compound", "access": "private"},
+                "geometry": {"type": "LineString", "coordinates": [[92.715, 23.727], [92.720, 23.727]]},
+            },
+        ],
+    }
+    mock_settlements = {"type": "FeatureCollection", "features": []}
+    mock_facilities = {"type": "FeatureCollection", "features": []}
+
+    res = compute_zone_exposure("C03", mock_roads, mock_settlements, mock_facilities)
+    # The barred way (access=no) must not be counted as motorable
+    assert not any(r.feature_id == "r_no_access" and r.is_motorable for r in res.exposed_roads)
+    # The private way must have access_restricted=True
+    private_item = next(r for r in res.exposed_roads if r.feature_id == "r_private")
+    assert private_item.access_restricted is True
+
+
+def test_critical_facilities_whitelist_and_conservative_deduplication():
+    """
+    Whitelists hospitals/clinics/police/fire stations, excludes generic healthcare=centre,
+    and conservatively merges facilities with matching names within <=50m.
+    """
+    mock_facilities = {
+        "type": "FeatureCollection",
+        "features": [
+            # Whitelisted Hospital Node
+            {
+                "type": "Feature",
+                "id": "f_hosp_node",
+                "properties": {"name": "Ebenezar Hospital", "amenity": "hospital", "category": "hospital"},
+                "geometry": {"type": "Point", "coordinates": [92.7176, 23.7271]},
+            },
+            # Duplicate Polygon Center ~15m away
+            {
+                "type": "Feature",
+                "id": "f_hosp_way",
+                "properties": {"name": "Ebenezar Hospital Area", "amenity": "hospital", "category": "hospital"},
+                "geometry": {"type": "Point", "coordinates": [92.7177, 23.7272]},
+            },
+            # Different facility ~35m away: must NOT be merged
+            {
+                "type": "Feature",
+                "id": "f_police",
+                "properties": {"name": "Central Police Post", "amenity": "police", "category": "police"},
+                "geometry": {"type": "Point", "coordinates": [92.7179, 23.7273]},
+            },
+            # Non-whitelisted generic healthcare=centre with no amenity tag
+            {
+                "type": "Feature",
+                "id": "f_generic",
+                "properties": {"name": "Generic Health Centre", "healthcare": "centre"},
+                "geometry": {"type": "Point", "coordinates": [92.7180, 23.7274]},
+            },
+        ],
+    }
+    mock_roads = {"type": "FeatureCollection", "features": []}
+    mock_settlements = {"type": "FeatureCollection", "features": []}
+
+    res = compute_zone_exposure("C03", mock_roads, mock_settlements, mock_facilities)
+    # Total raw facilities in zone: 3 (excluding generic health centre)
+    # Deduplicated facilities: 2 (Ebenezar merged, Central Police Post preserved)
+    assert res.critical_facilities_exposed == 2
+    names = [f.name for f in res.exposed_facilities]
+    assert "Central Police Post" in names
+    assert any("Ebenezar" in n for n in names)
+
+
 # ── 21-22. 4 Horizons Hold Exposure Geography Constant ────────────────────────
 
 def test_priority_all_horizons_use_same_exposure():
@@ -342,9 +514,8 @@ def test_priority_all_horizons_use_same_exposure():
     # Check that each horizon contributor lists identical raw exposure values
     for h in [res.now, res.h24, res.h48, res.h72]:
         contrib_map = {c.component: c.raw_value for c in h.contributors}
-        assert contrib_map["road_exposure"] == exp["roads_exposed_km"]
-        assert contrib_map["settlement_exposure"] == exp["settlements_exposed"]
-        assert contrib_map["critical_facility_exposure"] == exp["critical_facilities_exposed"]
+        assert contrib_map["road_exposure"] == exp["motorable_road_km"]
+        assert contrib_map["critical_facility_exposure"] == exp["critical_facilities"]
 
 
 def test_priority_explanation_indirect_rainfall_only():

@@ -31,8 +31,16 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from pyproj import Geod
-from shapely.geometry import Point, Polygon, MultiPolygon, shape
-from shapely.ops import transform
+from shapely.geometry import Point, Polygon, MultiPolygon, LineString, MultiLineString, shape
+from shapely.ops import unary_union
+
+from backend.services.priority_config import (
+    MOTORABLE_HIGHWAY_CLASSES,
+    TRACK_HIGHWAY_CLASSES,
+    EXCLUDED_HIGHWAY_CLASSES,
+    FACILITY_WHITELIST_AMENITIES,
+    FACILITY_WHITELIST_HEALTHCARE,
+)
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 _SAMPLE_DIR = _REPO_ROOT / "data" / "sample"
@@ -47,6 +55,9 @@ class ExposedRoadItem:
     name: Optional[str]
     highway: str
     length_km: float
+    is_motorable: bool = True
+    access: Optional[str] = None
+    access_restricted: bool = False
     blockage_verified: bool = False
     road_status: str = "EXPOSED_NOT_VERIFIED_BLOCKED"
 
@@ -56,6 +67,7 @@ class ExposedSettlementItem:
     feature_id: str
     name: Optional[str]
     place: str
+    community_id: Optional[str] = None
 
 
 @dataclass
@@ -63,15 +75,25 @@ class ExposedFacilityItem:
     feature_id: str
     name: Optional[str]
     category: str
+    amenity: Optional[str] = None
+    healthcare: Optional[str] = None
+    latitude: float = 0.0
+    longitude: float = 0.0
+    is_whitelisted: bool = True
 
 
 @dataclass
 class ZoneExposureResult:
     zone_id: str
-    road_feature_count: int
-    road_length_km: float
-    settlements_exposed: int
-    critical_facilities_exposed: int
+    motorable_road_km: float              # Unique unioned length of motorable network (km)
+    motorable_road_segments_count: int
+    osm_road_segments_count: int          # Raw count of all intersecting OSM way segments
+    total_road_km: float                  # Sum of all clipped road linework (km)
+    pedestrian_road_km: float             # Steps, footways, paths, pedestrian
+    track_road_km: float                  # Tracks
+    communities_exposed: int              # Mapped community/locality centres
+    critical_facilities_exposed: int      # Whitelisted and deduplicated count
+    raw_facilities_count: int
 
     exposed_roads: List[ExposedRoadItem]
     exposed_settlements: List[ExposedSettlementItem]
@@ -83,6 +105,19 @@ class ZoneExposureResult:
     data_source: str
     attribution: str
     note: str
+
+    # Backward compatibility properties
+    @property
+    def road_feature_count(self) -> int:
+        return self.osm_road_segments_count
+
+    @property
+    def road_length_km(self) -> float:
+        return self.motorable_road_km
+
+    @property
+    def settlements_exposed(self) -> int:
+        return self.communities_exposed
 
 
 def _calc_linestring_length_km(geom) -> float:
@@ -200,6 +235,40 @@ def load_exposure_layers() -> Tuple[dict, dict, dict, str, str]:
     )
 
 
+def _conservative_dedup_facilities(fac_items: List[ExposedFacilityItem]) -> List[ExposedFacilityItem]:
+    """
+    Conservative deduplication of critical facilities:
+    Merges facilities with identical or fuzzy-matching names in close physical proximity (<=50m exact, <=30m fuzzy).
+    Never merges facilities solely because they are nearby.
+    """
+    deduped: List[ExposedFacilityItem] = []
+    seen: List[Tuple[str, str, Tuple[float, float], ExposedFacilityItem]] = []
+
+    for item in fac_items:
+        norm_name = (item.name or "").lower().strip()
+        cat = item.category
+        coords = (item.longitude, item.latitude)
+
+        is_dup = False
+        for s_name, s_cat, s_coords, s_item in seen:
+            if cat == s_cat or not cat or not s_cat:
+                dist = _GEOD.line_length([coords[0], s_coords[0]], [coords[1], s_coords[1]])
+                # Exact normalized name match <= 50m
+                if norm_name and s_name and norm_name == s_name and dist <= 50.0:
+                    is_dup = True
+                    break
+                # Conservative fuzzy match (stem containment) <= 30m
+                if norm_name and s_name and (norm_name in s_name or s_name in norm_name) and dist <= 30.0:
+                    is_dup = True
+                    break
+
+        if not is_dup:
+            seen.append((norm_name, cat, coords, item))
+            deduped.append(item)
+
+    return deduped
+
+
 def compute_zone_exposure(
     zone_id: str,
     roads_fc: Optional[dict] = None,
@@ -208,8 +277,9 @@ def compute_zone_exposure(
 ) -> ZoneExposureResult:
     """
     Computes road, settlement, and critical-facility exposure for a single zone polygon.
-    Clips road geometries to the zone polygon to measure only inside road length.
-    Uses zone.covers(point) / zone.intersects(point) for settlements and facilities.
+    Clips road geometries to the zone polygon and calculates unique motorable network length
+    using unary_union to prevent double-counting overlapping lines.
+    Filters critical facilities through whitelist and conservative deduplication.
     """
     zid = zone_id.upper()
 
@@ -238,9 +308,14 @@ def compute_zone_exposure(
         exp_type = "REAL_OSM"
         src = "OpenStreetMap contributors"
 
-    # 3. Intersect roads & compute clipped geodesic length
+    # 3. Intersect roads & compute unique motorable network length
     exposed_roads: List[ExposedRoadItem] = []
     total_road_km = 0.0
+    pedestrian_road_km = 0.0
+    track_road_km = 0.0
+    osm_road_segments_count = 0
+    motorable_segments_count = 0
+    motorable_lines: List[LineString] = []
     z_minx, z_miny, z_maxx, z_maxy = zone_geom.bounds
 
     for rf in roads_fc.get("features", []):
@@ -267,21 +342,66 @@ def compute_zone_exposure(
             continue
 
         part_km = _calc_linestring_length_km(clipped)
-        if part_km > 0.0:
-            total_road_km += part_km
-            props = rf.get("properties", {})
-            exposed_roads.append(
-                ExposedRoadItem(
-                    feature_id=str(props.get("road_id") or props.get("osm_id") or rf.get("id", "road")),
-                    name=props.get("name"),
-                    highway=str(props.get("highway") or props.get("road_type", "road")),
-                    length_km=round(part_km, 3),
-                    blockage_verified=False,
-                    road_status="EXPOSED_NOT_VERIFIED_BLOCKED",
-                )
-            )
+        if part_km <= 0.0:
+            continue
 
-    # 4. Intersect settlements
+        osm_road_segments_count += 1
+        total_road_km += part_km
+
+        props = rf.get("properties", {})
+        hw = str(props.get("highway") or props.get("road_type", "road"))
+        access = props.get("access")
+        vehicle = props.get("vehicle")
+        motor_vehicle = props.get("motor_vehicle")
+
+        is_track = hw in TRACK_HIGHWAY_CLASSES
+        is_excluded = hw in EXCLUDED_HIGHWAY_CLASSES
+        is_explicit_no_access = (access == "no" or vehicle == "no" or motor_vehicle == "no")
+        is_private = (access == "private")
+
+        if is_track:
+            track_road_km += part_km
+            is_motorable = False
+        elif is_excluded or is_explicit_no_access:
+            if is_excluded:
+                pedestrian_road_km += part_km
+            is_motorable = False
+        elif hw in MOTORABLE_HIGHWAY_CLASSES or exp_type == "SAMPLE_MOCK":
+            is_motorable = True
+            motorable_segments_count += 1
+            if isinstance(clipped, LineString):
+                motorable_lines.append(clipped)
+            elif isinstance(clipped, MultiLineString):
+                motorable_lines.extend(clipped.geoms)
+            elif hasattr(clipped, "geoms"):
+                for g in clipped.geoms:
+                    if isinstance(g, LineString):
+                        motorable_lines.append(g)
+        else:
+            is_motorable = False
+
+        exposed_roads.append(
+            ExposedRoadItem(
+                feature_id=str(props.get("road_id") or props.get("osm_id") or rf.get("id", "road")),
+                name=props.get("name"),
+                highway=hw,
+                length_km=round(part_km, 3),
+                is_motorable=is_motorable,
+                access=access,
+                access_restricted=is_private or is_explicit_no_access,
+                blockage_verified=False,
+                road_status="EXPOSED_NOT_VERIFIED_BLOCKED",
+            )
+        )
+
+    # Calculate unique motorable network length using unary_union
+    if motorable_lines:
+        union_geom = unary_union(motorable_lines)
+        unique_motorable_road_km = _calc_linestring_length_km(union_geom)
+    else:
+        unique_motorable_road_km = 0.0
+
+    # 4. Intersect mapped community/locality centres
     exposed_settlements: List[ExposedSettlementItem] = []
     for sf in settlements_fc.get("features", []):
         coords = sf.get("geometry", {}).get("coordinates", [])
@@ -295,14 +415,15 @@ def compute_zone_exposure(
             props = sf.get("properties", {})
             exposed_settlements.append(
                 ExposedSettlementItem(
-                    feature_id=str(props.get("village_id") or props.get("osm_id") or sf.get("id", "village")),
+                    feature_id=str(props.get("community_id") or props.get("village_id") or props.get("osm_id") or sf.get("id", "community")),
                     name=props.get("name"),
-                    place=str(props.get("place", "settlement")),
+                    place=str(props.get("place", "locality")),
+                    community_id=props.get("community_id") or props.get("village_id"),
                 )
             )
 
-    # 5. Intersect critical facilities
-    exposed_facilities: List[ExposedFacilityItem] = []
+    # 5. Intersect critical facilities with whitelist filtering
+    raw_facilities: List[ExposedFacilityItem] = []
     for cf in facilities_fc.get("features", []):
         coords = cf.get("geometry", {}).get("coordinates", [])
         if not coords or len(coords) < 2:
@@ -313,26 +434,47 @@ def compute_zone_exposure(
         c_geom = Point(lon, lat)
         if zone_geom.covers(c_geom) or zone_geom.intersects(c_geom):
             props = cf.get("properties", {})
-            exposed_facilities.append(
-                ExposedFacilityItem(
-                    feature_id=str(props.get("facility_id") or props.get("osm_id") or cf.get("id", "facility")),
-                    name=props.get("name"),
-                    category=str(props.get("category") or props.get("facility_type", "facility")),
-                )
+            amenity = props.get("amenity")
+            healthcare = props.get("healthcare")
+            category_val = str(props.get("category") or props.get("facility_type", "")).lower()
+            is_whitelisted = (
+                amenity in FACILITY_WHITELIST_AMENITIES
+                or healthcare in FACILITY_WHITELIST_HEALTHCARE
+                or category_val in FACILITY_WHITELIST_AMENITIES
+                or exp_type == "SAMPLE_MOCK"
             )
+            if is_whitelisted:
+                raw_facilities.append(
+                    ExposedFacilityItem(
+                        feature_id=str(props.get("facility_id") or props.get("osm_id") or cf.get("id", "facility")),
+                        name=props.get("name"),
+                        category=str(props.get("category") or props.get("facility_type", "facility")),
+                        amenity=amenity,
+                        healthcare=healthcare,
+                        latitude=lat,
+                        longitude=lon,
+                        is_whitelisted=True,
+                    )
+                )
 
+    deduped_facilities = _conservative_dedup_facilities(raw_facilities)
 
     mode = "PROTOTYPE_MIXED_PROVENANCE" if exp_type == "REAL_OSM" else "SAMPLE_FALLBACK"
 
     return ZoneExposureResult(
         zone_id=zid,
-        road_feature_count=len(exposed_roads),
-        road_length_km=round(total_road_km, 3),
-        settlements_exposed=len(exposed_settlements),
-        critical_facilities_exposed=len(exposed_facilities),
+        motorable_road_km=round(unique_motorable_road_km, 3),
+        motorable_road_segments_count=motorable_segments_count,
+        osm_road_segments_count=osm_road_segments_count,
+        total_road_km=round(total_road_km, 3),
+        pedestrian_road_km=round(pedestrian_road_km, 3),
+        track_road_km=round(track_road_km, 3),
+        communities_exposed=len(exposed_settlements),
+        critical_facilities_exposed=len(deduped_facilities),
+        raw_facilities_count=len(raw_facilities),
         exposed_roads=exposed_roads,
         exposed_settlements=exposed_settlements,
-        exposed_facilities=exposed_facilities,
+        exposed_facilities=deduped_facilities,
         hazard_geometry="SAMPLE_MOCK",
         exposure_features=exp_type,
         analysis_mode=mode,

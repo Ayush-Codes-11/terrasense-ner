@@ -65,6 +65,10 @@ def parse_osm_roads(data: dict) -> dict:
             "bridge": tags.get("bridge"),
             "tunnel": tags.get("tunnel"),
             "surface": tags.get("surface"),
+            "service": tags.get("service"),
+            "access": tags.get("access"),
+            "vehicle": tags.get("vehicle"),
+            "motor_vehicle": tags.get("motor_vehicle"),
             "source": "OpenStreetMap contributors",
             "data_type": "REAL_OSM",
             "blockage_verified": False,
@@ -130,6 +134,7 @@ def parse_osm_settlements(data: dict) -> dict:
         props = {
             "osm_type": el_type,
             "osm_id": el_id,
+            "community_id": f"OSM_{el_type[0].upper()}{el_id}",
             "village_id": f"OSM_{el_type[0].upper()}{el_id}",
             "name": name,
             "place": place_type,

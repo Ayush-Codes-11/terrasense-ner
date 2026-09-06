@@ -17,10 +17,13 @@ interface ExposureCardProps {
 export default function ExposureCard({ exposure, zoneId }: ExposureCardProps) {
   const isPlaceholder = !exposure;
 
-  const roadKm = exposure?.summary?.roads_exposed_km ?? 0;
-  const roadCount = exposure?.summary?.roads_exposed ?? 0;
-  const villageCount = exposure?.summary?.villages_exposed ?? 0;
-  const facilityCount = exposure?.summary?.hospitals_exposed ?? 0;
+  const motorableKm = exposure?.summary?.motorable_road_km ?? exposure?.summary?.roads_exposed_km ?? 0;
+  const motorableSegments = exposure?.summary?.motorable_road_segments_count ?? exposure?.summary?.roads_exposed ?? 0;
+  const rawSegments = exposure?.summary?.osm_road_segments_count ?? exposure?.summary?.roads_exposed ?? 0;
+  const communityCount = exposure?.summary?.mapped_communities ?? exposure?.summary?.villages_exposed ?? 0;
+  const facilityCount = exposure?.summary?.critical_facilities ?? exposure?.summary?.hospitals_exposed ?? 0;
+  const pedestrianKm = exposure?.summary?.pedestrian_road_km ?? 0;
+  const trackKm = exposure?.summary?.track_road_km ?? 0;
   const isReal = exposure?.exposure_features === "REAL_OSM";
 
   return (
@@ -51,16 +54,16 @@ export default function ExposureCard({ exposure, zoneId }: ExposureCardProps) {
       {isPlaceholder ? (
         <div className="flex flex-col items-center justify-center py-5 gap-2">
           <div className="grid grid-cols-3 gap-2 w-full">
-            {["Roads", "Settlements", "Facilities"].map((t) => (
+            {["Motorable Roads", "Locality Centres", "Facilities"].map((t) => (
               <div
                 key={t}
                 className="flex flex-col items-center gap-1 p-2 rounded-lg bg-slate-900/40 border border-dashed border-slate-700/50"
               >
                 <div className="text-base">
-                  {t === "Roads" ? "🛣" : t === "Settlements" ? "🏘" : "🏥"}
+                  {t.includes("Roads") ? "🛣" : t.includes("Locality") ? "🏘" : "🏥"}
                 </div>
                 <div className="w-8 h-3 bg-slate-800 rounded" />
-                <span className="text-[9px] text-slate-500">{t}</span>
+                <span className="text-[9px] text-slate-500 text-center">{t}</span>
               </div>
             ))}
           </div>
@@ -75,26 +78,37 @@ export default function ExposureCard({ exposure, zoneId }: ExposureCardProps) {
             <div className="flex flex-col items-center p-2 rounded bg-slate-900/50 border border-slate-700/60">
               <span className="text-sm">🛣</span>
               <span className="text-sm font-bold text-white mt-0.5">
-                {roadKm.toFixed(2)} <span className="text-[9px] font-normal text-slate-400">km</span>
+                {motorableKm.toFixed(2)} <span className="text-[9px] font-normal text-slate-400">km</span>
               </span>
-              <span className="text-[9px] text-slate-400">Roads exposed</span>
-              <span className="text-[8px] text-slate-500">({roadCount} segments)</span>
+              <span className="text-[9px] text-slate-400 text-center">Motorable roads</span>
+              <span className="text-[8px] text-slate-500 text-center">
+                {motorableSegments} motorable / {rawSegments} OSM road segments
+              </span>
             </div>
 
             <div className="flex flex-col items-center p-2 rounded bg-slate-900/50 border border-slate-700/60">
               <span className="text-sm">🏘</span>
-              <span className="text-sm font-bold text-white mt-0.5">{villageCount}</span>
-              <span className="text-[9px] text-slate-400">Settlements</span>
-              <span className="text-[8px] text-slate-500">in hazard zone</span>
+              <span className="text-sm font-bold text-white mt-0.5">{communityCount}</span>
+              <span className="text-[9px] text-slate-400 text-center">Mapped community centres</span>
+              <span className="text-[8px] text-slate-500 text-center">OSM landmarks (not pop.)</span>
             </div>
 
             <div className="flex flex-col items-center p-2 rounded bg-slate-900/50 border border-slate-700/60">
               <span className="text-sm">🏥</span>
               <span className="text-sm font-bold text-white mt-0.5">{facilityCount}</span>
-              <span className="text-[9px] text-slate-400">Critical facilities</span>
-              <span className="text-[8px] text-slate-500">hospitals/police</span>
+              <span className="text-[9px] text-slate-400 text-center">Critical facilities</span>
+              <span className="text-[8px] text-slate-500 text-center">whitelisted & deduped</span>
             </div>
           </div>
+
+          {/* Non-motorized / Track detail if present */}
+          {(pedestrianKm > 0 || trackKm > 0) && (
+            <div className="text-[9px] text-slate-500 bg-slate-900/40 rounded px-2 py-1 border border-slate-800">
+              Non-motorized features excluded from priority road km:{" "}
+              {pedestrianKm > 0 && <span className="text-slate-400">{pedestrianKm.toFixed(2)} km steps/paths </span>}
+              {trackKm > 0 && <span className="text-slate-400">· {trackKm.toFixed(2)} km tracks</span>}
+            </div>
+          )}
 
           {/* Strict Non-blockage guarantee */}
           <div className="flex items-start gap-1.5 text-[10px] text-slate-400 bg-amber-500/10 rounded px-2.5 py-1.5 border border-amber-500/20">

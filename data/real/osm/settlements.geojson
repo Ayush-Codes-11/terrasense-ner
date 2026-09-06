@@ -7,6 +7,7 @@
       "properties": {
         "osm_type": "node",
         "osm_id": 245716231,
+        "community_id": "OSM_N245716231",
         "village_id": "OSM_N245716231",
         "name": "Aizawl",
         "place": "city",
@@ -20,6 +21,29 @@
         "coordinates": [
           92.7179947,
           23.7277631
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "osm_settlement_node_7162182742",
+      "properties": {
+        "osm_type": "node",
+        "osm_id": 7162182742,
+        "community_id": "OSM_N7162182742",
+        "village_id": "OSM_N7162182742",
+        "name": "Tlangnuam",
+        "place": "suburb",
+        "population": null,
+        "admin_level": null,
+        "source": "OpenStreetMap contributors",
+        "data_type": "REAL_OSM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.716906,
+          23.7080773
         ]
       }
     }

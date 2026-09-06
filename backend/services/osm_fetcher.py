@@ -85,11 +85,12 @@ out tags geom;
 
 def build_settlements_query(south: float, west: float, north: float, east: float) -> str:
     """
-    Builds Overpass QL query for settlements returning tags and centers.
+    Builds Overpass QL query for mapped community/locality centres returning tags and centers.
+    Includes city, town, village, hamlet, suburb, neighbourhood, quarter, locality.
     """
     return f"""[out:json][timeout:60];
 (
-  nwr["place"~"city|town|village|hamlet"]({south},{west},{north},{east});
+  nwr["place"~"^(city|town|village|hamlet|suburb|neighbourhood|quarter|locality)$"]({south},{west},{north},{east});
 );
 out tags center;
 """

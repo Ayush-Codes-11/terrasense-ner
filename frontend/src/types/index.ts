@@ -130,15 +130,25 @@ export interface ExposedFeature {
   verified_report_id?: string;
 }
 
+export interface ExposureSummary {
+  osm_road_segments_count?: number;
+  motorable_road_segments_count?: number;
+  motorable_road_km?: number;
+  total_road_km?: number;
+  pedestrian_road_km?: number;
+  track_road_km?: number;
+  mapped_communities?: number;
+  critical_facilities?: number;
+  roads_blocked: number;
+  roads_exposed: number;
+  roads_exposed_km: number;
+  villages_exposed: number;
+  hospitals_exposed: number;
+}
+
 export interface ExposureData {
   zone_id: string;
-  summary: {
-    roads_exposed: number;
-    roads_exposed_km: number;
-    villages_exposed: number;
-    hospitals_exposed: number;
-    roads_blocked: number; // verified field reports only
-  };
+  summary: ExposureSummary;
   roads?: Array<{
     feature_id: string;
     name: string | null;

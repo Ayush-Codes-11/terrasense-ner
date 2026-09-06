@@ -37,6 +37,11 @@ export interface RoadGeoJSONProperties {
   road_type?: "national_highway" | "state_highway" | "district_road" | "local_road";
   highway?: string;
   ref?: string | null;
+  surface?: string | null;
+  service?: string | null;
+  access?: string | null;
+  vehicle?: string | null;
+  motor_vehicle?: string | null;
   source?: string;
   data_type?: "SAMPLE_MOCK" | "REAL_OSM";
   blockage_verified?: boolean;

@@ -97,7 +97,7 @@ export default function EmergencyPriorityCard({
           <span className="font-semibold text-amber-300">
             PROTOTYPE DECISION-SUPPORT — NOT OFFICIAL.
           </span>{" "}
-          Weights: 60% landslide risk, 15% road exposure, 15% settlements, 10% facilities. Not an official government emergency classification.
+          Weights: 65% landslide risk, 20% motorable road exposure, 15% critical facilities (mapped localities retained for context). Heuristic prototype parameters, not operational emergency weights.
         </p>
       </div>
 
