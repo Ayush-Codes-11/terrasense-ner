@@ -1,0 +1,11 @@
+#!/bin/sh
+echo "Synchronizing TerraSense deployment bundle..."
+
+python backend/scripts/sync_deployment_bundle.py || exit 1
+
+git add backend/data backend/ml
+
+python -m pytest backend/tests/test_deployment_sync.py -q || exit 1
+
+echo "Deployment bundle synchronized and verified."
+exit 0

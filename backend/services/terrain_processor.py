@@ -14,9 +14,18 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
-import rasterio
-from rasterio.mask import mask
-from rasterio.warp import calculate_default_transform, reproject, Resampling
+
+try:
+    import rasterio
+    from rasterio.mask import mask
+    from rasterio.warp import calculate_default_transform, reproject, Resampling
+except ImportError:
+    rasterio = None
+    mask = None
+    calculate_default_transform = None
+    reproject = None
+    Resampling = None
+
 from shapely.geometry import shape
 from shapely.ops import transform as shapely_transform
 import pyproj
@@ -39,6 +48,11 @@ def reproject_dem_to_utm(
     Reprojects input DEM (EPSG:4326) to UTM Zone 46N (EPSG:32646) with metric resolution (~30m).
     Uses bilinear resampling for continuous elevation surfaces.
     """
+    if rasterio is None:
+        raise ImportError(
+            "rasterio is required for offline DEM reprojection. "
+            "Install development dependencies via `pip install -r backend/requirements-dev.txt`."
+        )
     with rasterio.open(src_path) as src:
         transform, width, height = calculate_default_transform(
             src.crs,
@@ -198,6 +212,11 @@ def process_pilot_zonal_terrain(
     3. Overlays each of the 25 pilot grid zones
     4. Computes zonal statistics and saves to zonal_terrain.json
     """
+    if rasterio is None:
+        raise ImportError(
+            "rasterio is required for offline DEM processing. "
+            "Install development dependencies via `pip install -r backend/requirements-dev.txt`."
+        )
     if dem_tif is None:
         dem_tif = _TERRAIN_DIR / "copernicus_glo30_aizawl.tif"
     if grid_geojson is None:

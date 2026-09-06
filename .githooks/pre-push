@@ -1,6 +1,11 @@
 #!/bin/sh
-echo "Running TerraSense deployment parity sync & check..."
-python backend/scripts/sync_deployment_bundle.py || exit 1
-python -m pytest backend/tests/test_deployment_sync.py || exit 1
-echo "Deployment bundle parity check PASSED."
+echo "Checking TerraSense deployment bundle parity..."
+
+python -m pytest backend/tests/test_deployment_sync.py -q || {
+  echo "ERROR: Deployment bundle is stale."
+  echo "Run: python backend/scripts/sync_deployment_bundle.py"
+  echo "Then commit the synchronized files before pushing."
+  exit 1
+}
+
 exit 0

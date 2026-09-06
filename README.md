@@ -66,13 +66,27 @@ pip install -r requirements.txt
 python prototype_scorer.py
 ```
 
-### Mandatory Pre-Push Gate (Deployment Bundle Parity)
-Every future TerraSense coding phase and developer commit must finish with:
-```bash
-python backend/scripts/sync_deployment_bundle.py
-python -m pytest backend/tests/test_deployment_sync.py
-```
-before commit/push. This synchronizes canonical `data/` and `ml/` into `backend/data/` and `backend/ml/` and asserts 100% SHA-256 parity in CI.
+### Mandatory Pre-Push Gate & Git Hooks (Deployment Bundle Parity)
+To prevent canonical `data/` and `ml/` from diverging from `backend/data/` and `backend/ml/`:
+
+1. **Activate Local Git Hooks (One-time per clone):**
+   `core.hooksPath` is a local Git configuration and is not enabled automatically simply because `.githooks/` is committed. Run:
+   ```bash
+   git config core.hooksPath .githooks
+   ```
+   - **`.githooks/pre-commit`**: Automatically runs `python backend/scripts/sync_deployment_bundle.py`, stages any updated `backend/data` and `backend/ml` files into the same commit, and verifies parity before the commit is created.
+   - **`.githooks/pre-push`**: Non-mutating verification gate that ensures parity is 100% satisfied before push.
+
+2. **Mandatory Step for Antigravity & Developers:**
+   Every future TerraSense coding phase must finish with:
+   ```bash
+   python backend/scripts/sync_deployment_bundle.py
+   python -m pytest backend/tests/test_deployment_sync.py
+   ```
+   before commit/push.
+
+3. **CI Semantics:**
+   GitHub Actions CI (`.github/workflows/ci.yml`) provides repository-level parity and regression detection after push. Note: Because Vercel Git auto-deployments trigger independently upon Git push, CI failure detects regressions on GitHub after push, but does not intercept Vercel deployment unless custom Vercel Deployment Checks or deployment pipelines are configured.
 
 ---
 
