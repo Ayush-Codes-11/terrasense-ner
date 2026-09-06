@@ -39,31 +39,86 @@ export function propsToZone(props: ZoneGeoJSONProperties): Zone {
 // Phase 4 backend will compute these dynamically from the rainfall accumulator.
 
 export function propsToForecast(props: ZoneGeoJSONProperties): ZoneForecast {
+  // Fallback transformer when backend is down — does not consume deprecated forecast_risk_* fields
+  const d0 = props.rain_24h ?? 0;
+  const f1 = props.forecast_24h ?? 0;
+  const f2 = props.forecast_48h ?? 0;
+  const f3 = props.forecast_72h ?? 0;
+
+  const nowAntecedent = props.rain_3d ?? d0 * 2;
+  const h24Antecedent = Math.round(nowAntecedent * 0.7 + f1);
+  const h48Antecedent = Math.round(nowAntecedent * 0.4 + f1 + f2);
+  const h72Antecedent = Math.round(f1 + f2 + f3);
+
   return {
     zone_id: props.zone_id,
     current: props.risk_category as RiskLevel,
     current_score: props.risk_score,
-    forecast: {
+    windows: {
+      now: {
+        risk: props.risk_category as RiskLevel,
+        risk_score: props.risk_score,
+        antecedent_rain_mm: nowAntecedent,
+        recent_24h_rain_mm: d0,
+        forecast_interval_rain_mm: null,
+        mode: "SAMPLE_FALLBACK",
+      },
       "24h": {
-        risk: props.forecast_risk_24h as RiskLevel,
-        risk_score: props.forecast_score_24h,
-        antecedent_rain_mm: props.antecedent_24h,
+        risk: (h24Antecedent > 100 ? "VERY_HIGH" : h24Antecedent > 60 ? "HIGH" : "MODERATE") as RiskLevel,
+        risk_score: Math.min(Number((props.risk_score * 1.1).toFixed(2)), 0.99),
+        antecedent_rain_mm: h24Antecedent,
+        recent_24h_rain_mm: f1,
+        forecast_interval_rain_mm: f1,
+        mode: "SAMPLE_FALLBACK",
       },
       "48h": {
-        risk: props.forecast_risk_48h as RiskLevel,
-        risk_score: props.forecast_score_48h,
-        antecedent_rain_mm: props.antecedent_48h,
+        risk: (h48Antecedent > 100 ? "VERY_HIGH" : h48Antecedent > 60 ? "HIGH" : "MODERATE") as RiskLevel,
+        risk_score: Math.min(Number((props.risk_score * 1.05).toFixed(2)), 0.99),
+        antecedent_rain_mm: h48Antecedent,
+        recent_24h_rain_mm: f2,
+        forecast_interval_rain_mm: f2,
+        mode: "SAMPLE_FALLBACK",
       },
       "72h": {
-        risk: props.forecast_risk_72h as RiskLevel,
-        risk_score: props.forecast_score_72h,
-        antecedent_rain_mm: props.antecedent_72h,
+        risk: (h72Antecedent > 100 ? "VERY_HIGH" : h72Antecedent > 60 ? "HIGH" : "MODERATE") as RiskLevel,
+        risk_score: Math.min(Number((props.risk_score * 0.9).toFixed(2)), 0.99),
+        antecedent_rain_mm: h72Antecedent,
+        recent_24h_rain_mm: f3,
+        forecast_interval_rain_mm: f3,
+        mode: "SAMPLE_FALLBACK",
       },
     },
+    forecast: {
+      "24h": {
+        risk: (h24Antecedent > 100 ? "VERY_HIGH" : h24Antecedent > 60 ? "HIGH" : "MODERATE") as RiskLevel,
+        risk_score: Math.min(Number((props.risk_score * 1.1).toFixed(2)), 0.99),
+        antecedent_rain_mm: h24Antecedent,
+        recent_24h_rain_mm: f1,
+        forecast_interval_rain_mm: f1,
+        mode: "SAMPLE_FALLBACK",
+      },
+      "48h": {
+        risk: (h48Antecedent > 100 ? "VERY_HIGH" : h48Antecedent > 60 ? "HIGH" : "MODERATE") as RiskLevel,
+        risk_score: Math.min(Number((props.risk_score * 1.05).toFixed(2)), 0.99),
+        antecedent_rain_mm: h48Antecedent,
+        recent_24h_rain_mm: f2,
+        forecast_interval_rain_mm: f2,
+        mode: "SAMPLE_FALLBACK",
+      },
+      "72h": {
+        risk: (h72Antecedent > 100 ? "VERY_HIGH" : h72Antecedent > 60 ? "HIGH" : "MODERATE") as RiskLevel,
+        risk_score: Math.min(Number((props.risk_score * 0.9).toFixed(2)), 0.99),
+        antecedent_rain_mm: h72Antecedent,
+        recent_24h_rain_mm: f3,
+        forecast_interval_rain_mm: f3,
+        mode: "SAMPLE_FALLBACK",
+      },
+    },
+    risk_change_summary: "Sample fallback: backend offline. Estimated rolling accumulation.",
     data_meta: {
       source: "sample",
       freshness: null,
-      note: "SAMPLE_MOCK — antecedent rainfall pre-computed, not from real accumulator",
+      note: "Sample fallback — backend is offline.",
     },
   };
 }

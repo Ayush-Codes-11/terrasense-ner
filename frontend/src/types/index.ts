@@ -72,23 +72,42 @@ export interface WeatherData extends RainfallWindow, RainfallForecast {
   data_meta: DataMeta;
 }
 
-// ----- Risk Forecast (antecedent-aware) -----
+// ----- Risk Forecast (weather-linked antecedent-aware outlook) -----
 
 export interface ForecastWindow {
+  horizon?: string;
   risk: RiskLevel;
+  risk_category?: string;
   risk_score: number;
-  antecedent_rain_mm: number; // accumulated observed + forecast
+  score?: number;
+  antecedent_rain_mm: number;          // 3-day rolling accumulation
+  recent_24h_rain_mm?: number;
+  forecast_interval_rain_mm?: number | null;
+  mode?: string;
+  input_data_type?: string;
+  score_type?: string;
+  is_probability?: boolean;
+  is_calibrated?: boolean;
 }
 
 export interface ZoneForecast {
   zone_id: string;
   current: RiskLevel;
   current_score: number;
+  windows?: {
+    now: ForecastWindow;
+    "24h": ForecastWindow;
+    "48h": ForecastWindow;
+    "72h": ForecastWindow;
+  };
+  now?: ForecastWindow;
   forecast: {
     "24h": ForecastWindow;
     "48h": ForecastWindow;
     "72h": ForecastWindow;
   };
+  risk_change_summary?: string;
+  transition_details?: string[];
   data_meta: DataMeta;
 }
 

@@ -64,8 +64,8 @@ def test_get_zone_current_risk_c03():
     assert res.status_code == 200
     data = res.json()
     assert data["zone_id"] == "C03"
-    assert data["risk_category"] == "VERY_HIGH"
-    assert data["score"] >= 0.75
+    assert data["risk_category"] == "HIGH"
+    assert 0.50 <= data["score"] < 0.75
     assert data["score_type"] == "prototype_relative_risk_score"
     assert data["is_probability"] is False
     assert data["is_calibrated"] is False
@@ -96,9 +96,11 @@ def test_get_zone_forecast_distinction():
     assert data["now"]["is_probability"] is False
     assert data["now"]["score_type"] == "prototype_relative_risk_score"
 
-    # Future windows are explicitly marked SAMPLE_MOCK with Phase 5 pending
+    # Future windows in Phase 5 are dynamically PROTOTYPE_COMPUTED
     for win_key in ["24h", "48h", "72h"]:
         win = data["forecast"][win_key]
-        assert win["mode"] == "SAMPLE_MOCK"
-        assert win["phase"] == "Phase 5 pending"
+        assert win["mode"] == "PROTOTYPE_COMPUTED"
+        assert win["score_type"] == "prototype_relative_risk_score"
+        assert win["is_probability"] is False
         assert "antecedent_rain_mm" in win
+

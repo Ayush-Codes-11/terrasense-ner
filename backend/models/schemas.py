@@ -113,36 +113,52 @@ class AllZonesRiskResponse(BaseModel):
     data_meta: DataMeta
 
 
-# ── Forecast ─────────────────────────────────────────────────────────────────
+# ── Forecast / Risk Outlook ──────────────────────────────────────────────────
 
-class NowWindow(BaseModel):
-    risk: str
-    risk_score: float
+class HorizonWindowSchema(BaseModel):
+    horizon: str                       # "now" | "24h" | "48h" | "72h"
+    risk_category: str                 # "LOW" | "MODERATE" | "HIGH" | "VERY_HIGH"
+    risk: str                          # Alias for backwards-compat with TS
+    risk_score: float                  # prototype relative risk score [0, 1]
+    score: float                       # Alias for risk_score
     mode: str = "PROTOTYPE_COMPUTED"
+    input_data_type: str = "SAMPLE_MOCK"
     score_type: str = "prototype_relative_risk_score"
     is_probability: bool = False
     is_calibrated: bool = False
     computed_by: str = "prototype_scorer_v1"
 
+    # Rainfall context responsible for this horizon
+    recent_24h_rain_mm: float
+    antecedent_3d_rain_mm: float
+    antecedent_rain_mm: float          # Alias for backwards-compat with TS
+    forecast_interval_rain_mm: Optional[float] = None
 
-class ForecastWindow(BaseModel):
-    risk: str
-    risk_score: float
-    antecedent_rain_mm: float
-    mode: str = "SAMPLE_MOCK"
-    phase: str = "Phase 5 pending"
+    normalized_features: Optional[Dict[str, float]] = None
+    contributors: Optional[List[ContributorSchema]] = None
 
 
 class ZoneForecastResponse(BaseModel):
     """
-    NOW is computed dynamically by ml.prototype_scorer.
-    +24h, +48h, +72h windows are marked SAMPLE_MOCK (Phase 5 pending).
+    Phase 5: Weather-linked landslide-risk outlook.
+    ALL horizons (NOW, +24h, +48h, +72h) are dynamically computed by ml.prototype_scorer
+    using rolling 3-day antecedent rainfall accumulation.
     """
     zone_id: str
-    current: str          # maps to ZoneForecast.current in TS
-    current_score: float  # maps to ZoneForecast.current_score in TS
-    now: NowWindow
-    forecast: Dict[str, ForecastWindow]  # keys: "24h", "48h", "72h"
+    current: str          # current risk category
+    current_score: float  # current risk score
+
+    # Structured 4-window dictionary: "now", "24h", "48h", "72h"
+    windows: Dict[str, HorizonWindowSchema]
+
+    # Backward compatibility accessors
+    now: HorizonWindowSchema
+    forecast: Dict[str, HorizonWindowSchema]  # "24h", "48h", "72h"
+
+    # Deterministic transition explanation
+    risk_change_summary: str
+    transition_details: List[str]
+
     data_meta: DataMeta
 
 
@@ -150,19 +166,14 @@ class ZoneForecastResponse(BaseModel):
 
 class WeatherResponse(BaseModel):
     """
-    Rainfall inputs for a zone. All values SAMPLE_MOCK in Phase 3/4.
-    Phase 5+ replaces with real IMD/GPM observations.
+    Canonical rainfall series & rolling accumulation for a zone.
+    All inputs remain SAMPLE_MOCK in Phase 5.
     """
     zone_id: str
-    rain_24h_mm: float
-    rain_3d_mm: float
-    rain_7d_mm: float
-    forecast_24h_mm: float
-    forecast_48h_mm: float
-    forecast_72h_mm: float
-    antecedent_24h_mm: float   # observed_24h + forecast_24h
-    antecedent_48h_mm: float
-    antecedent_72h_mm: float
+    observed_daily_mm: Dict[str, float]
+    forecast_interval_mm: Dict[str, float]
+    rolling_3d_accumulation_mm: Dict[str, float]
+    recent_24h_mm: Dict[str, float]
     data_meta: DataMeta
 
 
