@@ -81,7 +81,9 @@ def get_rainfall_series(zone_id: str) -> RainfallSeries:
     """
     Retrieves canonical rainfall observations and forecast intervals for a zone.
 
-    In Phase 5, reads from data/sample/sample_weather.json.
+    data/sample/sample_weather.json is the sole authoritative SAMPLE_MOCK weather scenario dataset.
+    This canonical rainfall adapter NEVER derives runtime values from legacy forecast_24h,
+    forecast_48h, forecast_72h, forecast_risk_*, or forecast_score_* GeoJSON fields.
     Future phases will swap this data source for IMD/GPM adapters without altering
     the RainfallSeries interface or accumulator contracts.
     """

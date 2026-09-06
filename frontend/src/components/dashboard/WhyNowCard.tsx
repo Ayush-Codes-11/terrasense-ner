@@ -71,7 +71,7 @@ export default function WhyNowCard({ whyNow, zoneId }: WhyNowCardProps) {
           {[
             "3-day rainfall accumulation",
             "24h forecast rainfall",
-            "Terrain susceptibility",
+            "Terrain slope contribution",
             "Soil moisture index",
           ].map((label) => (
             <div

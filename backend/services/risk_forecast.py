@@ -5,7 +5,7 @@ risk_forecast.py — 4-horizon weather-linked landslide-risk outlook engine.
 SCIENTIFIC & ARCHITECTURAL DISCIPLINE:
 1. TerraSense does NOT predict rainfall itself.
    Input: Observed rainfall (SAMPLE_MOCK) + Forecast rainfall (SAMPLE_MOCK)
-          + Static terrain susceptibility + Soil wetness index.
+          + Static terrain slope contribution + Soil wetness index.
    Output: Weather-linked landslide-risk outlook (NOW, +24h, +48h, +72h).
 
 2. ALL 4 HORIZONS ARE COMPUTED USING THE SAME PROTOTYPE SCORER:
@@ -154,7 +154,7 @@ def _build_deterministic_explanation(
     )
     summary = (
         f"Peak relative risk outlook occurs at {peak_horizon} (score {peak_score:.4f}), "
-        f"driven by rolling antecedent rainfall accumulation and terrain susceptibility."
+        f"driven by rolling antecedent rainfall accumulation and terrain slope contribution."
     )
 
     return summary, details

@@ -174,10 +174,13 @@ def test_all_horizons_in_bounds_and_computed():
 # ── 15: Legacy Mock Fields Have Zero Effect ────────────────────────────────────
 
 def test_legacy_forecast_fields_have_no_effect():
-    """Injecting old mock forecast properties must have no effect on calculated outlook."""
+    """Injecting old mock forecast properties (including forecast_24h/48h/72h and forecast_risk_*/score_*) must have zero effect on calculated outlook."""
     p1 = {"zone_id": "C03", "slope": 42.0, "soil_wetness_index": 0.62}
     p2 = {
         "zone_id": "C03", "slope": 42.0, "soil_wetness_index": 0.62,
+        "forecast_24h": 999.0,
+        "forecast_48h": 999.0,
+        "forecast_72h": 999.0,
         "forecast_risk_24h": "LOW",
         "forecast_score_24h": 0.01,
         "forecast_risk_48h": "LOW",
@@ -187,9 +190,29 @@ def test_legacy_forecast_fields_have_no_effect():
     }
     out1 = compute_zone_risk_outlook(p1)
     out2 = compute_zone_risk_outlook(p2)
+    assert out1.now.risk_score == out2.now.risk_score
     assert out1.h24.risk_score == out2.h24.risk_score
     assert out1.h48.risk_score == out2.h48.risk_score
     assert out1.h72.risk_score == out2.h72.risk_score
+    assert out1.risk_change_summary == out2.risk_change_summary
+
+
+def test_forecast_explanation_prefers_terrain_slope_contribution():
+    """Verify deterministic explanations use 'terrain slope contribution' instead of 'terrain susceptibility'."""
+    zone_props = {"zone_id": "C03", "slope": 42.0, "soil_wetness_index": 0.62}
+    out = compute_zone_risk_outlook(zone_props)
+    assert "terrain slope contribution" in out.risk_change_summary
+    assert "susceptibility" not in out.risk_change_summary.lower()
+
+
+def test_single_canonical_sample_weather_dataset():
+    """Verify data/sample/sample_weather.json is the single canonical source and frontend mirror is absent."""
+    canonical_path = _REPO_ROOT / "data" / "sample" / "sample_weather.json"
+    frontend_mirror = _REPO_ROOT / "frontend" / "public" / "data" / "sample" / "sample_weather.json"
+
+    assert canonical_path.exists(), "data/sample/sample_weather.json must exist as canonical source"
+    assert not frontend_mirror.exists(), "frontend/public/data/sample/sample_weather.json must not exist"
+
 
 
 # ── 16: Consistency of NOW Horizon with Direct Scorer ─────────────────────────
