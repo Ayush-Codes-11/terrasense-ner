@@ -183,6 +183,8 @@ class OSMStatusResponse(BaseModel):
     status: str  # "OSM snapshot" | "Cached OSM" | "Sample fallback"
     is_real: bool
     retrieved_at: Optional[str] = None
+    layers_retrieved_at: Optional[Dict[str, str]] = None
+    dataset_description: Optional[str] = None
     source: str
     attribution: str
     feature_counts: Dict[str, int]

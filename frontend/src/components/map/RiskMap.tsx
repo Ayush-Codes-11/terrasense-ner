@@ -426,7 +426,7 @@ export default function RiskMap({
           </LayersControl.Overlay>
 
           {/* ── Critical Facilities ── */}
-          <LayersControl.Overlay checked name={geoData.isRealOsm ? "🏥 Critical Facilities (Real OSM)" : "🏥 Critical Facilities (sample)"}>
+          <LayersControl.Overlay checked name={geoData.isRealOsm ? "🏥 Critical Facilities (Real OSM — Whitelisted)" : "🏥 Critical Facilities (sample)"}>
             <>
               {hospitals?.features.map((f, i) => {
                 const props = f.properties as FacilityGeoJSONProperties;
@@ -463,6 +463,9 @@ export default function RiskMap({
                             <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-mono bg-emerald-950 text-emerald-300 border border-emerald-800">
                               REAL_OSM · © OSM contributors
                             </span>
+                            <p className="text-[9px] text-slate-400 italic mt-0.5">
+                              Whitelisted & deduplicated critical facility ({facilityType})
+                            </p>
                           </div>
                         ) : (
                           <p className="text-amber-500 text-[10px] mt-1 font-mono">

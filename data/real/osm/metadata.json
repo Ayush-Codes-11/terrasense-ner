@@ -1,7 +1,15 @@
 {
   "data_type": "REAL_OSM",
+  "dataset_type": "CACHED_OSM_DATASET",
+  "dataset_description": "Cached multi-layer OpenStreetMap dataset assembled via Overpass API queries across roads, communities, and critical facilities with separate layer retrieval timestamps.",
   "source": "OpenStreetMap contributors via Overpass API",
   "retrieved_at": "2026-09-06T08:02:54.256139+00:00",
+  "last_updated": "2026-09-06T08:35:19.442803+00:00",
+  "layers_retrieved_at": {
+    "roads": "2026-09-06T08:02:54.256139+00:00",
+    "critical_facilities": "2026-09-06T08:02:54.256139+00:00",
+    "settlements": "2026-09-06T08:35:19.442803+00:00"
+  },
   "bbox": [
     23.6896,
     92.6801,
@@ -13,12 +21,12 @@
   "feature_counts": {
     "roads": 1485,
     "settlements": 2,
-    "critical_facilities": 31
+    "critical_facilities": 31,
+    "whitelisted_critical_facilities": 20
   },
   "file_sizes_bytes": {
     "roads.geojson": 6037581,
     "settlements.geojson": 1259,
     "critical_facilities.geojson": 19588
-  },
-  "last_updated": "2026-09-06T08:35:19.442803+00:00"
+  }
 }

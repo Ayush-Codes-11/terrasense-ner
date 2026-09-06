@@ -169,6 +169,8 @@ def get_osm_provenance_status() -> Dict[str, Any]:
                 "source": meta.get("source", "OpenStreetMap contributors via Overpass API"),
                 "attribution": meta.get("attribution", "© OpenStreetMap contributors"),
                 "feature_counts": meta.get("feature_counts", {}),
+                "layers_retrieved_at": meta.get("layers_retrieved_at", {}),
+                "dataset_description": meta.get("dataset_description", "Cached multi-layer OpenStreetMap dataset"),
             }
         except Exception:
             return {
@@ -267,6 +269,77 @@ def _conservative_dedup_facilities(fac_items: List[ExposedFacilityItem]) -> List
             deduped.append(item)
 
     return deduped
+
+
+def get_critical_facilities_feature_collection(raw: bool = False) -> Tuple[dict, str, str]:
+    """
+    Returns critical facilities FeatureCollection.
+    If raw=False (default): returns the 20 whitelisted & conservatively deduplicated
+    critical facilities across the pilot area, strictly matching exposure engine semantics.
+    If raw=True: returns the un-deduplicated 31 OSM healthcare/emergency features.
+    """
+    roads_fc, settlements_fc, facilities_fc, data_type, src = load_exposure_layers()
+    if raw or data_type == "SAMPLE_MOCK":
+        return facilities_fc, data_type, src
+
+    raw_facilities: List[ExposedFacilityItem] = []
+    for cf in facilities_fc.get("features", []):
+        props = cf.get("properties", {})
+        amenity = props.get("amenity")
+        healthcare = props.get("healthcare")
+        category_val = str(props.get("category") or props.get("facility_type", "")).lower()
+        coords = cf.get("geometry", {}).get("coordinates", [])
+        if coords and len(coords) >= 2:
+            lon, lat = coords[0], coords[1]
+        else:
+            continue
+        if amenity is not None or healthcare is not None:
+            is_whitelisted = (amenity in FACILITY_WHITELIST_AMENITIES or healthcare in FACILITY_WHITELIST_HEALTHCARE)
+        else:
+            is_whitelisted = category_val in FACILITY_WHITELIST_AMENITIES
+
+        if is_whitelisted:
+            raw_facilities.append(
+                ExposedFacilityItem(
+                    feature_id=str(props.get("facility_id") or props.get("osm_id") or cf.get("id", "facility")),
+                    name=props.get("name"),
+                    category=str(props.get("category") or props.get("facility_type", "facility")),
+                    amenity=amenity,
+                    healthcare=healthcare,
+                    latitude=lat,
+                    longitude=lon,
+                    is_whitelisted=True,
+                )
+            )
+
+    deduped = _conservative_dedup_facilities(raw_facilities)
+    deduped_features = [
+        {
+            "type": "Feature",
+            "id": f"osm_facility_{d.category}_{d.feature_id}",
+            "properties": {
+                "osm_id": d.feature_id,
+                "facility_id": d.feature_id,
+                "name": d.name,
+                "category": d.category,
+                "amenity": d.amenity,
+                "healthcare": d.healthcare,
+                "is_whitelisted": True,
+                "data_type": "REAL_OSM",
+                "source": "OpenStreetMap contributors",
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [d.longitude, d.latitude],
+            },
+        }
+        for d in deduped
+    ]
+
+    return {
+        "type": "FeatureCollection",
+        "features": deduped_features,
+    }, data_type, src
 
 
 def compute_zone_exposure(
@@ -394,7 +467,9 @@ def compute_zone_exposure(
             )
         )
 
-    # Calculate unique motorable network length using unary_union
+    # Calculate unique motorable network length using unary_union.
+    # unary_union removes duplicate and overlapping linework while preserving
+    # geometrically distinct parallel carriageways (legitimate dual carriageways are not collapsed into one).
     if motorable_lines:
         union_geom = unary_union(motorable_lines)
         unique_motorable_road_km = _calc_linestring_length_km(union_geom)
