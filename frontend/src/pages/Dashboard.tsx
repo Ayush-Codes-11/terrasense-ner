@@ -109,6 +109,18 @@ export default function Dashboard() {
   const riskEngineOk =
     apiOnline === true ? true : apiOnline === false ? false : null;
 
+  const [localReports, setLocalReports] = useState<any[]>([]);
+
+  // Load local reports on mount
+  useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem("terrasense_reports") || "[]");
+      setLocalReports(saved);
+    } catch(e) {
+      console.error("Failed to load local reports", e);
+    }
+  });
+
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-slate-900">
       {/* Top bar */}
@@ -214,7 +226,7 @@ export default function Dashboard() {
       <div className="shrink-0 h-44 border-t border-slate-700 bg-slate-850 flex">
         {/* Reports */}
         <div className="flex-1 p-3 overflow-hidden">
-          <ReportList reports={[]} />
+          <ReportList reports={localReports} />
         </div>
 
         {/* System Status */}
@@ -231,8 +243,8 @@ export default function Dashboard() {
               },
               {
                 label: "Observed Rain",
-                status: "REAL GPM (0.1°)",
-                ok: true,
+                status: "SAMPLE scenario",
+                ok: null,
               },
               {
                 label: "Forecast Rain",
@@ -293,7 +305,7 @@ export default function Dashboard() {
 
           {/* Data mode note */}
           <div className="mt-auto text-[10px] text-slate-600 border-t border-slate-700 pt-2">
-            Phase 8 · Copernicus DEM · NASA GPM IMERG Observed Rain · Real OSM Exposure · Prototype Scorer
+            Phase 12 · Copernicus DEM · NASA GPM · Real OSM Exposure · GSI Inventory · Prototype Scorer
           </div>
         </div>
       </div>

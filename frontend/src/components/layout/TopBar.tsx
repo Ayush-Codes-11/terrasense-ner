@@ -44,11 +44,20 @@ export default function TopBar({ districtMeta }: TopBarProps) {
         <div className="h-6 w-px bg-slate-700" />
 
         {/* Pilot district */}
-        <div>
-          <div className="text-xs text-slate-400">Pilot District</div>
-          <div className="text-sm font-medium text-white">
-            {districtMeta?.district_name ?? "Aizawl"},{" "}
-            {districtMeta?.state ?? "Mizoram"}
+        <div className="flex items-center gap-4">
+          <div>
+            <div className="text-[10px] text-amber-400 font-semibold uppercase tracking-wider">Pilot Deployment</div>
+            <div className="text-sm font-medium text-white">
+              {districtMeta?.district_name ?? "Aizawl"},{" "}
+              {districtMeta?.state ?? "Mizoram"}
+            </div>
+          </div>
+          <div className="h-6 w-px bg-slate-700 hidden sm:block" />
+          <div className="hidden sm:block">
+            <div className="text-[10px] text-slate-400 uppercase tracking-wider">Designed Coverage</div>
+            <div className="text-xs font-medium text-slate-300">
+              North Eastern Region
+            </div>
           </div>
         </div>
       </div>
@@ -64,8 +73,8 @@ export default function TopBar({ districtMeta }: TopBarProps) {
         <div className="h-3 w-px bg-slate-700" />
         <div className="flex items-center gap-1.5">
           <span className="text-[10px] text-slate-400">Rainfall:</span>
-          <span className="text-[10px] font-semibold text-green-400 bg-green-950/60 px-1.5 py-0.5 rounded border border-green-500/30">
-            REAL GPM observed
+          <span className="text-[10px] font-semibold text-amber-400 bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-500/30">
+            SAMPLE scenario
           </span>
         </div>
         <div className="h-3 w-px bg-slate-700" />

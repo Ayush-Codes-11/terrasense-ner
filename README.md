@@ -6,9 +6,19 @@
 
 ---
 
-## Pilot Area
+## Pilot Area & Designed Coverage
 
-**Aizawl District, Mizoram** — chosen for its landslide relevance, available terrain data, and manageable geographic scope.
+**Current prototype coverage:** Aizawl District, Mizoram — chosen for its landslide relevance, available terrain data, and manageable geographic scope.
+**Intended deployment coverage:** all North Eastern states
+
+### Scaling Architecture
+TerraSense is architected to scale geographically:
+1. **Pilot** → Aizawl pilot validates the full pipeline.
+2. **District** → Extend ingestion and processing district-by-district using tiled DEM, rainfall feeds and spatial databases.
+3. **State** → State-scale tiled processing.
+4. **NER Scale** → NER-wide command dashboard with on-demand state/district risk layers and unified alerting.
+
+*Note: The frontend basemap provider is independent from TerraSense analytics. A future production implementation can use Google Maps, ArcGIS, Mapbox or another approved mapping provider while preserving the same TerraSense GIS overlays and backend.*
 
 ---
 
@@ -30,12 +40,17 @@ terrasense-ner/
 
 ## Data Lineage
 
-| Directory | Purpose | ML training? |
-|-----------|---------|-------------|
-| `data/sample/` | UI rendering and API contract tests | ❌ Never |
-| `data/real/osm/` | OSM roads, villages, hospitals | N/A (geodata) |
-| `data/real/terrain/` | Slope/elevation from SRTM DEM | ✅ If labelled |
-| `data/real/weather/` | Real weather API responses | Input only |
+| Directory | Purpose | Provenance |
+|-----------|---------|------------|
+| `data/sample/` | UI rendering and API contract tests | MOCK / SYNTHETIC |
+| `data/real/osm/` | Roads, communities, facilities | REAL OpenStreetMap |
+| `data/real/terrain/` | Slope/elevation | REAL Copernicus GLO-30 DEM |
+| `data/real/weather/` | Recent rainfall inputs | REAL NASA GPM IMERG |
+| `data/real/gsi/` | Landslide inventory | REAL GSI public inventory |
+
+**Map layers & UI representation:**
+* **Roads / Critical facilities / Communities:** Displayed using real OpenStreetMap data where available.
+* **Risk Zones:** 25 georeferenced prototype analysis boundaries (5×5 grid over Aizawl), not official administrative or hazard boundaries.
 
 ---
 

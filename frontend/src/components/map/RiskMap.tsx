@@ -75,8 +75,8 @@ function MapLegend() {
           )
           .join("") +
         `<div style="border-top:1px solid rgba(71,85,105,0.4);margin-top:6px;padding-top:5px;font-size:9px;color:#475569;">
-          <span style="background:rgba(251,191,36,0.2);border:1px solid rgba(251,191,36,0.4);color:#fbbf24;border-radius:3px;padding:1px 4px;">SAMPLE</span>
-          &nbsp;Not geospatially accurate
+          <span style="background:rgba(251,191,36,0.2);border:1px solid rgba(251,191,36,0.4);color:#fbbf24;border-radius:3px;padding:1px 4px;">PROTOTYPE</span>
+          &nbsp;Georeferenced to real coordinates; prototype analysis boundaries, not official administrative/hazard boundaries.
         </div>`;
       return div;
     };
@@ -131,6 +131,7 @@ interface RiskMapProps {
   onZoneSelect: (props: ZoneGeoJSONProperties) => void;
   zoneRisks?: Map<string, Zone> | null;
   isRiskFallback?: boolean;
+  reports?: any[];
 }
 
 // ---- Main component ----
@@ -141,6 +142,7 @@ export default function RiskMap({
   onZoneSelect,
   zoneRisks,
   isRiskFallback = false,
+  reports = [],
 }: RiskMapProps) {
   const { gridRisk, roads, villages, hospitals, loading, error } = geoData;
 
@@ -153,7 +155,7 @@ export default function RiskMap({
       const isSelected = feature?.properties?.zone_id === selectedZoneId;
       return {
         fillColor: riskColor(cat),
-        fillOpacity: isSelected ? 0.65 : 0.35,
+        fillOpacity: isSelected ? 0.40 : 0.25,
         color: isSelected ? "#ffffff" : riskColor(cat),
         weight: isSelected ? 2.5 : 1.2,
         opacity: 0.9,
@@ -180,7 +182,8 @@ export default function RiskMap({
           <div>Risk Level: <strong>${catLabel}</strong></div>
           <div>Prototype Score: <strong>${scoreStr}</strong></div>
           <div style="font-size:9px;color:#64748b;margin-top:4px;border-top:1px solid #e2e8f0;padding-top:2px;">
-            ${isRiskFallback ? "SAMPLE_MOCK fallback" : "Computed via Prototype Scorer"}
+            ${isRiskFallback ? "SAMPLE_MOCK fallback" : "Computed via Prototype Scorer"}<br/>
+            Georeferenced prototype analysis boundary
           </div>
         </div>`
       );
@@ -208,7 +211,7 @@ export default function RiskMap({
       {isRiskFallback ? (
         <div className="absolute top-2 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-amber-500/40 text-[10px] text-amber-400 font-medium pointer-events-none">
           <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-          Sample fallback · backend offline · not geospatially accurate
+          Sample fallback · backend offline · prototype geometry
         </div>
       ) : (
         <div className="absolute top-2 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-green-500/40 text-[10px] text-green-400 font-medium pointer-events-none">
@@ -261,19 +264,35 @@ export default function RiskMap({
         style={{ height: "100%", width: "100%", background: "#0f172a" }}
         zoomControl={true}
       >
-        {/* Standard OpenStreetMap tiles — no API key required */}
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
-          maxZoom={19}
-        />
-
         {/* Custom legend */}
         <MapLegend />
 
         <LayersControl position="topright">
+          {/* ── Basemaps ── */}
+          <LayersControl.BaseLayer checked name="Terrain">
+            <TileLayer
+              url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
+              attribution='Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+              maxZoom={17}
+            />
+          </LayersControl.BaseLayer>
+          <LayersControl.BaseLayer name="Streets">
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
+              maxZoom={19}
+            />
+          </LayersControl.BaseLayer>
+          <LayersControl.BaseLayer name="Satellite">
+            <TileLayer
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+              attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EAP, and the GIS User Community'
+              maxZoom={19}
+            />
+          </LayersControl.BaseLayer>
+
           {/* ── Risk Zones ── */}
-          <LayersControl.Overlay checked name="⬛ Risk Zones (sample)">
+          <LayersControl.Overlay checked name="⬛ Risk Zones (5×5 Prototype Grid)">
             {gridRisk && (
               <GeoJSON
                 key={`risk-${selectedZoneId ?? "none"}-${isRiskFallback ? "fallback" : "live"}-${zoneRisks?.size ?? 0}`}
@@ -289,7 +308,7 @@ export default function RiskMap({
           </LayersControl.Overlay>
 
           {/* ── Roads ── */}
-          <LayersControl.Overlay checked name={geoData.isRealOsm ? "🛣 Roads (Real OSM)" : "🛣 Roads (sample)"}>
+          <LayersControl.Overlay checked name={geoData.isRealOsm ? "🛣 Roads" : "🛣 Roads (fallback)"}>
             <>
               {roads?.features.map((f, i) => {
                 const props = f.properties as RoadGeoJSONProperties;
@@ -365,7 +384,7 @@ export default function RiskMap({
           </LayersControl.Overlay>
 
           {/* ── Villages / Communities / Localities ── */}
-          <LayersControl.Overlay checked name={geoData.isRealOsm ? "🏘 Communities / Localities (Real OSM)" : "🏘 Villages (sample)"}>
+          <LayersControl.Overlay checked name={geoData.isRealOsm ? "🏘 Communities / Localities" : "🏘 Communities (fallback)"}>
             <>
               {villages?.features.map((f, i) => {
                 const props = f.properties as VillageGeoJSONProperties;
@@ -426,7 +445,7 @@ export default function RiskMap({
           </LayersControl.Overlay>
 
           {/* ── Critical Facilities ── */}
-          <LayersControl.Overlay checked name={geoData.isRealOsm ? "🏥 Critical Facilities (Real OSM — Whitelisted)" : "🏥 Critical Facilities (sample)"}>
+          <LayersControl.Overlay checked name={geoData.isRealOsm ? "🏥 Critical Facilities" : "🏥 Critical Facilities (fallback)"}>
             <>
               {hospitals?.features.map((f, i) => {
                 const props = f.properties as FacilityGeoJSONProperties;
@@ -479,6 +498,43 @@ export default function RiskMap({
               })}
             </>
           </LayersControl.Overlay>
+
+          {/* ── Field Reports ── */}
+          <LayersControl.Overlay checked name="⚠️ Field Reports">
+            <>
+              {reports?.map((r, i) => {
+                return (
+                  <CircleMarker
+                    key={r.id || i}
+                    center={[r.lat, r.lon]}
+                    radius={8}
+                    pathOptions={{
+                      color: "#ffffff",
+                      fillColor: "#fbbf24", // amber
+                      fillOpacity: 1,
+                      weight: 2,
+                    }}
+                  >
+                    <Popup>
+                      <div className="text-xs">
+                        <p className="font-semibold text-amber-500 uppercase">{r.category?.replace("_", " ")}</p>
+                        <p className="text-slate-800">{r.description}</p>
+                        <p className="text-slate-500 mt-1">Severity: {r.severity}</p>
+                        <p className="text-slate-500">Reporter: {r.reporter}</p>
+                        {r.zone_id && (
+                          <p className="text-slate-500">Zone: {r.zone_id}</p>
+                        )}
+                        <p className="text-[10px] text-slate-400 mt-1 border-t border-slate-200 pt-1">
+                          Status: {r.sync_status} · {new Date(r.timestamp).toLocaleString()}
+                        </p>
+                      </div>
+                    </Popup>
+                  </CircleMarker>
+                );
+              })}
+            </>
+          </LayersControl.Overlay>
+
         </LayersControl>
       </MapContainer>
     </div>
