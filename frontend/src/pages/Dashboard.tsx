@@ -1,12 +1,11 @@
 // ============================================================
-// Dashboard — main page (Phase 2 update)
-// Changes from Phase 1:
-//   - MapPlaceholder → RiskMap (Leaflet)
-//   - useGeoJSONData hook loads all four sample layers
-//   - Zone click → selectedZoneProps state → card data derived via transformers
-//   - RiskSeverityCard, ForecastCard, WhyNowCard now show real zone data
-//   - ExposureCard, EmergencyPriorityCard remain as Phase 6 placeholders
-//   - System Status updated: "OSM Geodata" now green (sample loaded)
+// Dashboard — main page (Phase 3 update)
+// Changes from Phase 2:
+//   - useZoneDetails hook fetches forecast from FastAPI on zone click
+//   - Falls back to local GeoJSON transformer if backend is down
+//   - API status indicator in System Status bar (green = api, amber = local fallback)
+//   - ForecastCard driven by API data when available
+//   - WhyNow still uses local transformer (backend endpoint added in Phase 7)
 // ============================================================
 
 import { useState, useMemo } from "react";
@@ -20,9 +19,9 @@ import EmergencyPriorityCard from "../components/dashboard/EmergencyPriorityCard
 import WhyNowCard from "../components/dashboard/WhyNowCard";
 import ReportList from "../components/reports/ReportList";
 import { useGeoJSONData } from "../hooks/useGeoJSONData";
+import { useZoneDetails } from "../hooks/useZoneDetails";
 import {
   propsToZone,
-  propsToForecast,
   propsToWhyNow,
 } from "../utils/zoneTransformers";
 import type { ZoneGeoJSONProperties } from "../types/geojson";
@@ -33,15 +32,19 @@ export default function Dashboard() {
   const [selectedZoneProps, setSelectedZoneProps] =
     useState<ZoneGeoJSONProperties | null>(null);
 
-  // Derive typed card data from raw GeoJSON properties
+  const selectedZoneId = selectedZoneProps?.zone_id ?? null;
+
+  // Fetch forecast from API (falls back to local transformer if backend is down)
+  const { forecast, loading: forecastLoading, apiOnline, source: forecastSource } =
+    useZoneDetails(selectedZoneId, selectedZoneProps);
+
+  // Derive zone for RiskSeverityCard from local GeoJSON (immediate, no API call)
   const selectedZone = useMemo(
     () => (selectedZoneProps ? propsToZone(selectedZoneProps) : null),
     [selectedZoneProps]
   );
-  const forecast = useMemo(
-    () => (selectedZoneProps ? propsToForecast(selectedZoneProps) : null),
-    [selectedZoneProps]
-  );
+
+  // Why Now still uses local transformer (Phase 7 adds backend endpoint)
   const whyNow = useMemo(
     () => (selectedZoneProps ? propsToWhyNow(selectedZoneProps) : null),
     [selectedZoneProps]
@@ -55,15 +58,21 @@ export default function Dashboard() {
       .map((f) => propsToZone(f.properties as ZoneGeoJSONProperties));
   }, [geoData.gridRisk]);
 
-  const selectedZoneId = selectedZoneProps?.zone_id ?? null;
-
-  // System status: OSM Geodata turns green once sample data loads
-  const osmStatus = geoData.loading
+  // System status indicators
+  const geoLayersOk = geoData.error ? false : geoData.gridRisk ? true : null;
+  const geoLayersStatus = geoData.loading
     ? "Loading…"
     : geoData.error
       ? "Load error"
       : "Sample loaded";
-  const osmOk = geoData.error ? false : geoData.gridRisk ? true : null;
+
+  const apiStatus =
+    apiOnline === true
+      ? "Connected"
+      : apiOnline === false
+        ? "Offline (local fallback)"
+        : "Awaiting zone selection";
+  const apiOk = apiOnline === true ? true : apiOnline === false ? false : null;
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-slate-900">
@@ -72,7 +81,7 @@ export default function Dashboard() {
 
       {/* Main content */}
       <div className="flex flex-1 overflow-hidden">
-        {/* ── Left: Map (flex-grow takes ~60%) ── */}
+        {/* ── Left: Map ── */}
         <div className="flex-1 p-3 overflow-hidden">
           <RiskMap
             geoData={geoData}
@@ -86,13 +95,13 @@ export default function Dashboard() {
           {/* Zone selection indicator */}
           {selectedZoneId ? (
             <div className="flex items-center justify-between px-3 py-1.5 rounded-md bg-blue-600/10 border border-blue-500/30">
-              <div>
+              <div className="flex items-center gap-2">
                 <span className="text-xs text-blue-400 font-medium">
                   Zone {selectedZoneId} selected
                 </span>
                 {selectedZoneProps && (
                   <span
-                    className={`ml-2 text-[10px] font-semibold ${
+                    className={`text-[10px] font-semibold ${
                       selectedZoneProps.risk_category === "VERY_HIGH"
                         ? "text-red-400"
                         : selectedZoneProps.risk_category === "HIGH"
@@ -105,12 +114,30 @@ export default function Dashboard() {
                     {selectedZoneProps.risk_category.replace("_", " ")}
                   </span>
                 )}
+                {/* Data source badge */}
+                {forecastSource && (
+                  <span
+                    className={`text-[9px] px-1.5 py-0.5 rounded border ${
+                      forecastSource === "api"
+                        ? "bg-green-500/10 text-green-400 border-green-500/30"
+                        : "bg-amber-500/10 text-amber-400 border-amber-500/30"
+                    }`}
+                  >
+                    {forecastSource === "api" ? "API" : "local"}
+                  </span>
+                )}
+                {forecastLoading && (
+                  <svg className="w-3 h-3 text-blue-400 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                  </svg>
+                )}
               </div>
               <button
                 className="text-[10px] text-blue-400 hover:text-blue-300 transition-colors"
                 onClick={() => setSelectedZoneProps(null)}
               >
-                ✕ Clear
+                ✕
               </button>
             </div>
           ) : (
@@ -144,14 +171,18 @@ export default function Dashboard() {
           <div className="flex flex-col gap-1.5">
             {[
               {
+                label: "FastAPI Backend",
+                status: apiStatus,
+                ok: apiOk,
+              },
+              {
                 label: "Risk Engine",
                 status: "Not connected — Phase 4",
                 ok: null,
               },
               { label: "Weather Data", status: "Sample mode", ok: null },
-              { label: "OSM Geodata", status: osmStatus, ok: osmOk },
+              { label: "Geospatial Layers", status: geoLayersStatus, ok: geoLayersOk },
               { label: "Field Reports", status: "Phase 8", ok: null },
-              { label: "Offline Sync", status: "Phase 9", ok: null },
             ].map(({ label, status, ok }) => (
               <div
                 key={label}
@@ -164,7 +195,7 @@ export default function Dashboard() {
                       ok === true
                         ? "bg-green-400"
                         : ok === false
-                          ? "bg-red-400"
+                          ? "bg-amber-400"
                           : "bg-slate-600"
                     }`}
                   />
@@ -173,7 +204,7 @@ export default function Dashboard() {
                       ok === true
                         ? "text-green-400"
                         : ok === false
-                          ? "text-red-400"
+                          ? "text-amber-400"
                           : "text-slate-600"
                     }
                   >
@@ -186,7 +217,7 @@ export default function Dashboard() {
 
           {/* Data mode note */}
           <div className="mt-auto text-[10px] text-slate-600 border-t border-slate-700 pt-2">
-            Phase 2 · Sample GeoJSON · CartoDB Dark basemap
+            Phase 3 · FastAPI backend · Sample GeoJSON
           </div>
         </div>
       </div>

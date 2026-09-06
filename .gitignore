@@ -26,6 +26,7 @@ ml/*.joblib
 .env
 .env.local
 .env.*.local
+.env.development
 
 # Large geodata files
 data/real/**/*.tif

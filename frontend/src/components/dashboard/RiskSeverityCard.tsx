@@ -119,9 +119,13 @@ export default function RiskSeverityCard({
               {RISK_LABEL[dominantRisk]}
             </span>
             {displayZone && (
-              <div className="text-2xl font-bold text-white">
-                {(displayZone.risk_score * 100).toFixed(0)}
-                <span className="text-sm font-normal text-slate-400">%</span>
+              <div>
+                <div className="text-[9px] text-slate-500 uppercase tracking-wide">
+                  Risk Score
+                </div>
+                <div className="text-xl font-bold text-white font-mono">
+                  {displayZone.risk_score.toFixed(2)}
+                </div>
               </div>
             )}
           </div>

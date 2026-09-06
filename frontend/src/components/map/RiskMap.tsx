@@ -211,12 +211,11 @@ export default function RiskMap({
         style={{ height: "100%", width: "100%", background: "#0f172a" }}
         zoomControl={true}
       >
-        {/* CartoDB Dark tile layer — good contrast with risk colours */}
+        {/* Standard OpenStreetMap tiles — no API key required */}
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions" target="_blank">CARTO</a>'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
           maxZoom={19}
-          subdomains="abcd"
         />
 
         {/* Custom legend */}

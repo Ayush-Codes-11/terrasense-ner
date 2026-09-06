@@ -13,6 +13,8 @@ export interface DataMeta {
   source: DataSource;
   freshness: string | null; // ISO-8601 timestamp or null
   note?: string;
+  data_type?: string;   // optional: "SAMPLE_MOCK" when backend includes it
+  is_live?: boolean;    // optional: false for sample responses
 }
 
 // ----- Zone / Grid -----
@@ -127,7 +129,7 @@ export interface FeatureDriver {
 
 export interface WhyNowData {
   zone_id: string;
-  model_type: "prototype" | "xgboost";
+  model_type: "sample" | "prototype" | "xgboost";
   drivers: FeatureDriver[]; // top 3–4
   data_meta: DataMeta;
 }

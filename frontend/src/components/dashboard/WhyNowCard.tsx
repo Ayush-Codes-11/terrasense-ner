@@ -39,7 +39,16 @@ export default function WhyNowCard({ whyNow, zoneId }: WhyNowCardProps) {
   const modelLabel =
     whyNow?.model_type === "xgboost"
       ? "XGBoost + SHAP"
-      : "Prototype Weighted Scorer";
+      : whyNow?.model_type === "prototype"
+        ? "Prototype Weighted Scorer"
+        : "Sample Scenario Drivers";
+
+  const modelFooter =
+    whyNow?.model_type === "xgboost"
+      ? "SHAP value attribution from XGBoost model. No accuracy claims are made."
+      : whyNow?.model_type === "prototype"
+        ? "Feature attribution from Prototype Weighted Scorer. No accuracy claims are made."
+        : "Illustrative drivers from SAMPLE_MOCK scenario data. Risk engine connected in Phase 4.";
 
   return (
     <div className="card p-4 flex flex-col gap-3">
@@ -84,8 +93,14 @@ export default function WhyNowCard({ whyNow, zoneId }: WhyNowCardProps) {
         <>
           {/* Model type tag */}
           <div className="flex items-center gap-1.5">
-            <span className="text-[10px] text-slate-500">Model:</span>
-            <span className="text-[10px] bg-blue-500/10 text-blue-400 border border-blue-500/30 px-1.5 py-0.5 rounded">
+            <span className="text-[10px] text-slate-500">Source:</span>
+            <span
+              className={`text-[10px] px-1.5 py-0.5 rounded border ${
+                whyNow.model_type === "sample"
+                  ? "bg-amber-500/10 text-amber-400 border-amber-500/30"
+                  : "bg-blue-500/10 text-blue-400 border-blue-500/30"
+              }`}
+            >
               {modelLabel}
             </span>
           </div>
@@ -124,7 +139,7 @@ export default function WhyNowCard({ whyNow, zoneId }: WhyNowCardProps) {
           </div>
 
           <p className="text-[10px] text-slate-600 border-t border-slate-700 pt-2">
-            Feature attribution from {modelLabel}. No accuracy claims are made.
+            {modelFooter}
           </p>
         </>
       )}

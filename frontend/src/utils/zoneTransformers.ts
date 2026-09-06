@@ -82,7 +82,7 @@ export function propsToWhyNow(props: ZoneGeoJSONProperties): WhyNowData {
       feature: "rain_3d",
       display_name: "3-day rainfall accumulation",
       direction: "up",
-      description: `${props.rain_3d}mm over past 3 days — elevated slope saturation`,
+      description: `${props.rain_3d}mm over past 3 days — elevated (SAMPLE_MOCK)`,
       freshness: "Sample",
     });
   } else if (props.rain_3d > 25) {
@@ -98,7 +98,7 @@ export function propsToWhyNow(props: ZoneGeoJSONProperties): WhyNowData {
       feature: "rain_3d",
       display_name: "3-day rainfall accumulation",
       direction: "down",
-      description: `${props.rain_3d}mm over past 3 days — below saturation threshold`,
+      description: `${props.rain_3d}mm over past 3 days — low (SAMPLE_MOCK)`,
       freshness: "Sample",
     });
   }
@@ -109,7 +109,7 @@ export function propsToWhyNow(props: ZoneGeoJSONProperties): WhyNowData {
       feature: "slope",
       display_name: "Terrain slope angle",
       direction: "up",
-      description: `${props.slope}° — above 30° high-susceptibility threshold`,
+      description: `${props.slope}° — steep terrain`,
       freshness: "Static",
     });
   } else if (props.slope > 20) {
@@ -125,7 +125,7 @@ export function propsToWhyNow(props: ZoneGeoJSONProperties): WhyNowData {
       feature: "slope",
       display_name: "Terrain slope angle",
       direction: "down",
-      description: `${props.slope}° — gentle gradient, lower susceptibility`,
+      description: `${props.slope}° — gentle terrain`,
       freshness: "Static",
     });
   }
@@ -136,7 +136,7 @@ export function propsToWhyNow(props: ZoneGeoJSONProperties): WhyNowData {
       feature: "soil_moisture",
       display_name: "Soil moisture index",
       direction: "up",
-      description: `${(props.soil_moisture * 100).toFixed(0)}% — near saturation`,
+      description: `${(props.soil_moisture * 100).toFixed(0)}% — elevated in sample scenario`,
       freshness: "Sample",
     });
   } else if (props.soil_moisture > 0.33) {
@@ -170,7 +170,7 @@ export function propsToWhyNow(props: ZoneGeoJSONProperties): WhyNowData {
 
   return {
     zone_id: props.zone_id,
-    model_type: "prototype",
+    model_type: "sample",
     drivers: drivers.slice(0, 4),
     data_meta: {
       source: "sample",
