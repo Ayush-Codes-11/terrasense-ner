@@ -111,49 +111,114 @@ export interface ZoneForecast {
   data_meta: DataMeta;
 }
 
-// ----- Exposure -----
+// ----- Exposure (Phase 6) -----
 
-export type FacilityType = "road" | "village" | "hospital" | "other";
+export type FacilityType = "road" | "village" | "hospital" | "clinic" | "police" | "fire_station" | "other";
 
 export interface ExposedFeature {
   feature_id: string;
-  name: string;
+  name: string | null;
   type: FacilityType;
   exposed: boolean;
+  length_km?: number;
   /**
    * blocked is ONLY true when a verified field report confirms blockage.
    * It defaults to false even when exposed = true.
    */
   blocked: boolean;
+  road_status?: string;
   verified_report_id?: string;
 }
 
 export interface ExposureData {
   zone_id: string;
-  exposed_features: ExposedFeature[];
   summary: {
     roads_exposed: number;
+    roads_exposed_km: number;
     villages_exposed: number;
     hospitals_exposed: number;
     roads_blocked: number; // verified field reports only
   };
+  roads?: Array<{
+    feature_id: string;
+    name: string | null;
+    highway: string;
+    length_km: number;
+    blockage_verified: boolean;
+    road_status: string;
+  }>;
+  settlements?: Array<{
+    feature_id: string;
+    name: string | null;
+    place: string;
+  }>;
+  critical_facilities?: Array<{
+    feature_id: string;
+    name: string | null;
+    category: string;
+  }>;
+  exposed_features?: ExposedFeature[];
+  hazard_geometry?: string;
+  exposure_features?: string;
+  analysis_mode?: string;
   data_meta: DataMeta;
 }
 
-// ----- Prototype Decision-Support Priority -----
+// ----- Prototype Decision-Support Priority (Phase 6) -----
 
-export type PriorityLevel = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+export type PriorityLevel = "LOW" | "MODERATE" | "HIGH" | "VERY_HIGH" | "MEDIUM" | "CRITICAL";
+
+export interface HorizonPriority {
+  horizon: string;
+  priority: string;
+  priority_score: number;
+  landslide_risk_score: number;
+  landslide_risk_category: string;
+  score_type?: string;
+  contributors?: Array<{
+    component: string;
+    display_name: string;
+    weight: number;
+    raw_value: number;
+    normalized_input: number;
+    contribution: number;
+  }>;
+}
 
 export interface PriorityData {
   zone_id: string;
   priority: PriorityLevel;
-  /**
-   * Always displayed. This is NOT an official government classification.
-   */
+  priority_score?: number;
   priority_label: "PROTOTYPE DECISION-SUPPORT — NOT OFFICIAL";
-  reasoning: string[];
+  windows?: {
+    now: HorizonPriority;
+    "24h": HorizonPriority;
+    "48h": HorizonPriority;
+    "72h": HorizonPriority;
+  };
+  now?: HorizonPriority;
+  forecast?: {
+    "24h": HorizonPriority;
+    "48h": HorizonPriority;
+    "72h": HorizonPriority;
+  };
+  explanation?: string;
+  horizon_transitions?: string[];
+  exposure_summary?: {
+    roads_exposed_count: number;
+    roads_exposed_km: number;
+    settlements_exposed: number;
+    critical_facilities_exposed: number;
+    blockage_verified: boolean;
+    road_status: string;
+  };
+  reasoning?: string[];
+  hazard_geometry?: string;
+  exposure_features?: string;
+  analysis_mode?: string;
   data_meta: DataMeta;
 }
+
 
 // ----- Why Now (feature attribution) -----
 

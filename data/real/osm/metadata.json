@@ -1,0 +1,23 @@
+{
+  "data_type": "REAL_OSM",
+  "source": "OpenStreetMap contributors via Overpass API",
+  "retrieved_at": "2026-09-06T08:02:54.256139+00:00",
+  "bbox": [
+    23.6896,
+    92.6801,
+    23.7646,
+    92.7551
+  ],
+  "is_live": false,
+  "attribution": "\u00a9 OpenStreetMap contributors",
+  "feature_counts": {
+    "roads": 1485,
+    "settlements": 1,
+    "critical_facilities": 31
+  },
+  "file_sizes_bytes": {
+    "roads.geojson": 6037581,
+    "settlements.geojson": 613,
+    "critical_facilities.geojson": 19588
+  }
+}

@@ -1,13 +1,12 @@
 // ============================================================
 // EmergencyPriorityCard — Prototype Decision-Support Priority
-// Phase 1: placeholder
-// Phase 6+: receives PriorityData from /priority/{zone_id}
+// Phase 6: 4-horizon priority evaluation holding exposure constant
 //
 // IMPORTANT: Always displays "PROTOTYPE DECISION-SUPPORT — NOT OFFICIAL"
 // This is not a government or operational classification.
 // ============================================================
 
-import type { PriorityData, PriorityLevel } from "../../types";
+import type { PriorityData, HorizonPriority } from "../../types";
 import { PRIORITY_BG_CLASSES } from "../../utils/risk";
 import DataSourceBadge from "../common/DataSourceBadge";
 
@@ -16,19 +15,44 @@ interface EmergencyPriorityCardProps {
   zoneId?: string | null;
 }
 
-const PRIORITY_ICONS: Record<PriorityLevel, string> = {
+const PRIORITY_ICONS: Record<string, string> = {
   LOW: "🟢",
+  MODERATE: "🔵",
   MEDIUM: "🔵",
   HIGH: "🟠",
+  VERY_HIGH: "🔴",
   CRITICAL: "🔴",
 };
 
-const PRIORITY_DESC: Record<PriorityLevel, string> = {
-  LOW: "Situation is stable. Continue monitoring.",
-  MEDIUM: "Elevated risk. Pre-position resources.",
-  HIGH: "Significant exposure. Alert local officials.",
-  CRITICAL: "Immediate action recommended. Evacuate if warranted.",
-};
+function HorizonCell({
+  label,
+  h,
+}: {
+  label: string;
+  h?: HorizonPriority | null;
+}) {
+  if (!h) return null;
+  const pClass = PRIORITY_BG_CLASSES[h.priority] ?? "bg-slate-700 text-slate-300";
+  const icon = PRIORITY_ICONS[h.priority] ?? "⚪";
+
+  return (
+    <div className="flex flex-col items-center p-2 rounded bg-slate-900/50 border border-slate-700/60">
+      <span className="text-[10px] font-semibold text-slate-400 mb-1">{label}</span>
+      <div className="flex items-center gap-1">
+        <span className="text-xs">{icon}</span>
+        <span className={`risk-badge text-[10px] px-1.5 py-0.5 ${pClass}`}>
+          {h.priority.replace("_", " ")}
+        </span>
+      </div>
+      <span className="text-[9px] text-slate-500 font-mono mt-1">
+        Score {h.priority_score.toFixed(2)}
+      </span>
+      <span className="text-[8px] text-slate-500">
+        Risk: {h.landslide_risk_category.replace("_", " ")}
+      </span>
+    </div>
+  );
+}
 
 export default function EmergencyPriorityCard({
   priority,
@@ -36,25 +60,30 @@ export default function EmergencyPriorityCard({
 }: EmergencyPriorityCardProps) {
   const isPlaceholder = !priority;
 
+  const nowH = priority?.windows?.now ?? priority?.now;
+  const h24 = priority?.windows?.["24h"] ?? priority?.forecast?.["24h"];
+  const h48 = priority?.windows?.["48h"] ?? priority?.forecast?.["48h"];
+  const h72 = priority?.windows?.["72h"] ?? priority?.forecast?.["72h"];
+
   return (
     <div className="card p-4 flex flex-col gap-3">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
-            Decision-Support Priority
+            Prototype Decision-Support Priority
           </h2>
-          <p className="text-[10px] text-slate-600 mt-0.5">
-            {zoneId ? `Zone ${zoneId}` : "Select a zone on the map"}
+          <p className="text-[10px] text-slate-500 mt-0.5">
+            {zoneId ? `Zone ${zoneId} resource priority outlook` : "Select a zone on the map"}
           </p>
         </div>
-        <DataSourceBadge source={priority?.data_meta.source ?? "unavailable"} />
+        <DataSourceBadge source={priority?.data_meta?.source ?? "unavailable"} />
       </div>
 
-      {/* Disclaimer — always visible */}
-      <div className="flex items-start gap-1.5 bg-slate-900/60 rounded px-2 py-1.5 border border-slate-700/50">
+      {/* Strict Disclaimer — always visible */}
+      <div className="flex items-start gap-1.5 bg-slate-900/70 rounded px-2 py-1.5 border border-slate-700/60">
         <svg
-          className="w-3 h-3 text-slate-500 shrink-0 mt-0.5"
+          className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5"
           fill="currentColor"
           viewBox="0 0 20 20"
         >
@@ -64,12 +93,11 @@ export default function EmergencyPriorityCard({
             clipRule="evenodd"
           />
         </svg>
-        <p className="text-[10px] text-slate-500 leading-relaxed">
-          <span className="font-semibold text-slate-400">
+        <p className="text-[10px] text-slate-400 leading-tight">
+          <span className="font-semibold text-amber-300">
             PROTOTYPE DECISION-SUPPORT — NOT OFFICIAL.
           </span>{" "}
-          Outputs are from a prototype scoring model and must not be used for
-          operational disaster response without expert validation.
+          Weights: 60% landslide risk, 15% road exposure, 15% settlements, 10% facilities. Not an official government emergency classification.
         </p>
       </div>
 
@@ -79,46 +107,46 @@ export default function EmergencyPriorityCard({
             ?
           </div>
           <p className="text-xs text-slate-500 text-center">
-            Priority calculated after zone selection
-            <br />
-            <span className="text-[10px] text-slate-600">
-              Phase 6 enables spatial exposure logic
-            </span>
+            Select a zone on the map to evaluate 4-horizon priority
           </p>
         </div>
       ) : (
         <>
-          {/* Priority badge */}
-          <div className="flex items-center gap-3">
-            <div className="text-3xl">{PRIORITY_ICONS[priority.priority]}</div>
-            <div>
-              <span
-                className={`risk-badge text-sm px-3 py-1 ${PRIORITY_BG_CLASSES[priority.priority]}`}
-              >
-                {priority.priority}
-              </span>
-              <p className="text-[11px] text-slate-400 mt-1">
-                {PRIORITY_DESC[priority.priority]}
-              </p>
-            </div>
+          {/* 4-Horizon Priority Outlook Grid */}
+          <div className="grid grid-cols-4 gap-1.5">
+            <HorizonCell label="NOW" h={nowH} />
+            <HorizonCell label="+24h" h={h24} />
+            <HorizonCell label="+48h" h={h48} />
+            <HorizonCell label="+72h" h={h72} />
           </div>
 
-          {/* Reasoning list */}
-          {priority.reasoning.length > 0 && (
-            <div className="flex flex-col gap-1">
-              <p className="text-[10px] text-slate-500 uppercase tracking-wide">
-                Factors
+          {/* Deterministic Explanation */}
+          {priority.explanation && (
+            <div className="bg-slate-900/60 border border-slate-700/50 rounded-md p-2 flex flex-col gap-1">
+              <span className="text-[9px] font-semibold text-slate-400 uppercase tracking-wide">
+                Priority Outlook Rationale
+              </span>
+              <p className="text-[10px] text-slate-300 leading-snug">
+                {priority.explanation}
               </p>
-              {priority.reasoning.map((r, i) => (
-                <div key={i} className="flex items-start gap-1.5 text-xs">
-                  <span className="text-slate-600 shrink-0">·</span>
-                  <span className="text-slate-400">{r}</span>
-                </div>
-              ))}
+              {priority.horizon_transitions && priority.horizon_transitions.length > 0 && (
+                <ul className="text-[9px] text-slate-400 list-disc list-inside space-y-0.5 mt-0.5">
+                  {priority.horizon_transitions.map((t, i) => (
+                    <li key={i} className="leading-tight">
+                      {t}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           )}
         </>
       )}
+
+      {/* Footer */}
+      <p className="text-[9px] text-slate-500 border-t border-slate-700/60 pt-2 leading-tight">
+        Static OSM exposure geography · Dynamic rainfall-triggered risk · Prototype Decision-Support
+      </p>
     </div>
   );
 }

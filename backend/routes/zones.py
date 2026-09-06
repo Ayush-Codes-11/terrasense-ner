@@ -29,6 +29,12 @@ def health():
             "GET /risk/current/{zone_id}",
             "GET /risk/forecast/{zone_id}",
             "GET /weather/{zone_id}",
+            "GET /geodata/osm/status",
+            "GET /geodata/osm/roads",
+            "GET /geodata/osm/settlements",
+            "GET /geodata/osm/critical-facilities",
+            "GET /exposure/{zone_id}",
+            "GET /priority/{zone_id}",
             "GET /docs",
         ],
     )

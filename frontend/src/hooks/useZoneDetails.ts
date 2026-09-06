@@ -1,16 +1,21 @@
 // ============================================================
-// useZoneDetails — fetches zone forecast + current risk from FastAPI backend.
+// useZoneDetails — fetches zone forecast, risk, exposure, and priority from FastAPI.
 // Falls back to local GeoJSON-derived data if the backend is down.
 //
-// source = "api"             → data from /risk/forecast/{zone_id} & /risk/current/{zone_id}
+// source = "api"             → data from FastAPI endpoints
 // source = "sample_fallback" → data derived locally via zoneTransformers
 // source = null              → no zone selected
 // ============================================================
 
 import { useState, useEffect } from "react";
-import type { Zone, ZoneForecast, WhyNowData } from "../types";
+import type { Zone, ZoneForecast, WhyNowData, ExposureData, PriorityData } from "../types";
 import type { ZoneGeoJSONProperties } from "../types/geojson";
-import { getZoneForecast, getZoneRisk } from "../services/api";
+import {
+  getZoneForecast,
+  getZoneRisk,
+  getZoneExposure,
+  getZonePriority,
+} from "../services/api";
 import {
   propsToForecast,
   propsToZone,
@@ -23,6 +28,8 @@ export interface ZoneDetailsResult {
   forecast: ZoneForecast | null;
   selectedZone: Zone | null;
   whyNow: WhyNowData | null;
+  exposure: ExposureData | null;
+  priority: PriorityData | null;
   loading: boolean;
   apiOnline: boolean | null;
   source: ForecastSource;
@@ -35,6 +42,8 @@ export function useZoneDetails(
 ): ZoneDetailsResult {
   const [apiForecast, setApiForecast] = useState<ZoneForecast | null>(null);
   const [apiZoneRisk, setApiZoneRisk] = useState<Zone | null>(null);
+  const [apiExposure, setApiExposure] = useState<ExposureData | null>(null);
+  const [apiPriority, setApiPriority] = useState<PriorityData | null>(null);
   const [loading, setLoading] = useState(false);
   const [apiOnline, setApiOnline] = useState<boolean | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -43,6 +52,8 @@ export function useZoneDetails(
     if (!zoneId) {
       setApiForecast(null);
       setApiZoneRisk(null);
+      setApiExposure(null);
+      setApiPriority(null);
       setError(null);
       setApiOnline(null);
       return;
@@ -51,10 +62,17 @@ export function useZoneDetails(
     setLoading(true);
     setError(null);
 
-    Promise.all([getZoneForecast(zoneId), getZoneRisk(zoneId)])
-      .then(([forecastData, zoneRiskData]) => {
+    Promise.all([
+      getZoneForecast(zoneId),
+      getZoneRisk(zoneId),
+      getZoneExposure(zoneId),
+      getZonePriority(zoneId),
+    ])
+      .then(([forecastData, zoneRiskData, exposureData, priorityData]) => {
         setApiForecast(forecastData);
         setApiZoneRisk(zoneRiskData);
+        setApiExposure(exposureData);
+        setApiPriority(priorityData);
         setApiOnline(true);
         setLoading(false);
       })
@@ -62,6 +80,8 @@ export function useZoneDetails(
         // Backend down or CORS error → fall back gracefully to local sample data.
         setApiForecast(null);
         setApiZoneRisk(null);
+        setApiExposure(null);
+        setApiPriority(null);
         setApiOnline(false);
         setError(String(err));
         setLoading(false);
@@ -93,6 +113,8 @@ export function useZoneDetails(
       forecast: apiForecast,
       selectedZone: apiZoneRisk,
       whyNow,
+      exposure: apiExposure,
+      priority: apiPriority,
       loading,
       apiOnline: true,
       source: "api",
@@ -104,11 +126,53 @@ export function useZoneDetails(
   const localForecast = localProps ? propsToForecast(localProps) : null;
   const localZone = localProps ? propsToZone(localProps) : null;
   const localWhyNow = localProps ? propsToWhyNow(localProps) : null;
+  const localExposure: ExposureData | null = localProps
+    ? {
+        zone_id: localProps.zone_id,
+        summary: {
+          roads_exposed: 2,
+          roads_exposed_km: 1.5,
+          villages_exposed: 1,
+          hospitals_exposed: 1,
+          roads_blocked: 0,
+        },
+        data_meta: {
+          data_type: "SAMPLE_MOCK",
+          source: "sample",
+          freshness: null,
+          is_live: false,
+          note: "Sample fallback — backend offline",
+        },
+      }
+    : null;
+
+  const localPriority: PriorityData | null = localProps
+    ? {
+        zone_id: localProps.zone_id,
+        priority:
+          localProps.risk_category === "VERY_HIGH"
+            ? "VERY_HIGH"
+            : localProps.risk_category === "HIGH"
+              ? "HIGH"
+              : "MODERATE",
+        priority_label: "PROTOTYPE DECISION-SUPPORT — NOT OFFICIAL",
+        explanation: `Sample fallback priority for Zone ${localProps.zone_id}.`,
+        data_meta: {
+          data_type: "SAMPLE_MOCK",
+          source: "sample",
+          freshness: null,
+          is_live: false,
+          note: "Sample fallback — backend offline",
+        },
+      }
+    : null;
 
   return {
     forecast: localForecast,
     selectedZone: localZone,
     whyNow: localWhyNow,
+    exposure: localExposure,
+    priority: localPriority,
     loading,
     apiOnline,
     source: localProps ? "sample_fallback" : null,

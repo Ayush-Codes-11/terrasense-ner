@@ -13,6 +13,8 @@ import type {
   WeatherData,
   DistrictMeta,
   Alert,
+  ExposureData,
+  PriorityData,
 } from "../types";
 
 const BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "";
@@ -168,3 +170,25 @@ export async function getAlerts(): Promise<Alert[]> {
   // Not implemented in backend yet.
   return [];
 }
+
+// ── Exposure & Priority (Phase 6) ─────────────────────────────────────────────
+
+export async function getZoneExposure(zoneId: string): Promise<ExposureData> {
+  return apiFetch<ExposureData>(`/exposure/${encodeURIComponent(zoneId)}`);
+}
+
+export async function getZonePriority(zoneId: string): Promise<PriorityData> {
+  return apiFetch<PriorityData>(`/priority/${encodeURIComponent(zoneId)}`);
+}
+
+export async function getOsmStatus(): Promise<{
+  status: string;
+  is_real: boolean;
+  retrieved_at: string | null;
+  source: string;
+  attribution: string;
+  feature_counts: Record<string, number>;
+}> {
+  return apiFetch(`/geodata/osm/status`);
+}
+

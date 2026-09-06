@@ -177,8 +177,104 @@ class WeatherResponse(BaseModel):
     data_meta: DataMeta
 
 
+# ── Geodata & OSM Status ──────────────────────────────────────────────────────
+
+class OSMStatusResponse(BaseModel):
+    status: str  # "OSM snapshot" | "Cached OSM" | "Sample fallback"
+    is_real: bool
+    retrieved_at: Optional[str] = None
+    source: str
+    attribution: str
+    feature_counts: Dict[str, int]
+    data_meta: DataMeta
+
+
+# ── Exposure (Phase 6) ────────────────────────────────────────────────────────
+
+class ExposedRoadSchema(BaseModel):
+    feature_id: str
+    name: Optional[str] = None
+    highway: str
+    length_km: float
+    blockage_verified: bool = False
+    road_status: str = "EXPOSED_NOT_VERIFIED_BLOCKED"
+
+
+class ExposedSettlementSchema(BaseModel):
+    feature_id: str
+    name: Optional[str] = None
+    place: str
+
+
+class ExposedFacilitySchema(BaseModel):
+    feature_id: str
+    name: Optional[str] = None
+    category: str
+
+
+class ExposureSummarySchema(BaseModel):
+    roads_exposed: int
+    roads_exposed_km: float
+    villages_exposed: int
+    hospitals_exposed: int
+    roads_blocked: int = 0  # Only >0 if verified field report exists
+
+
+class ZoneExposureResponse(BaseModel):
+    zone_id: str
+    summary: ExposureSummarySchema
+    roads: List[ExposedRoadSchema]
+    settlements: List[ExposedSettlementSchema]
+    critical_facilities: List[ExposedFacilitySchema]
+    hazard_geometry: str = "SAMPLE_MOCK"
+    exposure_features: str = "REAL_OSM"
+    analysis_mode: str = "PROTOTYPE_MIXED_PROVENANCE"
+    data_meta: DataMeta
+
+
+# ── Prototype Decision-Support Priority (Phase 6) ─────────────────────────────
+
+class PriorityContributorSchema(BaseModel):
+    component: str
+    display_name: str
+    weight: float
+    raw_value: float
+    normalized_input: float
+    contribution: float
+
+
+class HorizonPrioritySchema(BaseModel):
+    horizon: str
+    priority: str
+    priority_score: float
+    landslide_risk_score: float
+    landslide_risk_category: str
+    score_type: str = "prototype_decision_support_priority"
+    is_official_standard: bool = False
+    is_operationally_validated: bool = False
+    contributors: List[PriorityContributorSchema]
+
+
+class ZonePriorityResponse(BaseModel):
+    zone_id: str
+    priority: str
+    priority_score: float
+    priority_label: str = "PROTOTYPE DECISION-SUPPORT — NOT OFFICIAL"
+    windows: Dict[str, HorizonPrioritySchema]
+    now: HorizonPrioritySchema
+    forecast: Dict[str, HorizonPrioritySchema]  # "24h", "48h", "72h"
+    explanation: str
+    horizon_transitions: List[str]
+    exposure_summary: Dict[str, Any]
+    hazard_geometry: str = "SAMPLE_MOCK"
+    exposure_features: str = "REAL_OSM"
+    analysis_mode: str = "PROTOTYPE_MIXED_PROVENANCE"
+    data_meta: DataMeta
+
+
 # ── Error ─────────────────────────────────────────────────────────────────────
 
 class ErrorResponse(BaseModel):
     detail: str
     data_meta: DataMeta = Field(default_factory=lambda: DataMeta())
+

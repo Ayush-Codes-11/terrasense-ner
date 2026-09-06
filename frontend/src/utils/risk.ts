@@ -2,7 +2,7 @@
 // Risk utility helpers — colour, label, icon
 // ============================================================
 
-import type { RiskLevel, PriorityLevel } from "../types";
+import type { RiskLevel } from "../types";
 
 export const RISK_COLORS: Record<RiskLevel, string> = {
   LOW: "#22c55e",
@@ -25,10 +25,12 @@ export const RISK_LABEL: Record<RiskLevel, string> = {
   VERY_HIGH: "Very High",
 };
 
-export const PRIORITY_BG_CLASSES: Record<PriorityLevel, string> = {
+export const PRIORITY_BG_CLASSES: Record<string, string> = {
   LOW: "bg-slate-500/20 text-slate-400 border-slate-500/40",
+  MODERATE: "bg-blue-500/20 text-blue-400 border-blue-500/40",
   MEDIUM: "bg-blue-500/20 text-blue-400 border-blue-500/40",
   HIGH: "bg-orange-500/20 text-orange-400 border-orange-500/40",
+  VERY_HIGH: "bg-red-500/20 text-red-400 border-red-500/40",
   CRITICAL: "bg-red-500/20 text-red-400 border-red-500/40",
 };
 

@@ -31,24 +31,38 @@ export interface ZoneGeoJSONProperties {
 }
 
 export interface RoadGeoJSONProperties {
-  road_id: string;
-  name: string;
-  road_type: "national_highway" | "state_highway" | "district_road" | "local_road";
-  data_type: "SAMPLE_MOCK";
+  road_id?: string;
+  osm_id?: number;
+  name?: string | null;
+  road_type?: "national_highway" | "state_highway" | "district_road" | "local_road";
+  highway?: string;
+  ref?: string | null;
+  source?: string;
+  data_type?: "SAMPLE_MOCK" | "REAL_OSM";
+  blockage_verified?: boolean;
+  road_status?: string;
 }
 
 export interface VillageGeoJSONProperties {
-  village_id: string;
-  name: string;
-  population_est: number;
-  zone_id: string;
-  data_type: "SAMPLE_MOCK";
+  village_id?: string;
+  osm_id?: number;
+  name?: string | null;
+  population_est?: number;
+  population?: string | number;
+  place?: string;
+  zone_id?: string;
+  source?: string;
+  data_type?: "SAMPLE_MOCK" | "REAL_OSM";
 }
 
 export interface FacilityGeoJSONProperties {
-  facility_id: string;
-  name: string;
-  facility_type: "hospital" | "primary_health_centre" | "emergency_centre" | "other";
-  zone_id: string;
-  data_type: "SAMPLE_MOCK";
+  facility_id?: string;
+  osm_id?: number;
+  name?: string | null;
+  facility_type?: "hospital" | "primary_health_centre" | "emergency_centre" | "other" | string;
+  category?: string;
+  amenity?: string;
+  zone_id?: string;
+  source?: string;
+  data_type?: "SAMPLE_MOCK" | "REAL_OSM";
 }

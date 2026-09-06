@@ -88,20 +88,37 @@ function MapLegend() {
   return null;
 }
 
-// ---- Road colour by type ----
+// ---- Road colour by type / OSM highway ----
 
-function roadColor(type: string): string {
+function roadColor(type?: string): string {
+  if (!type) return "#94a3b8";
   const map: Record<string, string> = {
     national_highway: "#60a5fa",
+    motorway: "#60a5fa",
+    trunk: "#60a5fa",
+    primary: "#60a5fa",
     state_highway: "#818cf8",
+    secondary: "#818cf8",
     district_road: "#a78bfa",
+    tertiary: "#a78bfa",
+    unclassified: "#94a3b8",
+    residential: "#94a3b8",
+    living_street: "#94a3b8",
+    service: "#64748b",
+    track: "#78716c",
+    path: "#64748b",
+    footway: "#64748b",
     local_road: "#94a3b8",
   };
   return map[type] ?? "#94a3b8";
 }
 
-function roadWeight(type: string): number {
-  return type === "national_highway" ? 3 : type === "state_highway" ? 2.5 : 2;
+function roadWeight(type?: string): number {
+  if (!type) return 1.5;
+  if (["national_highway", "motorway", "trunk", "primary"].includes(type)) return 3;
+  if (["state_highway", "secondary"].includes(type)) return 2.5;
+  if (["district_road", "tertiary"].includes(type)) return 2;
+  return 1.5;
 }
 
 import type { Zone } from "../../types";
@@ -272,34 +289,53 @@ export default function RiskMap({
           </LayersControl.Overlay>
 
           {/* ── Roads ── */}
-          <LayersControl.Overlay checked name="🛣 Roads (sample)">
+          <LayersControl.Overlay checked name={geoData.isRealOsm ? "🛣 Roads (Real OSM)" : "🛣 Roads (sample)"}>
             <>
               {roads?.features.map((f, i) => {
                 const props = f.properties as RoadGeoJSONProperties;
+                const highwayType = props.highway ?? props.road_type ?? "road";
+                const isReal = props.data_type === "REAL_OSM" || geoData.isRealOsm;
+                const roadName = props.name || props.ref || (isReal ? "Unnamed road (OSM)" : "Unnamed road");
                 const coords = (
                   f.geometry as GeoJSON.LineString
                 ).coordinates.map(([lon, lat]) => [lat, lon] as [number, number]);
                 return (
                   <Polyline
-                    key={props.road_id ?? i}
+                    key={props.road_id ?? props.osm_id ?? i}
                     positions={coords}
                     pathOptions={{
-                      color: roadColor(props.road_type),
-                      weight: roadWeight(props.road_type),
+                      color: roadColor(highwayType),
+                      weight: roadWeight(highwayType),
                       opacity: 0.8,
                       dashArray:
-                        props.road_type === "local_road" ? "4 4" : undefined,
+                        highwayType === "local_road" || highwayType === "service" || highwayType === "track"
+                          ? "4 4"
+                          : undefined,
                     }}
                   >
                     <Popup>
                       <div className="text-xs">
-                        <p className="font-semibold">{props.name}</p>
+                        <p className="font-semibold">{roadName}</p>
                         <p className="text-slate-500 capitalize">
-                          {props.road_type.replace(/_/g, " ")}
+                          {highwayType.replace(/_/g, " ")}
                         </p>
-                        <p className="text-amber-500 text-[10px] mt-1">
-                          SAMPLE MOCK
-                        </p>
+                        {isReal ? (
+                          <div className="mt-1 border-t border-slate-700/50 pt-1">
+                            <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-mono bg-emerald-950 text-emerald-300 border border-emerald-800">
+                              REAL_OSM · © OSM contributors
+                            </span>
+                            <p className="text-slate-400 text-[10px] mt-1 font-mono">
+                              Status: EXPOSED_NOT_VERIFIED_BLOCKED
+                            </p>
+                            <p className="text-slate-500 text-[9px] italic">
+                              Intersecting hazard zone; blockage not verified
+                            </p>
+                          </div>
+                        ) : (
+                          <p className="text-amber-500 text-[10px] mt-1 font-mono">
+                            SAMPLE MOCK
+                          </p>
+                        )}
                       </div>
                     </Popup>
                   </Polyline>
@@ -308,15 +344,22 @@ export default function RiskMap({
             </>
           </LayersControl.Overlay>
 
-          {/* ── Villages ── */}
-          <LayersControl.Overlay checked name="🏘 Villages (sample)">
+          {/* ── Villages / Settlements ── */}
+          <LayersControl.Overlay checked name={geoData.isRealOsm ? "🏘 Settlements (Real OSM)" : "🏘 Villages (sample)"}>
             <>
               {villages?.features.map((f, i) => {
                 const props = f.properties as VillageGeoJSONProperties;
                 const [lon, lat] = (f.geometry as GeoJSON.Point).coordinates;
+                const isReal = props.data_type === "REAL_OSM" || geoData.isRealOsm;
+                const name = props.name || (isReal ? "Settlement (OSM)" : "Unnamed village");
+                const popDisplay = props.population
+                  ? `Pop. ${Number(props.population).toLocaleString()}`
+                  : props.population_est
+                    ? `Pop. est. ${props.population_est.toLocaleString()}`
+                    : null;
                 return (
                   <CircleMarker
-                    key={props.village_id ?? i}
+                    key={props.village_id ?? props.osm_id ?? i}
                     center={[lat, lon]}
                     radius={5}
                     pathOptions={{
@@ -328,16 +371,29 @@ export default function RiskMap({
                   >
                     <Popup>
                       <div className="text-xs">
-                        <p className="font-semibold">{props.name}</p>
-                        <p className="text-slate-500">
-                          Pop. est. {props.population_est.toLocaleString()}
-                        </p>
-                        <p className="text-slate-500">
-                          Zone: {props.zone_id}
-                        </p>
-                        <p className="text-amber-500 text-[10px] mt-1">
-                          SAMPLE MOCK
-                        </p>
+                        <p className="font-semibold">{name}</p>
+                        {props.place && (
+                          <p className="text-slate-500 capitalize">
+                            Type: {props.place}
+                          </p>
+                        )}
+                        {popDisplay && (
+                          <p className="text-slate-500">{popDisplay}</p>
+                        )}
+                        {props.zone_id && (
+                          <p className="text-slate-500">Zone: {props.zone_id}</p>
+                        )}
+                        {isReal ? (
+                          <div className="mt-1 border-t border-slate-700/50 pt-1">
+                            <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-mono bg-emerald-950 text-emerald-300 border border-emerald-800">
+                              REAL_OSM · © OSM contributors
+                            </span>
+                          </div>
+                        ) : (
+                          <p className="text-amber-500 text-[10px] mt-1 font-mono">
+                            SAMPLE MOCK
+                          </p>
+                        )}
                       </div>
                     </Popup>
                   </CircleMarker>
@@ -347,14 +403,22 @@ export default function RiskMap({
           </LayersControl.Overlay>
 
           {/* ── Critical Facilities ── */}
-          <LayersControl.Overlay checked name="🏥 Critical Facilities (sample)">
+          <LayersControl.Overlay checked name={geoData.isRealOsm ? "🏥 Critical Facilities (Real OSM)" : "🏥 Critical Facilities (sample)"}>
             <>
               {hospitals?.features.map((f, i) => {
                 const props = f.properties as FacilityGeoJSONProperties;
                 const [lon, lat] = (f.geometry as GeoJSON.Point).coordinates;
+                const isReal = props.data_type === "REAL_OSM" || geoData.isRealOsm;
+                const name = props.name || (isReal ? "Facility (OSM)" : "Unnamed facility");
+                const facilityType = (
+                  props.category ??
+                  props.amenity ??
+                  props.facility_type ??
+                  "critical_facility"
+                ).replace(/_/g, " ");
                 return (
                   <CircleMarker
-                    key={props.facility_id ?? i}
+                    key={props.facility_id ?? props.osm_id ?? i}
                     center={[lat, lon]}
                     radius={6}
                     pathOptions={{
@@ -366,14 +430,22 @@ export default function RiskMap({
                   >
                     <Popup>
                       <div className="text-xs">
-                        <p className="font-semibold">{props.name}</p>
-                        <p className="text-slate-500 capitalize">
-                          {props.facility_type.replace(/_/g, " ")}
-                        </p>
-                        <p className="text-slate-500">Zone: {props.zone_id}</p>
-                        <p className="text-amber-500 text-[10px] mt-1">
-                          SAMPLE MOCK
-                        </p>
+                        <p className="font-semibold">{name}</p>
+                        <p className="text-slate-500 capitalize">{facilityType}</p>
+                        {props.zone_id && (
+                          <p className="text-slate-500">Zone: {props.zone_id}</p>
+                        )}
+                        {isReal ? (
+                          <div className="mt-1 border-t border-slate-700/50 pt-1">
+                            <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-mono bg-emerald-950 text-emerald-300 border border-emerald-800">
+                              REAL_OSM · © OSM contributors
+                            </span>
+                          </div>
+                        ) : (
+                          <p className="text-amber-500 text-[10px] mt-1 font-mono">
+                            SAMPLE MOCK
+                          </p>
+                        )}
                       </div>
                     </Popup>
                   </CircleMarker>

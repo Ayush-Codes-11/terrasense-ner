@@ -51,11 +51,13 @@ export default function Dashboard() {
     apiOnline: allZonesApiOnline,
   } = useAllZoneRisks(fallbackZones);
 
-  // Fetch selected zone forecast & current risk details (with contributors)
+  // Fetch selected zone forecast & current risk details (with contributors, exposure, priority)
   const {
     forecast,
     selectedZone: apiSelectedZone,
     whyNow,
+    exposure,
+    priority,
     loading: forecastLoading,
     apiOnline: zoneDetailsApiOnline,
     source: forecastSource,
@@ -79,12 +81,16 @@ export default function Dashboard() {
         : allZonesApiOnline ?? zoneDetailsApiOnline;
 
   // System status indicators
-  const geoLayersOk = geoData.error ? false : geoData.gridRisk ? true : null;
-  const geoLayersStatus = geoData.loading
+  const geoExposureStatus = geoData.loading
     ? "Loading…"
     : geoData.error
       ? "Load error"
-      : "Sample loaded";
+      : geoData.osmStatus === "OSM snapshot"
+        ? "OSM snapshot"
+        : geoData.osmStatus === "Cached OSM"
+          ? "Cached OSM"
+          : "Sample fallback";
+  const geoExposureOk = geoData.error ? false : geoData.isRealOsm ? true : false;
 
   const apiStatus =
     apiOnline === true
@@ -198,8 +204,8 @@ export default function Dashboard() {
 
           <RiskSeverityCard zones={zonesList} selectedZone={selectedZone} />
           <ForecastCard forecast={forecast} zoneId={selectedZoneId} />
-          <ExposureCard exposure={null} zoneId={selectedZoneId} />
-          <EmergencyPriorityCard priority={null} zoneId={selectedZoneId} />
+          <ExposureCard exposure={exposure} zoneId={selectedZoneId} />
+          <EmergencyPriorityCard priority={priority} zoneId={selectedZoneId} />
           <WhyNowCard whyNow={whyNow} zoneId={selectedZoneId} />
         </aside>
       </div>
@@ -228,11 +234,11 @@ export default function Dashboard() {
                 status: riskEngineStatus,
                 ok: riskEngineOk,
               },
-              { label: "Weather Data", status: "Sample mode", ok: null },
+              { label: "Weather Data", status: "Sample scenario", ok: null },
               {
-                label: "Geospatial Layers",
-                status: geoLayersStatus,
-                ok: geoLayersOk,
+                label: "Geospatial Exposure",
+                status: geoExposureStatus,
+                ok: geoExposureOk,
               },
               { label: "Field Reports", status: "Phase 8", ok: null },
             ].map(({ label, status, ok }) => (
