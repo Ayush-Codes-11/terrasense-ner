@@ -50,6 +50,8 @@ export async function getAllZoneRisks(): Promise<Zone[]> {
       slope: number;
       elevation: number;
       soil_moisture: number;
+      soil_wetness_index?: number;
+      normalized_features?: Zone["normalized_features"];
       contributors?: Zone["contributors"];
       data_meta: Zone["data_meta"];
     }>;
@@ -66,7 +68,9 @@ export async function getAllZoneRisks(): Promise<Zone[]> {
     computed_by: z.computed_by,
     slope_deg: z.slope,
     elevation_m: z.elevation,
-    soil_moisture_index: z.soil_moisture,
+    soil_moisture_index: z.soil_wetness_index ?? z.soil_moisture,
+    soil_wetness_index: z.soil_wetness_index ?? z.soil_moisture,
+    normalized_features: z.normalized_features,
     contributors: z.contributors,
     data_meta: z.data_meta,
   }));
@@ -87,6 +91,8 @@ export async function getZoneRisk(zoneId: string): Promise<Zone> {
     slope: number;
     elevation: number;
     soil_moisture: number;
+    soil_wetness_index?: number;
+    normalized_features?: Zone["normalized_features"];
     contributors?: Zone["contributors"];
     data_meta: Zone["data_meta"];
   }>(`/risk/current/${encodeURIComponent(zoneId)}`);
@@ -102,7 +108,9 @@ export async function getZoneRisk(zoneId: string): Promise<Zone> {
     computed_by: z.computed_by,
     slope_deg: z.slope,
     elevation_m: z.elevation,
-    soil_moisture_index: z.soil_moisture,
+    soil_moisture_index: z.soil_wetness_index ?? z.soil_moisture,
+    soil_wetness_index: z.soil_wetness_index ?? z.soil_moisture,
+    normalized_features: z.normalized_features,
     contributors: z.contributors,
     data_meta: z.data_meta,
   };

@@ -50,6 +50,14 @@ def test_get_all_current_risk():
         assert z["risk_category"] in ["LOW", "MODERATE", "HIGH", "VERY_HIGH"]
         assert len(z["contributors"]) == 4
 
+        # Verify nested normalized_features
+        nf = z["normalized_features"]
+        assert 0.0 <= nf["terrain"] <= 1.0
+        assert 0.0 <= nf["recent_rainfall"] <= 1.0
+        assert 0.0 <= nf["antecedent_rainfall"] <= 1.0
+        assert 0.0 <= nf["soil_wetness"] <= 1.0
+        assert "soil_wetness_index" in z
+
 
 def test_get_zone_current_risk_c03():
     res = client.get("/risk/current/C03")
@@ -61,6 +69,10 @@ def test_get_zone_current_risk_c03():
     assert data["score_type"] == "prototype_relative_risk_score"
     assert data["is_probability"] is False
     assert data["is_calibrated"] is False
+
+    # Check nested normalized_features
+    assert "normalized_features" in data
+    assert data["normalized_features"]["terrain"] == 1.0  # slope 42 / 40 ref = capped 1.0
 
     # Check contributors are sorted descending by contribution
     contribs = [c["contribution"] for c in data["contributors"]]

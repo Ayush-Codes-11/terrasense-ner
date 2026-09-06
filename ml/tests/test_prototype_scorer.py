@@ -134,7 +134,7 @@ def test_moderate_band_lower_boundary():
     assert r.risk_category == "MODERATE"
 
 
-# ── 7. Input validation ────────────────────────────────────────────────────────
+# ── 7. Input validation & Physical guards ─────────────────────────────────────
 
 def test_nan_input_raises():
     with pytest.raises(ValueError, match="Invalid input"):
@@ -149,6 +149,84 @@ def test_inf_input_raises():
 def test_negative_inf_raises():
     with pytest.raises(ValueError, match="Invalid input"):
         score_zone(25, 20, float("-inf"), 0.4)
+
+
+def test_negative_slope_raises():
+    with pytest.raises(ValueError, match="Physically invalid negative slope"):
+        score_zone(-1.0, 20, 60, 0.4)
+
+
+def test_negative_rain_24h_raises():
+    with pytest.raises(ValueError, match="Physically invalid negative rainfall"):
+        score_zone(25, -0.5, 60, 0.4)
+
+
+def test_negative_rain_3d_raises():
+    with pytest.raises(ValueError, match="Physically invalid negative rainfall"):
+        score_zone(25, 20, -5.0, 0.4)
+
+
+def test_soil_wetness_negative_raises():
+    with pytest.raises(ValueError, match="Physically invalid soil wetness index"):
+        score_zone(25, 20, 60, -0.05)
+
+
+def test_soil_wetness_greater_than_one_raises():
+    with pytest.raises(ValueError, match="Physically invalid soil wetness index"):
+        score_zone(25, 20, 60, 1.05)
+
+
+def test_missing_slope_raises():
+    with pytest.raises(ValueError, match="Missing required scoring input"):
+        score_zone(None, 20, 60, 0.4)
+
+
+def test_missing_rain_24h_raises():
+    with pytest.raises(ValueError, match="Missing required scoring input"):
+        score_zone(25, None, 60, 0.4)
+
+
+def test_missing_rain_3d_raises():
+    with pytest.raises(ValueError, match="Missing required scoring input"):
+        score_zone(25, 20, None, 0.4)
+
+
+def test_missing_soil_wetness_raises():
+    with pytest.raises(ValueError, match="Missing required scoring input"):
+        score_zone(25, 20, 60, None)
+
+
+def test_nested_normalized_features_object():
+    """Verify normalized_features is nested and represents normalized inputs, not weighted contributions."""
+    r = score_zone(20, 35, 75, 0.5)
+    nf = r.normalized_features
+    assert nf is not None
+    # slope: 20 / 40.0 = 0.5
+    assert abs(nf.terrain - 0.5) < 1e-4
+    # rain_24h: 35 / 70.0 = 0.5
+    assert abs(nf.recent_rainfall - 0.5) < 1e-4
+    # rain_3d: 75 / 150.0 = 0.5
+    assert abs(nf.antecedent_rainfall - 0.5) < 1e-4
+    # soil wetness: 0.5 / 1.0 = 0.5
+    assert abs(nf.soil_wetness - 0.5) < 1e-4
+
+    # Verify contributors hold the actual weighted contribution (weight * normalized_input)
+    terrain_contrib = next(c for c in r.contributors if c.component == "terrain")
+    assert abs(terrain_contrib.contribution - (WEIGHTS["terrain"] * 0.5)) < 1e-4
+
+    # Backward compatibility properties match normalized_features
+    assert r.terrain_component == nf.terrain
+    assert r.recent_rainfall_component == nf.recent_rainfall
+    assert r.antecedent_rainfall_component == nf.antecedent_rainfall
+    assert r.soil_wetness_component == nf.soil_wetness
+
+
+def test_soil_wetness_index_naming():
+    """Verify both soil_wetness_index and soil_moisture keyword arguments work identically."""
+    r1 = score_zone(slope_deg=25, rain_24h_mm=20, rain_3d_mm=60, soil_wetness_index=0.45)
+    r2 = score_zone(slope_deg=25, rain_24h_mm=20, rain_3d_mm=60, soil_moisture=0.45)
+    assert r1.score == r2.score
+    assert r1.normalized_features.soil_wetness == r2.normalized_features.soil_wetness
 
 
 # ── 8. Precomputed risk_score is NOT an input ──────────────────────────────────

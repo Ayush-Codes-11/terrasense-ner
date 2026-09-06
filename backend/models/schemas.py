@@ -67,6 +67,18 @@ class ContributorSchema(BaseModel):
     weight: Optional[float] = None
 
 
+class NormalizedFeatures(BaseModel):
+    """
+    Normalized feature inputs in range [0.0, 1.0].
+    These represent scaled physical inputs (raw_value / reference, capped at 1.0),
+    NOT the final weighted contributions.
+    """
+    terrain: float
+    recent_rainfall: float
+    antecedent_rainfall: float
+    soil_wetness: float
+
+
 class ZoneRisk(BaseModel):
     zone_id: str
     risk_category: str
@@ -80,17 +92,16 @@ class ZoneRisk(BaseModel):
     slope: float
     elevation: float
     soil_moisture: float
+    soil_wetness_index: float
+    soil_wetness_note: str = "SAMPLE_MOCK normalized index [0.0, 1.0] (not a real SMAP observation)"
     rain_24h: float
     rain_3d: float
     rain_7d: Optional[float] = None
 
-    # Transparent component breakdown
-    terrain_component: Optional[float] = None
-    recent_rainfall_component: Optional[float] = None
-    antecedent_rainfall_component: Optional[float] = None
-    soil_wetness_component: Optional[float] = None
+    # Nested normalized inputs (raw / reference capped at 1.0)
+    normalized_features: NormalizedFeatures
 
-    # Sorted by absolute contribution descending
+    # Sorted by absolute contribution descending (actual weighted contributions)
     contributors: Optional[List[ContributorSchema]] = None
 
     data_meta: DataMeta

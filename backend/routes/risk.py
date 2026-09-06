@@ -15,6 +15,7 @@ from models.schemas import (
     ContributorSchema,
     DataMeta,
     ForecastWindow,
+    NormalizedFeatures,
     NowWindow,
     ZoneForecastResponse,
     ZoneRisk,
@@ -48,6 +49,15 @@ def _props_to_zone_risk(p: dict) -> ZoneRisk:
         for c in res.contributors
     ]
 
+    normalized_features = NormalizedFeatures(
+        terrain=res.normalized_features.terrain,
+        recent_rainfall=res.normalized_features.recent_rainfall,
+        antecedent_rainfall=res.normalized_features.antecedent_rainfall,
+        soil_wetness=res.normalized_features.soil_wetness,
+    )
+
+    sw_val = float(p.get("soil_wetness_index") if "soil_wetness_index" in p else p.get("soil_moisture", 0.0))
+
     return ZoneRisk(
         zone_id=p["zone_id"],
         risk_category=res.risk_category,
@@ -59,14 +69,12 @@ def _props_to_zone_risk(p: dict) -> ZoneRisk:
         computed_by=res.computed_by,
         slope=float(p.get("slope", 0.0)),
         elevation=float(p.get("elevation", 0.0)),
-        soil_moisture=float(p.get("soil_moisture", 0.0)),
+        soil_moisture=sw_val,
+        soil_wetness_index=sw_val,
         rain_24h=float(p.get("rain_24h", 0.0)),
         rain_3d=float(p.get("rain_3d", 0.0)),
         rain_7d=float(p.get("rain_7d", 0.0)) if "rain_7d" in p else None,
-        terrain_component=res.terrain_component,
-        recent_rainfall_component=res.recent_rainfall_component,
-        antecedent_rainfall_component=res.antecedent_rainfall_component,
-        soil_wetness_component=res.soil_wetness_component,
+        normalized_features=normalized_features,
         contributors=contributors,
         data_meta=DataMeta(
             data_type="SAMPLE_MOCK",

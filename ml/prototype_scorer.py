@@ -10,26 +10,31 @@ prototype_scorer.py — Transparent weighted prototype risk scorer.
 ══════════════════════════════════════════════════════════════════════
 
 Inputs:  terrain + rainfall + soil wetness features
-Outputs: RiskResult with score, category, per-component contributions
+Outputs: RiskResult with score, category, per-component contributions,
+         and nested normalized_features.
 
 Design goals:
   • Fully transparent — every component is individually inspectable
-  • Monotone — increasing any hazard input never decreases the score
+  • Monotone — increasing any valid hazard input never decreases the score
+  • Validated inputs — physically invalid values (negative rain, negative slope,
+    soil wetness outside [0, 1]) are strictly rejected with ValueError,
+    never silently clamped.
   • No pre-computed risk_score values from GeoJSON are used as inputs
   • A future model (XGBoost/trained) replaces this module without
     changing the backend API or frontend components
 """
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 from typing import Optional
 
 from ml.scorer_config import (
     COMPONENT_LABELS,
     COMPUTED_BY,
-    FEATURE_REFS,
     IS_CALIBRATED,
     IS_PROBABILITY,
+    PROTOTYPE_NORMALIZATION_REFS,
     SCORE_TYPE,
     THRESHOLDS,
     WEIGHTS,
@@ -39,10 +44,23 @@ from ml.scorer_config import (
 # ── Data classes ───────────────────────────────────────────────────────────────
 
 @dataclass
+class NormalizedFeatures:
+    """
+    Normalized feature inputs in range [0.0, 1.0].
+    These represent scaled physical inputs (value / reference, capped at 1.0),
+    NOT the final weighted contributions.
+    """
+    terrain: float
+    recent_rainfall: float
+    antecedent_rainfall: float
+    soil_wetness: float
+
+
+@dataclass
 class Contributor:
     """Per-component contribution to the final prototype score."""
     component: str           # internal key, e.g. "terrain"
-    feature: str             # human-readable input name, e.g. "slope (deg)"
+    feature: str             # human-readable input name, e.g. "slope (42.0°)"
     display_name: str        # label shown in UI, from COMPONENT_LABELS
     normalized_input: float  # raw_value / reference, capped [0, 1]
     weight: float            # from WEIGHTS
@@ -59,11 +77,8 @@ class RiskResult:
     is_calibrated: bool
     computed_by: str
 
-    # Transparent component breakdown
-    terrain_component: float
-    recent_rainfall_component: float
-    antecedent_rainfall_component: float
-    soil_wetness_component: float
+    # Nested normalized inputs (not weighted contributions)
+    normalized_features: NormalizedFeatures
 
     # Sorted by absolute contribution descending (for WhyNow card)
     contributors: list[Contributor] = field(default_factory=list)
@@ -72,14 +87,31 @@ class RiskResult:
     elevation_m: Optional[float] = None
     rain_7d_mm: Optional[float] = None
 
+    # Backward compatibility properties
+    @property
+    def terrain_component(self) -> float:
+        return self.normalized_features.terrain
+
+    @property
+    def recent_rainfall_component(self) -> float:
+        return self.normalized_features.recent_rainfall
+
+    @property
+    def antecedent_rainfall_component(self) -> float:
+        return self.normalized_features.antecedent_rainfall
+
+    @property
+    def soil_wetness_component(self) -> float:
+        return self.normalized_features.soil_wetness
+
 
 # ── Private helpers ────────────────────────────────────────────────────────────
 
 def _normalize(value: float, reference: float) -> float:
-    """Divide value by reference, clamp to [0, 1].  reference > 0 assumed."""
+    """Divide value by reference, capped at 1.0. Assumes value >= 0 and reference > 0."""
     if reference <= 0:
         raise ValueError(f"reference must be > 0, got {reference}")
-    return min(max(value / reference, 0.0), 1.0)
+    return min(value / reference, 1.0)
 
 
 def _categorise(score: float) -> str:
@@ -87,7 +119,6 @@ def _categorise(score: float) -> str:
     for category, (low, high) in THRESHOLDS.items():
         if low <= score < high:
             return category
-    # Safety net: should not be reached given THRESHOLDS covers [0, >1)
     return "VERY_HIGH"
 
 
@@ -97,7 +128,8 @@ def score_zone(
     slope_deg: float,
     rain_24h_mm: float,
     rain_3d_mm: float,
-    soil_moisture: float,
+    soil_wetness_index: Optional[float] = None,
+    soil_moisture: Optional[float] = None,
     rain_7d_mm: Optional[float] = None,
     elevation_m: Optional[float] = None,
 ) -> RiskResult:
@@ -106,33 +138,46 @@ def score_zone(
 
     Parameters
     ----------
-    slope_deg       : Terrain slope in degrees.
-    rain_24h_mm     : Observed/sample rainfall in past 24 hours (mm).
-    rain_3d_mm      : Observed/sample 3-day accumulated rainfall (mm).
-    soil_moisture   : Soil wetness index [0, 1].  Any value outside [0, 1]
-                      is clamped silently.
-    rain_7d_mm      : Optional 7-day rainfall (mm).  Passed through as
-                      metadata; not used in this version of the formula.
-    elevation_m     : Optional elevation (m).  NOT used as a risk factor —
-                      elevation is not a simple monotonic risk predictor.
-                      Passed through as metadata only.
+    slope_deg          : Terrain slope in degrees (must be >= 0).
+    rain_24h_mm        : Observed/sample rainfall in past 24 hours in mm (must be >= 0).
+    rain_3d_mm         : Observed/sample 3-day accumulated rainfall in mm (must be >= 0).
+    soil_wetness_index : SAMPLE_MOCK normalized soil-wetness index [0.0, 1.0].
+                         (Not a real SMAP satellite measurement).
+    soil_moisture      : Backward-compatibility alias for soil_wetness_index.
+    rain_7d_mm         : Optional 7-day rainfall (mm). Passed through as metadata only.
+    elevation_m        : Optional elevation (m). NOT used as a risk factor;
+                         passed through as metadata only.
 
     Returns
     -------
-    RiskResult with score, category, component breakdown, and contributions.
+    RiskResult with score, category, normalized_features, and contributors.
 
     Raises
     ------
-    ValueError      : If any required numeric input is NaN or non-finite.
+    ValueError : If required inputs are missing, non-finite, or physically invalid
+                 (e.g., negative slope, negative rainfall, soil wetness outside [0, 1]).
     """
-    import math
+    # ── Missing required input checks ─────────────────────────────────────────
+    if slope_deg is None:
+        raise ValueError("Missing required scoring input: 'slope_deg'")
+    if rain_24h_mm is None:
+        raise ValueError("Missing required scoring input: 'rain_24h_mm'")
+    if rain_3d_mm is None:
+        raise ValueError("Missing required scoring input: 'rain_3d_mm'")
 
-    # ── Input validation ──────────────────────────────────────────────────────
+    # Resolve soil_wetness_index parameter / alias
+    sw_val = soil_wetness_index if soil_wetness_index is not None else soil_moisture
+    if sw_val is None:
+        raise ValueError(
+            "Missing required scoring input: 'soil_wetness_index' (or 'soil_moisture')"
+        )
+
+    # ── Non-finite checks ─────────────────────────────────────────────────────
     inputs = {
         "slope_deg": slope_deg,
         "rain_24h_mm": rain_24h_mm,
         "rain_3d_mm": rain_3d_mm,
-        "soil_moisture": soil_moisture,
+        "soil_wetness_index": sw_val,
     }
     for name, val in inputs.items():
         if not math.isfinite(val):
@@ -141,20 +186,38 @@ def score_zone(
                 "All required inputs must be finite numbers."
             )
 
-    # ── Normalise each feature to [0, 1] ─────────────────────────────────────
-    terrain_norm   = _normalize(slope_deg,   FEATURE_REFS["slope_deg"])
-    recent_norm    = _normalize(rain_24h_mm, FEATURE_REFS["rain_24h_mm"])
-    antecedent_norm = _normalize(rain_3d_mm, FEATURE_REFS["rain_3d_mm"])
-    soil_norm      = _normalize(soil_moisture, FEATURE_REFS["soil_moisture"])
+    # ── Physical validity checks ──────────────────────────────────────────────
+    # Do not silently clamp physically invalid inputs into valid scores!
+    if slope_deg < 0.0:
+        raise ValueError(f"Physically invalid negative slope: slope_deg={slope_deg} < 0")
+    if rain_24h_mm < 0.0:
+        raise ValueError(f"Physically invalid negative rainfall: rain_24h_mm={rain_24h_mm} < 0")
+    if rain_3d_mm < 0.0:
+        raise ValueError(f"Physically invalid negative rainfall: rain_3d_mm={rain_3d_mm} < 0")
+    if not (0.0 <= sw_val <= 1.0):
+        raise ValueError(
+            f"Physically invalid soil wetness index: {sw_val}. "
+            "SAMPLE_MOCK soil_wetness_index must be within [0.0, 1.0]."
+        )
+
+    # ── Normalise each feature to [0.0, 1.0] ──────────────────────────────────
+    terrain_norm = _normalize(slope_deg, PROTOTYPE_NORMALIZATION_REFS["slope_deg"])
+    recent_norm = _normalize(rain_24h_mm, PROTOTYPE_NORMALIZATION_REFS["rain_24h_mm"])
+    antecedent_norm = _normalize(rain_3d_mm, PROTOTYPE_NORMALIZATION_REFS["rain_3d_mm"])
+    soil_norm = _normalize(sw_val, PROTOTYPE_NORMALIZATION_REFS["soil_wetness_index"])
+
+    normalized_features = NormalizedFeatures(
+        terrain=round(terrain_norm, 4),
+        recent_rainfall=round(recent_norm, 4),
+        antecedent_rainfall=round(antecedent_norm, 4),
+        soil_wetness=round(soil_norm, 4),
+    )
 
     # ── Weighted sum ──────────────────────────────────────────────────────────
-    # score = Σ (weight_i × normalised_input_i)
-    # Monotone property: every normalised input ≥ 0 and weight > 0, so
-    # increasing any input strictly increases its component's contribution.
-    terrain_contribution   = WEIGHTS["terrain"]             * terrain_norm
-    recent_contribution    = WEIGHTS["recent_rainfall"]     * recent_norm
+    terrain_contribution = WEIGHTS["terrain"] * terrain_norm
+    recent_contribution = WEIGHTS["recent_rainfall"] * recent_norm
     antecedent_contribution = WEIGHTS["antecedent_rainfall"] * antecedent_norm
-    soil_contribution      = WEIGHTS["soil_wetness"]        * soil_norm
+    soil_contribution = WEIGHTS["soil_wetness"] * soil_norm
 
     score = (
         terrain_contribution
@@ -162,9 +225,9 @@ def score_zone(
         + antecedent_contribution
         + soil_contribution
     )
-    # Clamp to [0, 1] — should already be in range given weights sum to 1.0
     score = min(max(score, 0.0), 1.0)
 
+    # ── Build contributors list (sorted by contribution descending) ───────────
     contributors = sorted(
         [
             Contributor(
@@ -193,7 +256,7 @@ def score_zone(
             ),
             Contributor(
                 component="soil_wetness",
-                feature=f"soil_moisture ({soil_moisture:.2f})",
+                feature=f"soil_wetness_index ({sw_val:.2f})",
                 display_name=COMPONENT_LABELS["soil_wetness"],
                 normalized_input=round(soil_norm, 4),
                 weight=WEIGHTS["soil_wetness"],
@@ -211,10 +274,7 @@ def score_zone(
         is_probability=IS_PROBABILITY,
         is_calibrated=IS_CALIBRATED,
         computed_by=COMPUTED_BY,
-        terrain_component=round(terrain_norm, 4),
-        recent_rainfall_component=round(recent_norm, 4),
-        antecedent_rainfall_component=round(antecedent_norm, 4),
-        soil_wetness_component=round(soil_norm, 4),
+        normalized_features=normalized_features,
         contributors=contributors,
         elevation_m=elevation_m,
         rain_7d_mm=rain_7d_mm,

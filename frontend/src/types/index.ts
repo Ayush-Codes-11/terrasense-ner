@@ -26,6 +26,13 @@ export interface Contributor {
   weight?: number;
 }
 
+export interface NormalizedFeatures {
+  terrain: number;
+  recent_rainfall: number;
+  antecedent_rainfall: number;
+  soil_wetness: number;
+}
+
 export interface Zone {
   zone_id: string;
   name?: string;
@@ -39,6 +46,8 @@ export interface Zone {
   slope_deg?: number;
   elevation_m?: number;
   soil_moisture_index?: number;
+  soil_wetness_index?: number;
+  normalized_features?: NormalizedFeatures;
   contributors?: Contributor[];
   data_meta: DataMeta;
 }

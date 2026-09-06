@@ -42,11 +42,12 @@ def compute_zone_risk(zone_props: Dict[str, Any]) -> RiskResult:
       - elevation (elevation_m, pass-through metadata only)
     """
     if RISK_MODEL == "prototype":
-        # Extract features from sample properties
+        # Extract features from sample properties (clarified as soil_wetness_index)
         slope = float(zone_props.get("slope", 0.0))
         rain_24h = float(zone_props.get("rain_24h", 0.0))
         rain_3d = float(zone_props.get("rain_3d", 0.0))
-        soil_moisture = float(zone_props.get("soil_moisture", 0.0))
+        sw_val = zone_props.get("soil_wetness_index") if "soil_wetness_index" in zone_props else zone_props.get("soil_moisture")
+        soil_wetness = float(sw_val) if sw_val is not None else 0.0
         rain_7d = float(zone_props.get("rain_7d", 0.0)) if "rain_7d" in zone_props else None
         elevation = float(zone_props.get("elevation", 0.0)) if "elevation" in zone_props else None
 
@@ -54,7 +55,7 @@ def compute_zone_risk(zone_props: Dict[str, Any]) -> RiskResult:
             slope_deg=slope,
             rain_24h_mm=rain_24h,
             rain_3d_mm=rain_3d,
-            soil_moisture=soil_moisture,
+            soil_wetness_index=soil_wetness,
             rain_7d_mm=rain_7d,
             elevation_m=elevation,
         )
