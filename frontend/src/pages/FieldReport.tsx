@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import TopBar from "../components/layout/TopBar";
 import type { ReportType } from "../types";
-import { submitFieldReport } from "../services/api";
+import { saveReportLocally, syncPendingReports } from "../services/db";
 
 const REPORT_TYPES: { value: ReportType; label: string; icon: string; desc: string }[] = [
   {
@@ -74,34 +74,26 @@ export default function FieldReport() {
     }
 
     setSubmitting(true);
-    const reportId = crypto.randomUUID();
-    const payload = {
-      id: reportId,
+    const report = {
+      id: crypto.randomUUID(),
       timestamp: new Date().toISOString(),
       lat,
       lon,
-      zone_id: zoneId,
+      zone_id: zoneId || undefined,
       category: selectedType,
       severity,
       description: description + (selectedType === "road_blockage" && blockedRoad ? " [ROAD CONFIRMED BLOCKED]" : ""),
-      reporter,
-      sync_status: "SYNC PENDING",
+      reporter: reporter || undefined,
+      sync_status: navigator.onLine ? "SYNC_PENDING" : "LOCAL_ONLY",
     };
 
-    // Save to localStorage immediately
-    const existing = JSON.parse(localStorage.getItem("terrasense_reports") || "[]");
-    localStorage.setItem("terrasense_reports", JSON.stringify([payload, ...existing]));
-
     try {
-      // Attempt backend sync
-      const res = await submitFieldReport(payload);
+      // 1. Save locally to IndexedDB immediately
+      await saveReportLocally(report);
       
-      // Update local storage to SYNCED
-      const updated = JSON.parse(localStorage.getItem("terrasense_reports") || "[]");
-      const idx = updated.findIndex((r: any) => r.id === reportId);
-      if (idx !== -1) {
-        updated[idx].sync_status = "SYNCED";
-        localStorage.setItem("terrasense_reports", JSON.stringify(updated));
+      // 2. Try to sync immediately if online
+      if (navigator.onLine) {
+        await syncPendingReports();
       }
       
       alert("Report submitted successfully and synced with backend!");

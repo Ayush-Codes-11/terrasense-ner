@@ -45,7 +45,7 @@ terrasense-ner/
 | `data/sample/` | UI rendering and API contract tests | MOCK / SYNTHETIC |
 | `data/real/osm/` | Roads, communities, facilities | REAL OpenStreetMap |
 | `data/real/terrain/` | Slope/elevation | REAL Copernicus GLO-30 DEM |
-| `data/real/weather/` | Recent rainfall inputs | REAL NASA GPM IMERG |
+| `data/real/weather/` | Recent rainfall inputs | NASA GPM IMERG (Integration status: adapter implemented. Current runtime: SAMPLE / offline fixture. Real operational ingestion requires Earthdata-authenticated fetch) |
 | `data/real/gsi/` | Landslide inventory | REAL GSI public inventory |
 
 **Map layers & UI representation:**
@@ -117,10 +117,11 @@ To prevent canonical `data/` and `ml/` from diverging from `backend/data/` and `
 | 6 | ✅ | Real OSM exposure engine + decision-support priority |
 | 7 | ✅ | Real DEM terrain (Copernicus GLO-30) + GSI Landslide Inventory |
 | Deployment | ✅ | Vercel Git auto-deployment configuration & Parity CI |
-| 8 | ⏳ | Field reporting & community validation |
-| 9 | ⏳ | PWA + offline capability |
-| 10 | ⏳ | Alerts + charts |
-| 11 | ⏳ | Polish + production handoff |
+| 8 | ✅ | Real NASA GPM precipitation integration |
+| 9 | ✅ | Field reporting & community validation |
+| 10 | ✅ | PWA + offline capability |
+| 11 | ✅ | Prototype Alert Engine (PWA/SMS demo) |
+| 12 | ✅ | Map Visual Upgrade, UI Polish + SIH Production Handoff |
 
 ---
 

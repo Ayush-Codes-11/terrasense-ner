@@ -11,7 +11,7 @@
 //   - Graceful fallback: If backend fails, visibly labels "Sample fallback".
 // ============================================================
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import type { Feature } from "geojson";
 import TopBar from "../components/layout/TopBar";
 import RiskMap from "../components/map/RiskMap";
@@ -20,6 +20,7 @@ import ForecastCard from "../components/dashboard/ForecastCard";
 import ExposureCard from "../components/dashboard/ExposureCard";
 import EmergencyPriorityCard from "../components/dashboard/EmergencyPriorityCard";
 import WhyNowCard from "../components/dashboard/WhyNowCard";
+import AlertsPanel from "../components/dashboard/AlertsPanel";
 import ReportList from "../components/reports/ReportList";
 import { useGeoJSONData } from "../hooks/useGeoJSONData";
 import { useAllZoneRisks } from "../hooks/useAllZoneRisks";
@@ -110,16 +111,35 @@ export default function Dashboard() {
     apiOnline === true ? true : apiOnline === false ? false : null;
 
   const [localReports, setLocalReports] = useState<any[]>([]);
+  const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
 
-  // Load local reports on mount
-  useState(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem("terrasense_reports") || "[]");
-      setLocalReports(saved);
-    } catch(e) {
-      console.error("Failed to load local reports", e);
-    }
-  });
+  useEffect(() => {
+    const updateOnlineStatus = () => setIsOnline(navigator.onLine);
+    window.addEventListener("online", updateOnlineStatus);
+    window.addEventListener("offline", updateOnlineStatus);
+    return () => {
+      window.removeEventListener("online", updateOnlineStatus);
+      window.removeEventListener("offline", updateOnlineStatus);
+    };
+  }, []);
+
+  // Load local reports from IndexedDB on mount
+  useEffect(() => {
+    import("../services/db").then(({ getLocalReports, syncPendingReports }) => {
+      // Sync in background first
+      if (navigator.onLine) {
+        syncPendingReports().catch(console.error);
+      }
+      
+      getLocalReports()
+        .then((saved) => {
+          setLocalReports(saved || []);
+        })
+        .catch((e) => {
+          console.error("Failed to load local reports", e);
+        });
+    });
+  }, []);
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-slate-900">
@@ -216,6 +236,7 @@ export default function Dashboard() {
 
           <RiskSeverityCard zones={zonesList} selectedZone={selectedZone} />
           <ForecastCard forecast={forecast} zoneId={selectedZoneId} />
+          <AlertsPanel />
           <ExposureCard exposure={exposure} zoneId={selectedZoneId} />
           <EmergencyPriorityCard priority={priority} zoneId={selectedZoneId} />
           <WhyNowCard whyNow={whyNow} zoneId={selectedZoneId} />
@@ -225,8 +246,28 @@ export default function Dashboard() {
       {/* ── Bottom: Reports + Status strip ── */}
       <div className="shrink-0 h-44 border-t border-slate-700 bg-slate-850 flex">
         {/* Reports */}
-        <div className="flex-1 p-3 overflow-hidden">
-          <ReportList reports={localReports} />
+        <div className="flex-1 p-3 overflow-hidden flex flex-col">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
+              Field Reports
+            </h3>
+            <div className="flex items-center gap-3 text-[10px]">
+              {!isOnline ? (
+                <span className="text-amber-400 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                  Offline — reports will be stored on this device
+                </span>
+              ) : null}
+              {localReports.filter(r => r.sync_status !== "SYNCED").length > 0 && (
+                <span className="text-blue-400 font-medium">
+                  {localReports.filter(r => r.sync_status !== "SYNCED").length} reports pending sync
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="flex-1 overflow-hidden">
+            <ReportList reports={localReports} />
+          </div>
         </div>
 
         {/* System Status */}
