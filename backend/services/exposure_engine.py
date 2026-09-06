@@ -437,12 +437,15 @@ def compute_zone_exposure(
             amenity = props.get("amenity")
             healthcare = props.get("healthcare")
             category_val = str(props.get("category") or props.get("facility_type", "")).lower()
-            is_whitelisted = (
-                amenity in FACILITY_WHITELIST_AMENITIES
-                or healthcare in FACILITY_WHITELIST_HEALTHCARE
-                or category_val in FACILITY_WHITELIST_AMENITIES
-                or exp_type == "SAMPLE_MOCK"
-            )
+            if exp_type == "SAMPLE_MOCK":
+                is_whitelisted = category_val in FACILITY_WHITELIST_AMENITIES or True
+            elif amenity is not None or healthcare is not None:
+                is_whitelisted = (
+                    amenity in FACILITY_WHITELIST_AMENITIES
+                    or healthcare in FACILITY_WHITELIST_HEALTHCARE
+                )
+            else:
+                is_whitelisted = category_val in FACILITY_WHITELIST_AMENITIES
             if is_whitelisted:
                 raw_facilities.append(
                     ExposedFacilityItem(

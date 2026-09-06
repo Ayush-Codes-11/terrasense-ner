@@ -185,12 +185,14 @@ def parse_osm_critical_facilities(data: dict) -> dict:
         healthcare = tags.get("healthcare")
 
         category: Optional[str] = None
-        if amenity in ("hospital", "clinic") or healthcare:
-            category = "hospital" if amenity == "hospital" else "clinic"
-        elif amenity == "police":
-            category = "police"
-        elif amenity == "fire_station":
-            category = "fire_station"
+        if amenity in ("hospital", "clinic"):
+            category = amenity
+        elif healthcare in ("hospital", "clinic"):
+            category = healthcare
+        elif amenity in ("police", "fire_station"):
+            category = amenity
+        elif healthcare == "centre":
+            category = "health_centre"
         else:
             continue
 
