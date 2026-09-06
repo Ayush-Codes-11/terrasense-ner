@@ -163,7 +163,7 @@ export default function MapPlaceholder({ onZoneSelect }: MapPlaceholderProps) {
         </div>
 
         <div className="absolute bottom-1 right-2 text-[9px] text-slate-600">
-          Sample visualization — not geospatially accurate
+          Sample visualization - georeferenced prototype boundaries
         </div>
       </div>
 

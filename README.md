@@ -18,7 +18,7 @@ TerraSense is architected to scale geographically:
 3. **State** → State-scale tiled processing.
 4. **NER Scale** → NER-wide command dashboard with on-demand state/district risk layers and unified alerting.
 
-*Note: The frontend basemap provider is independent from TerraSense analytics. A future production implementation can use Google Maps, ArcGIS, Mapbox or another approved mapping provider while preserving the same TerraSense GIS overlays and backend.*
+*Note: The frontend currently provides three basemap toggle options (Terrain via OpenTopoMap, Streets, and Satellite) for testing and demonstration. A future production implementation can use Google Maps, ArcGIS, Mapbox or another approved mapping provider while preserving the same TerraSense GIS overlays and backend.*
 
 ---
 
@@ -133,4 +133,10 @@ To prevent canonical `data/` and `ml/` from diverging from `backend/data/` and `
 - **Road exposure ≠ road blocked:** a road is only marked blocked on a verified field report
 - **Priority label:** always shown as "Prototype Decision-Support Priority — not official"
 - **Continuous terrain derivatives:** Horn 3×3 slope/aspect calculated across continuous projected DEM before zonal masking
+
+## Storage & Persistence Limits (Prototype)
+- **Field Report Offline Cache**: Persistent on the user's browser/device via IndexedDB.
+- **Backend Field-Report Collection**: Prototype/demo acknowledgement storage. Non-persistent across serverless restarts.
+- **Alert History Backend**: Prototype in-memory history. Non-persistent across serverless restarts.
+- *(Future real production architecture will utilize a PostgreSQL/PostGIS / Supabase or equivalent persistent datastore, but this is not active in the current prototype).*
 

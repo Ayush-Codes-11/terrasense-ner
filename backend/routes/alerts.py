@@ -20,7 +20,8 @@ class Alert(BaseModel):
     delivery_channels: List[str]
     delivery_status: str
 
-# In-memory prototype storage
+# In-memory prototype history
+# Note: Non-persistent across serverless restarts. Not intended for permanent cloud storage.
 demo_alerts: List[Alert] = []
 
 @router.get("", response_model=List[Alert])
@@ -47,6 +48,7 @@ def test_alert(zone_id: str = "C03"):
     # Send SMS preview
     sms_provider = get_sms_provider()
     message = f"TerraSense NER Alert\nZone {zone_id}\nPriority: VERY HIGH\nOutlook: +24h\n{alert.rationale}"
-    sms_provider.send_sms("+919876543210", message)
+    status = sms_provider.send_sms("+919876543210", message)
+    alert.delivery_status = status
     
     return alert
