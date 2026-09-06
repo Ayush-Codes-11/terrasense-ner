@@ -1,0 +1,367 @@
+{
+  "type": "FeatureCollection",
+  "data_type": "SAMPLE_MOCK",
+  "disclaimer": "FOR UI/API TESTING ONLY. Not real geospatial or sensor data. Must not be used for ML training or real disaster response.",
+  "pilot_area": "Aizawl District, Mizoram, India (approximate bounding box)",
+  "coordinate_system": "WGS84 (EPSG:4326)",
+  "grid_spec": {
+    "center_lat": 23.7271,
+    "center_lon": 92.7176,
+    "rows": 5,
+    "cols": 5,
+    "cell_deg": 0.015,
+    "note": "Grid cells are uniform squares, not derived from real terrain. Phase 5 replaces with real SRTM-based zones."
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "A01", "risk_category": "LOW", "risk_score": 0.18,
+        "slope": 12, "elevation": 780, "soil_moisture": 0.25,
+        "rain_24h": 5, "rain_3d": 18, "rain_7d": 35,
+        "forecast_24h": 6, "forecast_48h": 4, "forecast_72h": 3,
+        "antecedent_24h": 11, "antecedent_48h": 15, "antecedent_72h": 18,
+        "forecast_risk_24h": "LOW", "forecast_risk_48h": "LOW", "forecast_risk_72h": "LOW",
+        "forecast_score_24h": 0.16, "forecast_score_48h": 0.14, "forecast_score_72h": 0.13,
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Polygon", "coordinates": [[[92.6801,23.6896],[92.6951,23.6896],[92.6951,23.7046],[92.6801,23.7046],[92.6801,23.6896]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "A02", "risk_category": "LOW", "risk_score": 0.20,
+        "slope": 15, "elevation": 820, "soil_moisture": 0.27,
+        "rain_24h": 6, "rain_3d": 20, "rain_7d": 38,
+        "forecast_24h": 8, "forecast_48h": 5, "forecast_72h": 4,
+        "antecedent_24h": 14, "antecedent_48h": 19, "antecedent_72h": 23,
+        "forecast_risk_24h": "LOW", "forecast_risk_48h": "LOW", "forecast_risk_72h": "LOW",
+        "forecast_score_24h": 0.18, "forecast_score_48h": 0.17, "forecast_score_72h": 0.16,
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Polygon", "coordinates": [[[92.6951,23.6896],[92.7101,23.6896],[92.7101,23.7046],[92.6951,23.7046],[92.6951,23.6896]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "A03", "risk_category": "MODERATE", "risk_score": 0.34,
+        "slope": 22, "elevation": 950, "soil_moisture": 0.32,
+        "rain_24h": 15, "rain_3d": 42, "rain_7d": 78,
+        "forecast_24h": 20, "forecast_48h": 12, "forecast_72h": 8,
+        "antecedent_24h": 35, "antecedent_48h": 47, "antecedent_72h": 55,
+        "forecast_risk_24h": "MODERATE", "forecast_risk_48h": "MODERATE", "forecast_risk_72h": "MODERATE",
+        "forecast_score_24h": 0.36, "forecast_score_48h": 0.33, "forecast_score_72h": 0.32,
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Polygon", "coordinates": [[[92.7101,23.6896],[92.7251,23.6896],[92.7251,23.7046],[92.7101,23.7046],[92.7101,23.6896]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "A04", "risk_category": "MODERATE", "risk_score": 0.31,
+        "slope": 20, "elevation": 900, "soil_moisture": 0.30,
+        "rain_24h": 12, "rain_3d": 38, "rain_7d": 72,
+        "forecast_24h": 18, "forecast_48h": 10, "forecast_72h": 6,
+        "antecedent_24h": 30, "antecedent_48h": 40, "antecedent_72h": 46,
+        "forecast_risk_24h": "MODERATE", "forecast_risk_48h": "MODERATE", "forecast_risk_72h": "LOW",
+        "forecast_score_24h": 0.33, "forecast_score_48h": 0.30, "forecast_score_72h": 0.27,
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Polygon", "coordinates": [[[92.7251,23.6896],[92.7401,23.6896],[92.7401,23.7046],[92.7251,23.7046],[92.7251,23.6896]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "A05", "risk_category": "LOW", "risk_score": 0.19,
+        "slope": 14, "elevation": 810, "soil_moisture": 0.26,
+        "rain_24h": 7, "rain_3d": 22, "rain_7d": 40,
+        "forecast_24h": 9, "forecast_48h": 6, "forecast_72h": 4,
+        "antecedent_24h": 16, "antecedent_48h": 22, "antecedent_72h": 26,
+        "forecast_risk_24h": "LOW", "forecast_risk_48h": "LOW", "forecast_risk_72h": "LOW",
+        "forecast_score_24h": 0.20, "forecast_score_48h": 0.19, "forecast_score_72h": 0.18,
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Polygon", "coordinates": [[[92.7401,23.6896],[92.7551,23.6896],[92.7551,23.7046],[92.7401,23.7046],[92.7401,23.6896]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "B01", "risk_category": "LOW", "risk_score": 0.15,
+        "slope": 10, "elevation": 760, "soil_moisture": 0.23,
+        "rain_24h": 4, "rain_3d": 15, "rain_7d": 30,
+        "forecast_24h": 5, "forecast_48h": 3, "forecast_72h": 2,
+        "antecedent_24h": 9, "antecedent_48h": 12, "antecedent_72h": 14,
+        "forecast_risk_24h": "LOW", "forecast_risk_48h": "LOW", "forecast_risk_72h": "LOW",
+        "forecast_score_24h": 0.13, "forecast_score_48h": 0.12, "forecast_score_72h": 0.11,
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Polygon", "coordinates": [[[92.6801,23.7046],[92.6951,23.7046],[92.6951,23.7196],[92.6801,23.7196],[92.6801,23.7046]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "B02", "risk_category": "MODERATE", "risk_score": 0.38,
+        "slope": 25, "elevation": 1050, "soil_moisture": 0.35,
+        "rain_24h": 18, "rain_3d": 55, "rain_7d": 95,
+        "forecast_24h": 25, "forecast_48h": 15, "forecast_72h": 10,
+        "antecedent_24h": 43, "antecedent_48h": 58, "antecedent_72h": 68,
+        "forecast_risk_24h": "MODERATE", "forecast_risk_48h": "MODERATE", "forecast_risk_72h": "MODERATE",
+        "forecast_score_24h": 0.40, "forecast_score_48h": 0.38, "forecast_score_72h": 0.36,
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Polygon", "coordinates": [[[92.6951,23.7046],[92.7101,23.7046],[92.7101,23.7196],[92.6951,23.7196],[92.6951,23.7046]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "B03", "risk_category": "HIGH", "risk_score": 0.62,
+        "slope": 35, "elevation": 1280, "soil_moisture": 0.48,
+        "rain_24h": 32, "rain_3d": 88, "rain_7d": 140,
+        "forecast_24h": 45, "forecast_48h": 30, "forecast_72h": 15,
+        "antecedent_24h": 77, "antecedent_48h": 107, "antecedent_72h": 122,
+        "forecast_risk_24h": "HIGH", "forecast_risk_48h": "VERY_HIGH", "forecast_risk_72h": "HIGH",
+        "forecast_score_24h": 0.65, "forecast_score_48h": 0.78, "forecast_score_72h": 0.66,
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Polygon", "coordinates": [[[92.7101,23.7046],[92.7251,23.7046],[92.7251,23.7196],[92.7101,23.7196],[92.7101,23.7046]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "B04", "risk_category": "HIGH", "risk_score": 0.65,
+        "slope": 38, "elevation": 1350, "soil_moisture": 0.51,
+        "rain_24h": 35, "rain_3d": 95, "rain_7d": 155,
+        "forecast_24h": 48, "forecast_48h": 32, "forecast_72h": 18,
+        "antecedent_24h": 83, "antecedent_48h": 115, "antecedent_72h": 133,
+        "forecast_risk_24h": "HIGH", "forecast_risk_48h": "VERY_HIGH", "forecast_risk_72h": "HIGH",
+        "forecast_score_24h": 0.67, "forecast_score_48h": 0.80, "forecast_score_72h": 0.71,
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Polygon", "coordinates": [[[92.7251,23.7046],[92.7401,23.7046],[92.7401,23.7196],[92.7251,23.7196],[92.7251,23.7046]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "B05", "risk_category": "MODERATE", "risk_score": 0.40,
+        "slope": 24, "elevation": 1020, "soil_moisture": 0.33,
+        "rain_24h": 16, "rain_3d": 50, "rain_7d": 88,
+        "forecast_24h": 22, "forecast_48h": 14, "forecast_72h": 9,
+        "antecedent_24h": 38, "antecedent_48h": 52, "antecedent_72h": 61,
+        "forecast_risk_24h": "MODERATE", "forecast_risk_48h": "MODERATE", "forecast_risk_72h": "HIGH",
+        "forecast_score_24h": 0.42, "forecast_score_48h": 0.44, "forecast_score_72h": 0.52,
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Polygon", "coordinates": [[[92.7401,23.7046],[92.7551,23.7046],[92.7551,23.7196],[92.7401,23.7196],[92.7401,23.7046]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "C01", "risk_category": "LOW", "risk_score": 0.12,
+        "slope": 8, "elevation": 740, "soil_moisture": 0.22,
+        "rain_24h": 3, "rain_3d": 12, "rain_7d": 25,
+        "forecast_24h": 4, "forecast_48h": 3, "forecast_72h": 2,
+        "antecedent_24h": 7, "antecedent_48h": 10, "antecedent_72h": 12,
+        "forecast_risk_24h": "LOW", "forecast_risk_48h": "LOW", "forecast_risk_72h": "LOW",
+        "forecast_score_24h": 0.11, "forecast_score_48h": 0.10, "forecast_score_72h": 0.10,
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Polygon", "coordinates": [[[92.6801,23.7196],[92.6951,23.7196],[92.6951,23.7346],[92.6801,23.7346],[92.6801,23.7196]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "C02", "risk_category": "MODERATE", "risk_score": 0.42,
+        "slope": 28, "elevation": 1100, "soil_moisture": 0.38,
+        "rain_24h": 22, "rain_3d": 65, "rain_7d": 110,
+        "forecast_24h": 28, "forecast_48h": 18, "forecast_72h": 12,
+        "antecedent_24h": 50, "antecedent_48h": 68, "antecedent_72h": 80,
+        "forecast_risk_24h": "MODERATE", "forecast_risk_48h": "HIGH", "forecast_risk_72h": "HIGH",
+        "forecast_score_24h": 0.44, "forecast_score_48h": 0.55, "forecast_score_72h": 0.60,
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Polygon", "coordinates": [[[92.6951,23.7196],[92.7101,23.7196],[92.7101,23.7346],[92.6951,23.7346],[92.6951,23.7196]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "C03", "risk_category": "VERY_HIGH", "risk_score": 0.84,
+        "slope": 42, "elevation": 1520, "soil_moisture": 0.62,
+        "rain_24h": 48, "rain_3d": 125, "rain_7d": 195,
+        "forecast_24h": 65, "forecast_48h": 45, "forecast_72h": 20,
+        "antecedent_24h": 113, "antecedent_48h": 158, "antecedent_72h": 178,
+        "forecast_risk_24h": "VERY_HIGH", "forecast_risk_48h": "VERY_HIGH", "forecast_risk_72h": "VERY_HIGH",
+        "forecast_score_24h": 0.88, "forecast_score_48h": 0.92, "forecast_score_72h": 0.87,
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Polygon", "coordinates": [[[92.7101,23.7196],[92.7251,23.7196],[92.7251,23.7346],[92.7101,23.7346],[92.7101,23.7196]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "C04", "risk_category": "HIGH", "risk_score": 0.68,
+        "slope": 36, "elevation": 1320, "soil_moisture": 0.52,
+        "rain_24h": 38, "rain_3d": 98, "rain_7d": 160,
+        "forecast_24h": 50, "forecast_48h": 35, "forecast_72h": 20,
+        "antecedent_24h": 88, "antecedent_48h": 123, "antecedent_72h": 143,
+        "forecast_risk_24h": "HIGH", "forecast_risk_48h": "VERY_HIGH", "forecast_risk_72h": "VERY_HIGH",
+        "forecast_score_24h": 0.71, "forecast_score_48h": 0.79, "forecast_score_72h": 0.82,
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Polygon", "coordinates": [[[92.7251,23.7196],[92.7401,23.7196],[92.7401,23.7346],[92.7251,23.7346],[92.7251,23.7196]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "C05", "risk_category": "MODERATE", "risk_score": 0.43,
+        "slope": 26, "elevation": 1080, "soil_moisture": 0.36,
+        "rain_24h": 20, "rain_3d": 58, "rain_7d": 100,
+        "forecast_24h": 26, "forecast_48h": 16, "forecast_72h": 10,
+        "antecedent_24h": 46, "antecedent_48h": 62, "antecedent_72h": 72,
+        "forecast_risk_24h": "MODERATE", "forecast_risk_48h": "HIGH", "forecast_risk_72h": "HIGH",
+        "forecast_score_24h": 0.45, "forecast_score_48h": 0.53, "forecast_score_72h": 0.57,
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Polygon", "coordinates": [[[92.7401,23.7196],[92.7551,23.7196],[92.7551,23.7346],[92.7401,23.7346],[92.7401,23.7196]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "D01", "risk_category": "LOW", "risk_score": 0.16,
+        "slope": 11, "elevation": 770, "soil_moisture": 0.24,
+        "rain_24h": 5, "rain_3d": 17, "rain_7d": 32,
+        "forecast_24h": 6, "forecast_48h": 4, "forecast_72h": 3,
+        "antecedent_24h": 11, "antecedent_48h": 15, "antecedent_72h": 18,
+        "forecast_risk_24h": "LOW", "forecast_risk_48h": "LOW", "forecast_risk_72h": "LOW",
+        "forecast_score_24h": 0.15, "forecast_score_48h": 0.14, "forecast_score_72h": 0.13,
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Polygon", "coordinates": [[[92.6801,23.7346],[92.6951,23.7346],[92.6951,23.7496],[92.6801,23.7496],[92.6801,23.7346]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "D02", "risk_category": "LOW", "risk_score": 0.22,
+        "slope": 16, "elevation": 850, "soil_moisture": 0.28,
+        "rain_24h": 8, "rain_3d": 25, "rain_7d": 48,
+        "forecast_24h": 10, "forecast_48h": 7, "forecast_72h": 5,
+        "antecedent_24h": 18, "antecedent_48h": 25, "antecedent_72h": 30,
+        "forecast_risk_24h": "LOW", "forecast_risk_48h": "LOW", "forecast_risk_72h": "LOW",
+        "forecast_score_24h": 0.23, "forecast_score_48h": 0.22, "forecast_score_72h": 0.21,
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Polygon", "coordinates": [[[92.6951,23.7346],[92.7101,23.7346],[92.7101,23.7496],[92.6951,23.7496],[92.6951,23.7346]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "D03", "risk_category": "HIGH", "risk_score": 0.58,
+        "slope": 33, "elevation": 1240, "soil_moisture": 0.46,
+        "rain_24h": 30, "rain_3d": 82, "rain_7d": 132,
+        "forecast_24h": 35, "forecast_48h": 55, "forecast_72h": 20,
+        "antecedent_24h": 65, "antecedent_48h": 120, "antecedent_72h": 140,
+        "forecast_risk_24h": "HIGH", "forecast_risk_48h": "VERY_HIGH", "forecast_risk_72h": "VERY_HIGH",
+        "forecast_score_24h": 0.61, "forecast_score_48h": 0.76, "forecast_score_72h": 0.79,
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Polygon", "coordinates": [[[92.7101,23.7346],[92.7251,23.7346],[92.7251,23.7496],[92.7101,23.7496],[92.7101,23.7346]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "D04", "risk_category": "MODERATE", "risk_score": 0.39,
+        "slope": 27, "elevation": 1090, "soil_moisture": 0.37,
+        "rain_24h": 21, "rain_3d": 62, "rain_7d": 105,
+        "forecast_24h": 27, "forecast_48h": 17, "forecast_72h": 11,
+        "antecedent_24h": 48, "antecedent_48h": 65, "antecedent_72h": 76,
+        "forecast_risk_24h": "MODERATE", "forecast_risk_48h": "HIGH", "forecast_risk_72h": "HIGH",
+        "forecast_score_24h": 0.41, "forecast_score_48h": 0.52, "forecast_score_72h": 0.56,
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Polygon", "coordinates": [[[92.7251,23.7346],[92.7401,23.7346],[92.7401,23.7496],[92.7251,23.7496],[92.7251,23.7346]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "D05", "risk_category": "LOW", "risk_score": 0.17,
+        "slope": 13, "elevation": 800, "soil_moisture": 0.25,
+        "rain_24h": 6, "rain_3d": 19, "rain_7d": 36,
+        "forecast_24h": 7, "forecast_48h": 5, "forecast_72h": 3,
+        "antecedent_24h": 13, "antecedent_48h": 18, "antecedent_72h": 21,
+        "forecast_risk_24h": "LOW", "forecast_risk_48h": "LOW", "forecast_risk_72h": "LOW",
+        "forecast_score_24h": 0.16, "forecast_score_48h": 0.15, "forecast_score_72h": 0.14,
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Polygon", "coordinates": [[[92.7401,23.7346],[92.7551,23.7346],[92.7551,23.7496],[92.7401,23.7496],[92.7401,23.7346]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "E01", "risk_category": "LOW", "risk_score": 0.11,
+        "slope": 9, "elevation": 750, "soil_moisture": 0.21,
+        "rain_24h": 3, "rain_3d": 10, "rain_7d": 22,
+        "forecast_24h": 4, "forecast_48h": 3, "forecast_72h": 2,
+        "antecedent_24h": 7, "antecedent_48h": 10, "antecedent_72h": 12,
+        "forecast_risk_24h": "LOW", "forecast_risk_48h": "LOW", "forecast_risk_72h": "LOW",
+        "forecast_score_24h": 0.10, "forecast_score_48h": 0.10, "forecast_score_72h": 0.09,
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Polygon", "coordinates": [[[92.6801,23.7496],[92.6951,23.7496],[92.6951,23.7646],[92.6801,23.7646],[92.6801,23.7496]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "E02", "risk_category": "LOW", "risk_score": 0.21,
+        "slope": 14, "elevation": 830, "soil_moisture": 0.26,
+        "rain_24h": 7, "rain_3d": 22, "rain_7d": 42,
+        "forecast_24h": 9, "forecast_48h": 6, "forecast_72h": 4,
+        "antecedent_24h": 16, "antecedent_48h": 22, "antecedent_72h": 26,
+        "forecast_risk_24h": "LOW", "forecast_risk_48h": "LOW", "forecast_risk_72h": "LOW",
+        "forecast_score_24h": 0.20, "forecast_score_48h": 0.19, "forecast_score_72h": 0.18,
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Polygon", "coordinates": [[[92.6951,23.7496],[92.7101,23.7496],[92.7101,23.7646],[92.6951,23.7646],[92.6951,23.7496]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "E03", "risk_category": "MODERATE", "risk_score": 0.35,
+        "slope": 23, "elevation": 980, "soil_moisture": 0.34,
+        "rain_24h": 17, "rain_3d": 48, "rain_7d": 85,
+        "forecast_24h": 22, "forecast_48h": 14, "forecast_72h": 9,
+        "antecedent_24h": 39, "antecedent_48h": 53, "antecedent_72h": 62,
+        "forecast_risk_24h": "MODERATE", "forecast_risk_48h": "MODERATE", "forecast_risk_72h": "HIGH",
+        "forecast_score_24h": 0.37, "forecast_score_48h": 0.40, "forecast_score_72h": 0.51,
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Polygon", "coordinates": [[[92.7101,23.7496],[92.7251,23.7496],[92.7251,23.7646],[92.7101,23.7646],[92.7101,23.7496]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "E04", "risk_category": "LOW", "risk_score": 0.24,
+        "slope": 18, "elevation": 870, "soil_moisture": 0.29,
+        "rain_24h": 10, "rain_3d": 30, "rain_7d": 55,
+        "forecast_24h": 12, "forecast_48h": 8, "forecast_72h": 5,
+        "antecedent_24h": 22, "antecedent_48h": 30, "antecedent_72h": 35,
+        "forecast_risk_24h": "LOW", "forecast_risk_48h": "LOW", "forecast_risk_72h": "MODERATE",
+        "forecast_score_24h": 0.24, "forecast_score_48h": 0.27, "forecast_score_72h": 0.30,
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Polygon", "coordinates": [[[92.7251,23.7496],[92.7401,23.7496],[92.7401,23.7646],[92.7251,23.7646],[92.7251,23.7496]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "E05", "risk_category": "LOW", "risk_score": 0.14,
+        "slope": 12, "elevation": 790, "soil_moisture": 0.24,
+        "rain_24h": 5, "rain_3d": 16, "rain_7d": 31,
+        "forecast_24h": 6, "forecast_48h": 4, "forecast_72h": 3,
+        "antecedent_24h": 11, "antecedent_48h": 15, "antecedent_72h": 18,
+        "forecast_risk_24h": "LOW", "forecast_risk_48h": "LOW", "forecast_risk_72h": "LOW",
+        "forecast_score_24h": 0.13, "forecast_score_48h": 0.12, "forecast_score_72h": 0.12,
+        "data_type": "SAMPLE_MOCK"
+      },
+      "geometry": { "type": "Polygon", "coordinates": [[[92.7401,23.7496],[92.7551,23.7496],[92.7551,23.7646],[92.7401,23.7646],[92.7401,23.7496]]] }
+    }
+  ]
+}

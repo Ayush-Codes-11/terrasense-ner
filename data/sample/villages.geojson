@@ -1,0 +1,67 @@
+{
+  "type": "FeatureCollection",
+  "data_type": "SAMPLE_MOCK",
+  "disclaimer": "FOR UI/API TESTING ONLY. Village locations and populations are fictitious.",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "village_id": "V01", "name": "Lungdai (Sample)", "population_est": 420, "zone_id": "A01", "data_type": "SAMPLE_MOCK" },
+      "geometry": { "type": "Point", "coordinates": [92.6870, 23.6980] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "village_id": "V02", "name": "Laipuitlang (Sample)", "population_est": 680, "zone_id": "B01", "data_type": "SAMPLE_MOCK" },
+      "geometry": { "type": "Point", "coordinates": [92.6910, 23.7095] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "village_id": "V03", "name": "Selesih (Sample)", "population_est": 1240, "zone_id": "B03", "data_type": "SAMPLE_MOCK" },
+      "geometry": { "type": "Point", "coordinates": [92.7175, 23.7125] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "village_id": "V04", "name": "Kanan Veng (Sample)", "population_est": 890, "zone_id": "B04", "data_type": "SAMPLE_MOCK" },
+      "geometry": { "type": "Point", "coordinates": [92.7320, 23.7115] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "village_id": "V05", "name": "Kulikawn (Sample)", "population_est": 2100, "zone_id": "C02", "data_type": "SAMPLE_MOCK" },
+      "geometry": { "type": "Point", "coordinates": [92.7020, 23.7260] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "village_id": "V06", "name": "Aizawl Central (Sample)", "population_est": 8500, "zone_id": "C03", "data_type": "SAMPLE_MOCK" },
+      "geometry": { "type": "Point", "coordinates": [92.7180, 23.7271] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "village_id": "V07", "name": "Dawrpui (Sample)", "population_est": 3200, "zone_id": "C04", "data_type": "SAMPLE_MOCK" },
+      "geometry": { "type": "Point", "coordinates": [92.7305, 23.7275] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "village_id": "V08", "name": "Bungkawn (Sample)", "population_est": 1800, "zone_id": "D03", "data_type": "SAMPLE_MOCK" },
+      "geometry": { "type": "Point", "coordinates": [92.7175, 23.7420] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "village_id": "V09", "name": "Ramhlun (Sample)", "population_est": 2600, "zone_id": "D04", "data_type": "SAMPLE_MOCK" },
+      "geometry": { "type": "Point", "coordinates": [92.7330, 23.7435] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "village_id": "V10", "name": "Chhinga Veng (Sample)", "population_est": 560, "zone_id": "D01", "data_type": "SAMPLE_MOCK" },
+      "geometry": { "type": "Point", "coordinates": [92.6880, 23.7415] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "village_id": "V11", "name": "Durtlang (Sample)", "population_est": 720, "zone_id": "E01", "data_type": "SAMPLE_MOCK" },
+      "geometry": { "type": "Point", "coordinates": [92.6890, 23.7565] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "village_id": "V12", "name": "Bawngkawn North (Sample)", "population_est": 1100, "zone_id": "E03", "data_type": "SAMPLE_MOCK" },
+      "geometry": { "type": "Point", "coordinates": [92.7175, 23.7560] }
+    }
+  ]
+}
