@@ -56,10 +56,16 @@ _CORS_ORIGINS = [
 if os.getenv("FRONTEND_URL"):
     _CORS_ORIGINS.append(os.getenv("FRONTEND_URL").rstrip("/"))
 
+# CORS Configuration:
+# - Localhost development (ports 5173, 5174)
+# - Production frontend via FRONTEND_URL environment variable
+# - Vercel Preview deployments matching terrasense-*.vercel.app
+# - Credentials false (no cookies/session tokens in current phase)
+# - Methods strictly GET (Note: Phase 8 field report submissions will require adding "POST")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_CORS_ORIGINS,
-    allow_origin_regex=r"^https://.*\.vercel\.app$",
+    allow_origin_regex=r"^https://terrasense-.*\.vercel\.app$",
     allow_credentials=False,
     allow_methods=["GET"],
     allow_headers=["*"],
