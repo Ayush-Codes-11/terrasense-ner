@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+/* ===================================================
+   TerraSense NER — Global Styles
+   =================================================== */
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-slate-900 text-slate-100 antialiased;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-slate-800;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-600 rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-500;
+}
+
+/* Card base */
+.card {
+  @apply bg-slate-800 border border-slate-700 rounded-lg;
+}
+
+/* Risk badge */
+.risk-badge {
+  @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border;
+}
+
+/* Data source badge */
+.source-badge {
+  @apply inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium;
+}
+
+/* Pulse animation for live indicator */
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.live-dot {
+  animation: live-pulse 2s ease-in-out infinite;
+}
