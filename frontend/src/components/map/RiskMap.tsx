@@ -211,12 +211,12 @@ export default function RiskMap({
       {isRiskFallback ? (
         <div className="absolute top-2 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-amber-500/40 text-[10px] text-amber-400 font-medium pointer-events-none">
           <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-          Sample fallback · backend offline · prototype geometry
+          Sample fallback · backend offline
         </div>
       ) : (
         <div className="absolute top-2 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-green-500/40 text-[10px] text-green-400 font-medium pointer-events-none">
           <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
-          Prototype scorer active · Risk colours computed via FastAPI · Aizawl pilot
+          Aizawl Pilot · Prototype Risk Grid
         </div>
       )}
 

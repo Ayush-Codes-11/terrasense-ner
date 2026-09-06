@@ -55,10 +55,10 @@ export default function AlertsPanel() {
   };
 
   return (
-    <div className="card p-4 flex flex-col gap-3">
+    <div className="p-3 flex flex-col gap-2 h-full">
       <div className="flex items-center justify-between">
         <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
-          Alert Engine (Phase 11)
+          ALERTS
         </h2>
         {permission !== "granted" ? (
           <button 
@@ -77,9 +77,9 @@ export default function AlertsPanel() {
       <button
         onClick={sendTestAlert}
         disabled={loading}
-        className="w-full py-1.5 rounded bg-red-600/20 hover:bg-red-600/30 text-red-400 text-xs font-medium border border-red-500/30 transition-colors"
+        className="w-full py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-600 transition-colors"
       >
-        {loading ? "Sending..." : "Send Test Alert (SMS Preview)"}
+        {loading ? "Sending..." : "Preview Test Alert"}
       </button>
 
       {alerts.length > 0 && (

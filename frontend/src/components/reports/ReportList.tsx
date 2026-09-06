@@ -48,7 +48,7 @@ export default function ReportList({ reports = [] }: ReportListProps) {
             No field reports yet
             <br />
             <span className="text-[10px]">
-              Offline reporting enabled in Phase 10
+              Use /field-report to submit
             </span>
           </p>
         </div>
