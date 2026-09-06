@@ -217,3 +217,21 @@ export async function getOsmStatus(): Promise<{
   return apiFetch(`/geodata/osm/status`);
 }
 
+// ── Field Reports (Phase 9) ───────────────────────────────────────────────────
+
+export async function submitFieldReport(report: any): Promise<any> {
+  if (!BASE) throw new Error("VITE_API_BASE_URL is not set");
+  const res = await fetch(`${BASE}/field-reports`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify(report),
+  });
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`API ${res.status} /field-reports: ${body}`);
+  }
+  return res.json();
+}

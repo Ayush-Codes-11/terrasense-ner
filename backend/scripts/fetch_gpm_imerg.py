@@ -250,6 +250,7 @@ def process_granule_data(
         "algorithm_generation": ALGORITHM_GENERATION,
         "granule_processing_version": meta_extra.get("granule_processing_version", "V07C"),
         "collection_concept_id": COLLECTION_CONCEPT_ID,
+        "source_data_origin": meta_extra.get("source_data_origin", "NASA_GES_DISC"),
         "source": "NASA Global Precipitation Measurement (GPM) IMERG Late Run",
         "product": f"NASA GPM IMERG Late Precipitation L3 1 day 0.1° V{COLLECTION_VERSION} ({COLLECTION_SHORTNAME})",
         "source_variable": "precipitation",
@@ -313,7 +314,8 @@ def main():
             fixture_data = json.load(f)
         granules = fixture_data["granules"]
         meta_extra = {
-            "granule_processing_version": fixture_data.get("granule_processing_version", "V07C")
+            "granule_processing_version": fixture_data.get("granule_processing_version", "V07C"),
+            "source_data_origin": "OFFLINE_TEST_FIXTURE"
         }
         gpm_dataset, metadata = process_granule_data(granules, zone_weights, native_cells, meta_extra)
     else:

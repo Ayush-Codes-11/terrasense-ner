@@ -64,12 +64,15 @@ def get_gpm_provenance_status() -> Dict[str, Any]:
     """Returns overall provenance status of the GPM precipitation layer."""
     meta = load_gpm_metadata()
     dataset = load_gpm_observed_dataset()
-    has_real_gpm = bool(meta and dataset.get("zones"))
+    source_origin = meta.get("source_data_origin", "")
+    has_real_gpm = bool(meta and dataset.get("zones") and source_origin == "NASA_GES_DISC")
+    is_offline_fixture = (source_origin == "OFFLINE_TEST_FIXTURE")
 
     if has_real_gpm:
         return {
             "status": "REAL_GPM",
             "is_real": True,
+            "source_data_origin": "NASA_GES_DISC",
             "source": meta.get(
                 "source",
                 "NASA Global Precipitation Measurement (GPM) IMERG Late Run",
@@ -103,9 +106,36 @@ def get_gpm_provenance_status() -> Dict[str, Any]:
             ),
         }
 
+    if is_offline_fixture:
+        return {
+            "status": "SAMPLE_GPM_COMPATIBLE",
+            "is_real": False,
+            "source_data_origin": "OFFLINE_TEST_FIXTURE",
+            "source": meta.get("source", "NASA Global Precipitation Measurement (GPM) IMERG Late Run (FIXTURE)"),
+            "product": meta.get("product", "Synthetic/Fixture GPM IMERG Precipitation"),
+            "collection": meta.get("collection", "GPM_3IMERGDL"),
+            "collection_version": meta.get("collection_version", "07"),
+            "algorithm_generation": meta.get("algorithm_generation", "V07"),
+            "granule_processing_version": meta.get("granule_processing_version", "V07C"),
+            "collection_concept_id": meta.get("collection_concept_id", "C2723754859-GES_DISC"),
+            "source_variable": meta.get("source_variable", "precipitation"),
+            "source_unit": meta.get("source_unit", "mm/day"),
+            "observation_duration": meta.get("observation_duration", "1 complete UTC day per bucket"),
+            "native_spatial_resolution_deg": meta.get("native_spatial_resolution_deg", 0.1),
+            "temporal_resolution": meta.get("temporal_resolution", "1 day (daily accumulation)"),
+            "reference_timestamp_utc": meta.get("reference_timestamp_utc"),
+            "retrieved_at_utc": meta.get("retrieved_at_utc"),
+            "days": meta.get("days", {}),
+            "total_zones": len(dataset.get("zones", {})),
+            "unique_native_cells_count": meta.get("unique_native_cells_count", 4),
+            "attribution": "Offline Test Fixture Data",
+            "notes": "Data is deterministically generated offline fixture, NOT authenticated real observation.",
+        }
+
     return {
         "status": "SAMPLE_MOCK",
         "is_real": False,
+        "source_data_origin": "MOCK",
         "source": "Sample mock weather scenario generator",
         "product": "Synthetic pilot grid precipitation",
         "collection": "None",

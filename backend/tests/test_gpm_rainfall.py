@@ -93,6 +93,16 @@ def test_real_weather_files_exist_and_valid():
     assert meta.get("source_unit") == "mm/day"
 
 
+def test_fixture_data_cannot_be_real_gpm():
+    """Prove that fixture data cannot be labelled as REAL_GPM."""
+    meta = load_gpm_metadata()
+    assert meta.get("source_data_origin") == "OFFLINE_TEST_FIXTURE"
+    prov_status = get_gpm_provenance_status()
+    assert prov_status["status"] == "SAMPLE_GPM_COMPATIBLE"
+    assert prov_status["is_real"] is False
+    assert prov_status["source_data_origin"] == "OFFLINE_TEST_FIXTURE"
+
+
 # ── 2. Native Coarse Cells & Area-Weighted Overlap ───────────────────────────
 
 def test_native_cell_distribution_across_zones():
@@ -153,12 +163,12 @@ def test_no_negative_or_nan_rainfall():
 
 def test_c03_rolling_accumulation_with_gpm():
     """
-    Test rolling accumulation on C03 where observed is REAL_GPM and forecast is SAMPLE_MOCK.
+    Test rolling accumulation on C03 where observed is SAMPLE_GPM_COMPATIBLE and forecast is SAMPLE_MOCK.
     C03 GPM observed: D-2=11.6, D-1=19.8, D0=32.4
     C03 sample forecast: F1=65.0, F2=45.0, F3=15.0
     """
     series = get_rainfall_series("C03")
-    assert series.observed_provenance == "REAL_GPM"
+    assert series.observed_provenance == "SAMPLE_GPM_COMPATIBLE"
     assert series.forecast_provenance == "SAMPLE_MOCK"
 
     rolling = compute_zone_rolling_rainfall(series)
@@ -188,6 +198,7 @@ def test_forecast_never_labelled_as_gpm():
         series = get_rainfall_series(zid)
         assert series.forecast_provenance == "SAMPLE_MOCK"
         assert series.forecast_provenance != "REAL_GPM"
+        assert series.forecast_provenance != "SAMPLE_GPM_COMPATIBLE"
 
 
 def test_missing_gpm_file_triggers_graceful_fallback():
@@ -203,12 +214,12 @@ def test_missing_gpm_file_triggers_graceful_fallback():
 # ── 6. API Route Verification ─────────────────────────────────────────────────
 
 def test_api_weather_status():
-    """GET /weather/status returns REAL_GPM metadata when dataset is present."""
+    """GET /weather/status returns SAMPLE_GPM_COMPATIBLE metadata when dataset is offline fixture."""
     response = client.get("/weather/status")
     assert response.status_code == 200
     data = response.json()
-    assert data["status"] == "REAL_GPM"
-    assert data["is_real"] is True
+    assert data["status"] == "SAMPLE_GPM_COMPATIBLE"
+    assert data["is_real"] is False
     assert data["collection"] == "GPM_3IMERGDL"
     assert data["collection_version"] == "07"
     assert data["algorithm_generation"] == "V07"
@@ -224,7 +235,7 @@ def test_api_weather_zone_c03():
     assert response.status_code == 200
     data = response.json()
     assert data["zone_id"] == "C03"
-    assert data["observed_provenance"] == "REAL_GPM"
+    assert data["observed_provenance"] == "SAMPLE_GPM_COMPATIBLE"
     assert data["forecast_provenance"] == "SAMPLE_MOCK"
     assert data["observed_daily_mm"]["d0"] == 32.4
     assert data["observed_daily_mm"]["d_minus_1"] == 19.8
@@ -233,35 +244,35 @@ def test_api_weather_zone_c03():
 
 
 def test_api_risk_current_c03_provenance():
-    """GET /risk/current/C03 reports REAL_DEM for slope and REAL_GPM for observed rainfall."""
+    """GET /risk/current/C03 reports REAL_DEM for slope and SAMPLE_GPM_COMPATIBLE for observed rainfall."""
     response = client.get("/risk/current/C03")
     assert response.status_code == 200
     data = response.json()
     prov = data.get("feature_provenance", {})
     assert prov.get("slope") == "REAL_DEM"
     assert prov.get("elevation") == "REAL_DEM"
-    assert prov.get("observed_rainfall") == "REAL_GPM"
+    assert prov.get("observed_rainfall") == "SAMPLE_GPM_COMPATIBLE"
     assert prov.get("soil_wetness") == "SAMPLE_MOCK"
 
 
 def test_api_risk_forecast_c03_provenance():
-    """GET /risk/forecast/C03 distinguishes REAL_GPM observed from SAMPLE_MOCK forecast."""
+    """GET /risk/forecast/C03 distinguishes SAMPLE_GPM_COMPATIBLE observed from SAMPLE_MOCK forecast."""
     response = client.get("/risk/forecast/C03")
     assert response.status_code == 200
     data = response.json()
     prov = data.get("feature_provenance", {})
     assert prov.get("slope") == "REAL_DEM"
-    assert prov.get("observed_rainfall") == "REAL_GPM"
+    assert prov.get("observed_rainfall") == "SAMPLE_GPM_COMPATIBLE"
     assert prov.get("forecast_rainfall") == "SAMPLE_MOCK"
     assert prov.get("soil_wetness") == "SAMPLE_MOCK"
 
 
 def test_api_risk_current_all_zones_gpm_provenance():
-    """GET /risk/current verifies all 25 zones carry observed_rainfall=REAL_GPM."""
+    """GET /risk/current verifies all 25 zones carry observed_rainfall=SAMPLE_GPM_COMPATIBLE."""
     response = client.get("/risk/current")
     assert response.status_code == 200
     data = response.json()
     assert data["total"] == 25
     for z in data["zones"]:
-        assert z["feature_provenance"]["observed_rainfall"] == "REAL_GPM"
+        assert z["feature_provenance"]["observed_rainfall"] == "SAMPLE_GPM_COMPATIBLE"
         assert z["feature_provenance"]["slope"] == "REAL_DEM"

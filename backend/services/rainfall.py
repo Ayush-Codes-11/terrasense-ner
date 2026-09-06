@@ -128,6 +128,12 @@ def get_rainfall_series(zone_id: str) -> RainfallSeries:
     )
 
     # Check for Real GPM IMERG observations
+    try:
+        from backend.services.gpm_loader import get_gpm_provenance_status
+        prov_status = get_gpm_provenance_status()
+    except ImportError:
+        prov_status = {"status": "SAMPLE_MOCK"}
+
     gpm_data = get_zone_gpm_observed(zid) if callable(get_zone_gpm_observed) else None
 
     if gpm_data and "observed_daily_mm" in gpm_data:
@@ -141,13 +147,13 @@ def get_rainfall_series(zone_id: str) -> RainfallSeries:
                 raise ValueError(f"Invalid real GPM rainfall for '{k}' in zone {zid}: {v}")
 
         observed = ObservedRainfall(d_minus_2=d2, d_minus_1=d1, d0=d0)
-        observed_prov = "REAL_GPM"
-        data_type = "REAL_GPM"
+        observed_prov = prov_status.get("status", "SAMPLE_MOCK")
+        data_type = observed_prov
         obs_buckets_meta = gpm_data.get("observed_buckets")
         obs_timestamp = gpm_data.get("observed_buckets", {}).get("d0", {}).get("window_end_utc")
-        source = "NASA GPM IMERG Late Precipitation L3 1 day 0.1° V07 (GPM_3IMERGDL)"
+        source = prov_status.get("source", "NASA GPM IMERG")
         note = (
-            "Observed rainfall from NASA GPM IMERG (~0.1° native grid). "
+            f"Observed rainfall from {source}. "
             "Future forecast intervals are SAMPLE_MOCK scenario."
         )
     else:

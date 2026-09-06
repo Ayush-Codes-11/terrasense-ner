@@ -67,11 +67,13 @@ app.add_middleware(
     allow_origins=_CORS_ORIGINS,
     allow_origin_regex=r"^https://terrasense-.*\.vercel\.app$",
     allow_credentials=False,
-    allow_methods=["GET"],
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 
 # ── Routers ───────────────────────────────────────────────────────────────────
+
+from routes.field_reports import router as field_reports_router
 
 app.include_router(zones_router)         # /health, /zones
 app.include_router(risk_router)          # /risk/current, /risk/forecast/{id}
@@ -80,6 +82,7 @@ app.include_router(geodata_router)       # /geodata/osm/*
 app.include_router(exposure_router)      # /exposure/{id}
 app.include_router(priority_router)      # /priority/{id}
 app.include_router(terrain_router)       # /terrain/status, /terrain/{zone_id}
+app.include_router(field_reports_router) # /field-reports
 
 
 

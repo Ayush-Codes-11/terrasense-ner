@@ -113,7 +113,11 @@ export function useZoneDetails(
           apiZoneRisk.feature_provenance?.observed_rainfall === "REAL_GPM" ||
           apiZoneRisk.feature_provenance?.rainfall === "REAL_GPM";
 
-        const isObservedRain = (isRecentRain || isAntecedentRain) && hasRealGpm;
+        const hasSampleGpm =
+          apiZoneRisk.feature_provenance?.observed_rainfall === "SAMPLE_GPM_COMPATIBLE" ||
+          apiZoneRisk.feature_provenance?.rainfall === "SAMPLE_GPM_COMPATIBLE";
+
+        const isObservedRain = (isRecentRain || isAntecedentRain) && (hasRealGpm || hasSampleGpm);
 
         const slopeVal =
           apiZoneRisk.slope_deg !== undefined
@@ -127,10 +131,10 @@ export function useZoneDetails(
           freshness = "REAL DEM";
           description = `Terrain slope: ${slopeVal}° mean — real Copernicus GLO-30 DEM`;
         } else if (isObservedRain) {
-          freshness = "REAL GPM";
+          freshness = hasRealGpm ? "REAL GPM" : "SAMPLE GPM";
           description = isRecentRain
-            ? `Recent 24h rainfall: observed NASA GPM IMERG Late (~0.1° grid)`
-            : `3-day antecedent rainfall: observed NASA GPM IMERG Late (~0.1° grid)`;
+            ? `Recent 24h rainfall: ${hasRealGpm ? 'observed NASA GPM IMERG Late' : 'SAMPLE/FIXTURE GPM compatible data'} (~0.1° grid)`
+            : `3-day antecedent rainfall: ${hasRealGpm ? 'observed NASA GPM IMERG Late' : 'SAMPLE/FIXTURE GPM compatible data'} (~0.1° grid)`;
         }
 
         return {

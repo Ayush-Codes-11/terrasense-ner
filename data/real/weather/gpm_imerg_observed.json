@@ -42,7 +42,8 @@
     },
     "is_live": false,
     "attribution": "NASA Global Precipitation Measurement (GPM) Integrated Multi-satellitE Retrievals for GPM (IMERG), archived and distributed by NASA GES DISC.",
-    "notes": "GPM IMERG estimates are satellite-derived precipitation measurements at ~0.1 deg (~10 km) native grid. Values represent recent observed precipitation triggers; future rainfall windows remain scenario-based."
+    "notes": "GPM IMERG estimates are satellite-derived precipitation measurements at ~0.1 deg (~10 km) native grid. Values represent recent observed precipitation triggers; future rainfall windows remain scenario-based.",
+    "source_data_origin": "OFFLINE_TEST_FIXTURE"
   },
   "zones": {
     "A01": {
