@@ -24,7 +24,7 @@ const PRIORITY_ICONS: Record<string, string> = {
   CRITICAL: "🔴",
 };
 
-function HorizonCell({
+function HorizonRow({
   label,
   h,
 }: {
@@ -32,23 +32,25 @@ function HorizonCell({
   h?: HorizonPriority | null;
 }) {
   if (!h) return null;
-  const pClass = PRIORITY_BG_CLASSES[h.priority] ?? "bg-slate-700 text-slate-300";
+  const pClass = PRIORITY_BG_CLASSES[h.priority] ?? "text-slate-400";
   const icon = PRIORITY_ICONS[h.priority] ?? "⚪";
 
   return (
-    <div className="flex flex-col items-center p-2 rounded bg-slate-900/50 border border-slate-700/60">
-      <span className="text-[10px] font-semibold text-slate-400 mb-1">{label}</span>
-      <div className="flex items-center gap-1">
-        <span className="text-xs">{icon}</span>
-        <span className={`risk-badge text-[10px] px-1.5 py-0.5 ${pClass}`}>
+    <div className={`flex items-center justify-between px-3 py-1.5 rounded ${label === "NOW" ? 'bg-slate-800' : ''}`}>
+      <span className={`w-12 text-[10px] font-mono font-medium ${label === "NOW" ? 'text-white' : 'text-slate-400'}`}>
+        {label}
+      </span>
+      <div className="w-24 flex items-center gap-1.5">
+        <span className="text-[10px]">{icon}</span>
+        <span className={`text-[10px] font-bold ${pClass}`}>
           {h.priority.replace("_", " ")}
         </span>
       </div>
-      <span className="text-[9px] text-slate-500 font-mono mt-1">
-        Score {h.priority_score.toFixed(2)}
+      <span className="w-16 text-[10px] text-slate-500 font-mono text-right tabular-nums">
+        {h.priority_score.toFixed(2)}
       </span>
-      <span className="text-[8px] text-slate-500">
-        Risk: {h.landslide_risk_category.replace("_", " ")}
+      <span className="w-16 text-[9px] text-slate-500 text-right truncate">
+        {h.landslide_risk_category.replace("_", " ")}
       </span>
     </div>
   );
@@ -112,32 +114,23 @@ export default function EmergencyPriorityCard({
         </div>
       ) : (
         <>
-          {/* 4-Horizon Priority Outlook Grid */}
-          <div className="grid grid-cols-4 gap-1.5">
-            <HorizonCell label="NOW" h={nowH} />
-            <HorizonCell label="+24h" h={h24} />
-            <HorizonCell label="+48h" h={h48} />
-            <HorizonCell label="+72h" h={h72} />
+          {/* 4-Horizon Priority Outlook Compact List */}
+          <div className="flex flex-col gap-1 border border-slate-700/50 rounded bg-slate-900/30 p-1">
+            <HorizonRow label="NOW" h={nowH} />
+            <HorizonRow label="+24h" h={h24} />
+            <HorizonRow label="+48h" h={h48} />
+            <HorizonRow label="+72h" h={h72} />
           </div>
 
           {/* Deterministic Explanation */}
           {priority.explanation && (
-            <div className="bg-slate-900/60 border border-slate-700/50 rounded-md p-2 flex flex-col gap-1">
+            <div className="border-t border-slate-700/50 pt-2 flex flex-col gap-1 mt-1">
               <span className="text-[9px] font-semibold text-slate-400 uppercase tracking-wide">
-                Priority Outlook Rationale
+                Priority Rationale
               </span>
               <p className="text-[10px] text-slate-300 leading-snug">
                 {priority.explanation}
               </p>
-              {priority.horizon_transitions && priority.horizon_transitions.length > 0 && (
-                <ul className="text-[9px] text-slate-400 list-disc list-inside space-y-0.5 mt-0.5">
-                  {priority.horizon_transitions.map((t, i) => (
-                    <li key={i} className="leading-tight">
-                      {t}
-                    </li>
-                  ))}
-                </ul>
-              )}
             </div>
           )}
         </>

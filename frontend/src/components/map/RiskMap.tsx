@@ -155,10 +155,10 @@ export default function RiskMap({
       const isSelected = feature?.properties?.zone_id === selectedZoneId;
       return {
         fillColor: riskColor(cat),
-        fillOpacity: isSelected ? 0.40 : 0.25,
+        fillOpacity: isSelected ? 0.45 : 0.30,
         color: isSelected ? "#ffffff" : riskColor(cat),
-        weight: isSelected ? 2.5 : 1.2,
-        opacity: 0.9,
+        weight: isSelected ? 2.5 : 1.5,
+        opacity: isSelected ? 1 : 0.4,
       };
     },
     [selectedZoneId, zoneRisks]
@@ -292,7 +292,7 @@ export default function RiskMap({
           </LayersControl.BaseLayer>
 
           {/* ── Risk Zones ── */}
-          <LayersControl.Overlay checked name="⬛ Risk Zones (5×5 Prototype Grid)">
+          <LayersControl.Overlay checked name="Risk Grid">
             {gridRisk && (
               <GeoJSON
                 key={`risk-${selectedZoneId ?? "none"}-${isRiskFallback ? "fallback" : "live"}-${zoneRisks?.size ?? 0}`}
@@ -308,7 +308,7 @@ export default function RiskMap({
           </LayersControl.Overlay>
 
           {/* ── Roads ── */}
-          <LayersControl.Overlay checked name={geoData.isRealOsm ? "🛣 Roads" : "🛣 Roads (fallback)"}>
+          <LayersControl.Overlay checked name="Roads">
             <>
               {roads?.features.map((f, i) => {
                 const props = f.properties as RoadGeoJSONProperties;
@@ -383,8 +383,63 @@ export default function RiskMap({
             </>
           </LayersControl.Overlay>
 
+          {/* ── Critical Facilities ── */}
+          <LayersControl.Overlay checked name="Critical Facilities">
+            <>
+              {hospitals?.features.map((f, i) => {
+                const props = f.properties as FacilityGeoJSONProperties;
+                const [lon, lat] = (f.geometry as GeoJSON.Point).coordinates;
+                const isReal = props.data_type === "REAL_OSM" || geoData.isRealOsm;
+                const name = props.name || (isReal ? "Facility (OSM)" : "Unnamed facility");
+                const facilityType = (
+                  props.category ??
+                  props.amenity ??
+                  props.facility_type ??
+                  "critical_facility"
+                ).replace(/_/g, " ");
+                return (
+                  <CircleMarker
+                    key={props.facility_id ?? props.osm_id ?? i}
+                    center={[lat, lon]}
+                    radius={6}
+                    pathOptions={{
+                      color: "#f87171",
+                      fillColor: "#ef4444",
+                      fillOpacity: 0.85,
+                      weight: 2,
+                    }}
+                  >
+                    <Popup>
+                      <div className="text-xs">
+                        <p className="font-semibold">{name}</p>
+                        <p className="text-slate-500 capitalize">{facilityType}</p>
+                        {props.zone_id && (
+                          <p className="text-slate-500">Zone: {props.zone_id}</p>
+                        )}
+                        {isReal ? (
+                          <div className="mt-1 border-t border-slate-700/50 pt-1">
+                            <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-mono bg-emerald-950 text-emerald-300 border border-emerald-800">
+                              REAL_OSM · © OSM contributors
+                            </span>
+                            <p className="text-[9px] text-slate-400 italic mt-0.5">
+                              Whitelisted & deduplicated critical facility ({facilityType})
+                            </p>
+                          </div>
+                        ) : (
+                          <p className="text-amber-500 text-[10px] mt-1 font-mono">
+                            SAMPLE MOCK
+                          </p>
+                        )}
+                      </div>
+                    </Popup>
+                  </CircleMarker>
+                );
+              })}
+            </>
+          </LayersControl.Overlay>
+
           {/* ── Villages / Communities / Localities ── */}
-          <LayersControl.Overlay checked name={geoData.isRealOsm ? "🏘 Communities / Localities" : "🏘 Communities (fallback)"}>
+          <LayersControl.Overlay checked name="Communities">
             <>
               {villages?.features.map((f, i) => {
                 const props = f.properties as VillageGeoJSONProperties;
@@ -444,63 +499,8 @@ export default function RiskMap({
             </>
           </LayersControl.Overlay>
 
-          {/* ── Critical Facilities ── */}
-          <LayersControl.Overlay checked name={geoData.isRealOsm ? "🏥 Critical Facilities" : "🏥 Critical Facilities (fallback)"}>
-            <>
-              {hospitals?.features.map((f, i) => {
-                const props = f.properties as FacilityGeoJSONProperties;
-                const [lon, lat] = (f.geometry as GeoJSON.Point).coordinates;
-                const isReal = props.data_type === "REAL_OSM" || geoData.isRealOsm;
-                const name = props.name || (isReal ? "Facility (OSM)" : "Unnamed facility");
-                const facilityType = (
-                  props.category ??
-                  props.amenity ??
-                  props.facility_type ??
-                  "critical_facility"
-                ).replace(/_/g, " ");
-                return (
-                  <CircleMarker
-                    key={props.facility_id ?? props.osm_id ?? i}
-                    center={[lat, lon]}
-                    radius={6}
-                    pathOptions={{
-                      color: "#f87171",
-                      fillColor: "#ef4444",
-                      fillOpacity: 0.85,
-                      weight: 2,
-                    }}
-                  >
-                    <Popup>
-                      <div className="text-xs">
-                        <p className="font-semibold">{name}</p>
-                        <p className="text-slate-500 capitalize">{facilityType}</p>
-                        {props.zone_id && (
-                          <p className="text-slate-500">Zone: {props.zone_id}</p>
-                        )}
-                        {isReal ? (
-                          <div className="mt-1 border-t border-slate-700/50 pt-1">
-                            <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-mono bg-emerald-950 text-emerald-300 border border-emerald-800">
-                              REAL_OSM · © OSM contributors
-                            </span>
-                            <p className="text-[9px] text-slate-400 italic mt-0.5">
-                              Whitelisted & deduplicated critical facility ({facilityType})
-                            </p>
-                          </div>
-                        ) : (
-                          <p className="text-amber-500 text-[10px] mt-1 font-mono">
-                            SAMPLE MOCK
-                          </p>
-                        )}
-                      </div>
-                    </Popup>
-                  </CircleMarker>
-                );
-              })}
-            </>
-          </LayersControl.Overlay>
-
           {/* ── Field Reports ── */}
-          <LayersControl.Overlay checked name="⚠️ Field Reports">
+          <LayersControl.Overlay checked name="Field Reports">
             <>
               {reports?.map((r, i) => {
                 return (

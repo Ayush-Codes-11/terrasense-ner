@@ -81,18 +81,6 @@ export default function Dashboard() {
         ? false
         : allZonesApiOnline ?? zoneDetailsApiOnline;
 
-  // System status indicators
-  const geoExposureStatus = geoData.loading
-    ? "Loading…"
-    : geoData.error
-      ? "Load error"
-      : geoData.osmStatus === "OSM snapshot"
-        ? "OSM snapshot"
-        : geoData.osmStatus === "Cached OSM"
-          ? "Cached OSM"
-          : "Sample fallback";
-  const geoExposureOk = geoData.error ? false : geoData.isRealOsm ? true : false;
-
   const apiStatus =
     apiOnline === true
       ? "Connected"
@@ -147,9 +135,9 @@ export default function Dashboard() {
       <TopBar districtMeta={null} />
 
       {/* Main content */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-col lg:flex-row flex-1 overflow-hidden overflow-y-auto lg:overflow-y-hidden">
         {/* ── Left: Map ── */}
-        <div className="flex-1 p-3 overflow-hidden">
+        <div className="h-[55vh] lg:h-auto lg:flex-1 p-3 shrink-0 relative min-h-[400px]">
           <RiskMap
             geoData={geoData}
             selectedZoneId={selectedZoneId}
@@ -160,7 +148,7 @@ export default function Dashboard() {
         </div>
 
         {/* ── Right: Card stack ── */}
-        <aside className="w-80 shrink-0 flex flex-col gap-2 p-3 overflow-y-auto border-l border-slate-700/50">
+        <aside className="w-full lg:w-96 shrink-0 flex flex-col gap-2 p-3 overflow-y-auto border-t lg:border-t-0 lg:border-l border-slate-700/50">
           {/* Zone selection indicator */}
           {selectedZoneId ? (
             <div className="flex items-center justify-between px-3 py-1.5 rounded-md bg-blue-600/10 border border-blue-500/30">
@@ -236,17 +224,16 @@ export default function Dashboard() {
 
           <RiskSeverityCard zones={zonesList} selectedZone={selectedZone} />
           <ForecastCard forecast={forecast} zoneId={selectedZoneId} />
-          <AlertsPanel />
           <ExposureCard exposure={exposure} zoneId={selectedZoneId} />
           <EmergencyPriorityCard priority={priority} zoneId={selectedZoneId} />
           <WhyNowCard whyNow={whyNow} zoneId={selectedZoneId} />
         </aside>
       </div>
 
-      {/* ── Bottom: Reports + Status strip ── */}
-      <div className="shrink-0 h-44 border-t border-slate-700 bg-slate-850 flex">
-        {/* Reports */}
-        <div className="flex-1 p-3 overflow-hidden flex flex-col">
+      {/* ── Bottom: Reports + Alerts + Status strip ── */}
+      <div className="shrink-0 flex flex-col lg:flex-row border-t border-slate-700 bg-slate-900 lg:h-44 h-auto max-h-[50vh] lg:max-h-none overflow-y-auto lg:overflow-y-hidden">
+        {/* Field Reports (Left) */}
+        <div className="flex-1 lg:border-r border-slate-700 p-3 overflow-hidden flex flex-col bg-slate-800/20 min-h-[150px]">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
               Field Reports
@@ -255,98 +242,60 @@ export default function Dashboard() {
               {!isOnline ? (
                 <span className="text-amber-400 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-                  Offline — reports will be stored on this device
+                  Offline
                 </span>
               ) : null}
               {localReports.filter(r => r.sync_status !== "SYNCED").length > 0 && (
                 <span className="text-blue-400 font-medium">
-                  {localReports.filter(r => r.sync_status !== "SYNCED").length} reports pending sync
+                  {localReports.filter(r => r.sync_status !== "SYNCED").length} pending sync
                 </span>
               )}
             </div>
           </div>
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-y-auto lg:overflow-hidden">
             <ReportList reports={localReports} />
           </div>
         </div>
 
-        {/* System Status */}
-        <div className="w-80 shrink-0 border-l border-slate-700 p-3 flex flex-col gap-2">
+        {/* Alerts Panel (Middle) */}
+        <div className="w-full lg:w-80 shrink-0 overflow-y-auto border-t lg:border-t-0 border-slate-700 max-h-48 lg:max-h-none">
+          <AlertsPanel />
+        </div>
+
+        {/* Data Provenance & Status (Right) */}
+        <div className="w-full lg:w-80 shrink-0 border-t lg:border-t-0 lg:border-l border-slate-700 p-3 flex flex-col gap-2 bg-slate-900/50">
           <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
-            System Status
+            Data Sources & Provenance
           </h3>
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5 font-mono">
             {[
-              {
-                label: "Terrain",
-                status: "REAL DEM",
-                ok: true,
-              },
-              {
-                label: "Observed Rain",
-                status: "SAMPLE scenario",
-                ok: null,
-              },
-              {
-                label: "Forecast Rain",
-                status: "SAMPLE scenario",
-                ok: null,
-              },
-              {
-                label: "Soil wetness",
-                status: "SAMPLE",
-                ok: null,
-              },
-              {
-                label: "Geospatial Exposure",
-                status: geoExposureStatus,
-                ok: geoExposureOk,
-              },
-              {
-                label: "Risk Engine",
-                status: riskEngineStatus,
-                ok: riskEngineOk,
-              },
-              {
-                label: "FastAPI Backend",
-                status: apiStatus,
-                ok: apiOk,
-              },
-            ].map(({ label, status, ok }) => (
-              <div
-                key={label}
-                className="flex items-center justify-between text-xs"
-              >
-                <span className="text-slate-500">{label}</span>
-                <div className="flex items-center gap-1.5">
-                  <span
-                    className={`w-1.5 h-1.5 rounded-full ${
-                      ok === true
-                        ? "bg-green-400"
-                        : ok === false
-                          ? "bg-amber-400"
-                          : "bg-slate-600"
-                    }`}
-                  />
-                  <span
-                    className={
-                      ok === true
-                        ? "text-green-400"
-                        : ok === false
-                          ? "text-amber-400"
-                          : "text-slate-400"
-                    }
-                  >
-                    {status}
-                  </span>
-                </div>
+              { label: "Basemap", source: "OpenTopoMap", prov: "REAL" },
+              { label: "Elevation", source: "Copernicus GLO-30", prov: "REAL" },
+              { label: "Roads", source: "OpenStreetMap", prov: "REAL" },
+              { label: "Facilities", source: "OpenStreetMap", prov: "REAL" },
+              { label: "Inventory", source: "GSI", prov: "REAL" },
+              { label: "Rainfall", source: "GPM-compatible", prov: "SAMPLE" },
+              { label: "Soil", source: "Prototype input", prov: "SAMPLE" },
+            ].map(({ label, source, prov }) => (
+              <div key={label} className="flex items-center justify-between text-[10px]">
+                <span className="text-slate-500 w-20">{label}</span>
+                <span className="text-slate-300 truncate flex-1 px-1">{source}</span>
+                <span className={`px-1.5 rounded-sm border ${
+                  prov === "REAL" ? "border-green-500/30 text-green-400 bg-green-500/10" : "border-amber-500/30 text-amber-400 bg-amber-500/10"
+                }`}>{prov}</span>
               </div>
             ))}
           </div>
 
-          {/* Data mode note */}
-          <div className="mt-auto text-[10px] text-slate-600 border-t border-slate-700 pt-2">
-            Phase 12 · Copernicus DEM · NASA GPM · Real OSM Exposure · GSI Inventory · Prototype Scorer
+          <div className="mt-auto border-t border-slate-700/50 pt-2 flex flex-col gap-1 font-mono text-[10px]">
+            <div className="flex justify-between items-center">
+              <span className="text-slate-500">Risk Engine</span>
+              <span className={riskEngineOk ? "text-green-400" : "text-amber-400"}>{riskEngineStatus}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-slate-500">Backend API</span>
+              <span className={apiOk ? "text-green-400" : "text-amber-400"}>{apiStatus}</span>
+            </div>
           </div>
         </div>
       </div>

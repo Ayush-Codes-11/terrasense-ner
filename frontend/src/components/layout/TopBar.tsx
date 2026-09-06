@@ -46,7 +46,7 @@ export default function TopBar({ districtMeta }: TopBarProps) {
         {/* Pilot district */}
         <div className="flex items-center gap-4">
           <div>
-            <div className="text-[10px] text-amber-400 font-semibold uppercase tracking-wider">Pilot Deployment</div>
+            <div className="text-[10px] text-amber-400 font-semibold uppercase tracking-wider">Pilot</div>
             <div className="text-sm font-medium text-white">
               {districtMeta?.district_name ?? "Aizawl"},{" "}
               {districtMeta?.state ?? "Mizoram"}
@@ -54,7 +54,7 @@ export default function TopBar({ districtMeta }: TopBarProps) {
           </div>
           <div className="h-6 w-px bg-slate-700 hidden sm:block" />
           <div className="hidden sm:block">
-            <div className="text-[10px] text-slate-400 uppercase tracking-wider">Designed Coverage</div>
+            <div className="text-[10px] text-slate-400 uppercase tracking-wider">Designed Scope</div>
             <div className="text-xs font-medium text-slate-300">
               North Eastern Region
             </div>
@@ -62,36 +62,7 @@ export default function TopBar({ districtMeta }: TopBarProps) {
         </div>
       </div>
 
-      {/* Centre: Data provenance badges */}
-      <div className="hidden sm:flex items-center gap-3 px-3 py-1.5 rounded-md bg-slate-800 border border-slate-700">
-        <div className="flex items-center gap-1.5">
-          <span className="text-[10px] text-slate-400">Terrain:</span>
-          <span className="text-[10px] font-semibold text-green-400 bg-green-950/60 px-1.5 py-0.5 rounded border border-green-500/30">
-            REAL DEM
-          </span>
-        </div>
-        <div className="h-3 w-px bg-slate-700" />
-        <div className="flex items-center gap-1.5">
-          <span className="text-[10px] text-slate-400">Rainfall:</span>
-          <span className="text-[10px] font-semibold text-amber-400 bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-500/30">
-            SAMPLE scenario
-          </span>
-        </div>
-        <div className="h-3 w-px bg-slate-700" />
-        <div className="flex items-center gap-1.5">
-          <span className="text-[10px] text-slate-400">Future rain:</span>
-          <span className="text-[10px] font-semibold text-amber-400 bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-500/30">
-            SAMPLE scenario
-          </span>
-        </div>
-        <div className="h-3 w-px bg-slate-700" />
-        <div className="flex items-center gap-1.5">
-          <span className="text-[10px] text-slate-400">Soil wetness:</span>
-          <span className="text-[10px] font-semibold text-amber-400 bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-500/30">
-            SAMPLE
-          </span>
-        </div>
-      </div>
+      {/* Centre removed per Phase 12 clean visual rules */}
 
       {/* Right: Timestamp + Nav */}
       <div className="flex items-center gap-3">

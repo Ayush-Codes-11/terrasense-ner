@@ -19,11 +19,8 @@ export default function ExposureCard({ exposure, zoneId }: ExposureCardProps) {
 
   const motorableKm = exposure?.summary?.motorable_road_km ?? exposure?.summary?.roads_exposed_km ?? 0;
   const motorableSegments = exposure?.summary?.motorable_road_segments_count ?? exposure?.summary?.roads_exposed ?? 0;
-  const rawSegments = exposure?.summary?.osm_road_segments_count ?? exposure?.summary?.roads_exposed ?? 0;
   const communityCount = exposure?.summary?.mapped_communities ?? exposure?.summary?.villages_exposed ?? 0;
   const facilityCount = exposure?.summary?.critical_facilities ?? exposure?.summary?.hospitals_exposed ?? 0;
-  const pedestrianKm = exposure?.summary?.pedestrian_road_km ?? 0;
-  const trackKm = exposure?.summary?.track_road_km ?? 0;
   const isReal = exposure?.exposure_features === "REAL_OSM";
 
   return (
@@ -52,89 +49,57 @@ export default function ExposureCard({ exposure, zoneId }: ExposureCardProps) {
       </div>
 
       {isPlaceholder ? (
-        <div className="flex flex-col items-center justify-center py-5 gap-2">
-          <div className="grid grid-cols-3 gap-2 w-full">
-            {["Motorable Roads", "Locality Centres", "Facilities"].map((t) => (
-              <div
-                key={t}
-                className="flex flex-col items-center gap-1 p-2 rounded-lg bg-slate-900/40 border border-dashed border-slate-700/50"
-              >
-                <div className="text-base">
-                  {t.includes("Roads") ? "🛣" : t.includes("Locality") ? "🏘" : "🏥"}
-                </div>
-                <div className="w-8 h-3 bg-slate-800 rounded" />
-                <span className="text-[9px] text-slate-500 text-center">{t}</span>
-              </div>
-            ))}
-          </div>
+        <div className="flex flex-col items-center justify-center py-5 gap-2 border border-dashed border-slate-700/50 rounded-lg">
           <p className="text-[10px] text-slate-500 text-center">
-            Click a zone on the map to compute real OSM exposure
+            Click a zone on the map to compute OSM exposure
           </p>
         </div>
       ) : (
         <>
           {/* Summary Metric Cards */}
           <div className="grid grid-cols-3 gap-2">
-            <div className="flex flex-col items-center p-2 rounded bg-slate-900/50 border border-slate-700/60">
-              <span className="text-sm">🛣</span>
-              <span className="text-sm font-bold text-white mt-0.5">
-                {motorableKm.toFixed(2)} <span className="text-[9px] font-normal text-slate-400">km</span>
+            <div className="flex flex-col p-2 rounded bg-slate-800/40 border border-slate-700/50 text-center">
+              <span className="text-lg font-bold text-white tabular-nums">
+                {motorableKm.toFixed(2)}
               </span>
-              <span className="text-[9px] text-slate-400 text-center">Motorable roads</span>
-              <span className="text-[8px] text-slate-500 text-center">
-                {motorableSegments} motorable / {rawSegments} OSM road segments
-              </span>
+              <span className="text-[9px] text-slate-400 mt-0.5">km motorable</span>
+              <span className="text-[8px] text-slate-500 mt-1 uppercase tracking-wider">{motorableSegments} segments</span>
             </div>
 
-            <div className="flex flex-col items-center p-2 rounded bg-slate-900/50 border border-slate-700/60">
-              <span className="text-sm">🏘</span>
-              <span className="text-sm font-bold text-white mt-0.5">{communityCount}</span>
-              <span className="text-[9px] text-slate-400 text-center">Mapped community centres</span>
-              <span className="text-[8px] text-slate-500 text-center">OSM landmarks (not pop.)</span>
+            <div className="flex flex-col p-2 rounded bg-slate-800/40 border border-slate-700/50 text-center">
+              <span className="text-lg font-bold text-white tabular-nums">{communityCount}</span>
+              <span className="text-[9px] text-slate-400 mt-0.5">community centres</span>
+              <span className="text-[8px] text-slate-500 mt-1 uppercase tracking-wider">mapped localities</span>
             </div>
 
-            <div className="flex flex-col items-center p-2 rounded bg-slate-900/50 border border-slate-700/60">
-              <span className="text-sm">🏥</span>
-              <span className="text-sm font-bold text-white mt-0.5">{facilityCount}</span>
-              <span className="text-[9px] text-slate-400 text-center">Critical facilities</span>
-              <span className="text-[8px] text-slate-500 text-center">whitelisted & deduped</span>
+            <div className="flex flex-col p-2 rounded bg-slate-800/40 border border-slate-700/50 text-center">
+              <span className="text-lg font-bold text-white tabular-nums">{facilityCount}</span>
+              <span className="text-[9px] text-slate-400 mt-0.5">critical facilities</span>
+              <span className="text-[8px] text-slate-500 mt-1 uppercase tracking-wider">whitelisted</span>
             </div>
           </div>
 
-          {/* Non-motorized / Track detail if present */}
-          {(pedestrianKm > 0 || trackKm > 0) && (
-            <div className="text-[9px] text-slate-500 bg-slate-900/40 rounded px-2 py-1 border border-slate-800">
-              Non-motorized features excluded from priority road km:{" "}
-              {pedestrianKm > 0 && <span className="text-slate-400">{pedestrianKm.toFixed(2)} km steps/paths </span>}
-              {trackKm > 0 && <span className="text-slate-400">· {trackKm.toFixed(2)} km tracks</span>}
-            </div>
-          )}
-
           {/* Strict Non-blockage guarantee */}
-          <div className="flex items-start gap-1.5 text-[10px] text-slate-400 bg-amber-500/10 rounded px-2.5 py-1.5 border border-amber-500/20">
-            <span className="text-amber-400 font-semibold shrink-0">EXPOSED</span>
-            <p className="leading-tight text-slate-300">
-              Roads are classified as <span className="text-amber-300 font-medium">EXPOSED_NOT_VERIFIED_BLOCKED</span>.
-              Zero roads are marked blocked without a verified field officer report.
-            </p>
+          <div className="text-[10px] text-amber-300 bg-amber-500/10 rounded px-2.5 py-1.5 border border-amber-500/20 leading-tight">
+            <strong>EXPOSED</strong> — Zero roads marked blocked without verified field report.
           </div>
 
           {/* Sample Features in zone */}
           {((exposure.roads && exposure.roads.length > 0) || (exposure.critical_facilities && exposure.critical_facilities.length > 0)) && (
             <div className="max-h-28 overflow-y-auto flex flex-col gap-1 pr-1 border-t border-slate-700/40 pt-1.5">
               <span className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">
-                Intersecting Features (Sample)
+                Intersecting Features
               </span>
               {exposure.critical_facilities?.slice(0, 3).map((f) => (
                 <div key={f.feature_id} className="flex items-center justify-between text-[10px] text-slate-300 py-0.5">
-                  <span className="truncate max-w-[170px]">🏥 {f.name || `Unnamed ${f.category}`}</span>
-                  <span className="text-[9px] px-1 rounded bg-slate-800 text-slate-400 capitalize">{f.category}</span>
+                  <span className="truncate max-w-[170px]">{f.name || `Unnamed ${f.category}`}</span>
+                  <span className="text-[9px] text-slate-500 capitalize">{f.category}</span>
                 </div>
               ))}
               {exposure.roads?.slice(0, 3).map((r) => (
                 <div key={r.feature_id} className="flex items-center justify-between text-[10px] text-slate-300 py-0.5">
-                  <span className="truncate max-w-[170px]">🛣 {r.name || `Unnamed ${r.highway}`}</span>
-                  <span className="text-[9px] text-slate-400 font-mono">{r.length_km.toFixed(2)} km</span>
+                  <span className="truncate max-w-[170px]">{r.name || `Unnamed ${r.highway}`}</span>
+                  <span className="text-[9px] text-slate-500 tabular-nums">{r.length_km.toFixed(2)} km</span>
                 </div>
               ))}
             </div>
@@ -144,7 +109,7 @@ export default function ExposureCard({ exposure, zoneId }: ExposureCardProps) {
 
       {/* Attribution footer */}
       <p className="text-[9px] text-slate-500 border-t border-slate-700/60 pt-2 leading-tight">
-        © OpenStreetMap contributors · Geodesic clipping via pyproj · Prototype spatial exposure model
+        © OpenStreetMap contributors · Geodesic clipping via pyproj
       </p>
     </div>
   );

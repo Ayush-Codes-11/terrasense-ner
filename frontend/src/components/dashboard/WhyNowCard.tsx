@@ -96,15 +96,9 @@ export default function WhyNowCard({ whyNow, zoneId }: WhyNowCardProps) {
       ) : (
         <>
           {/* Model type tag */}
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 mb-1">
             <span className="text-[10px] text-slate-500">Source:</span>
-            <span
-              className={`text-[10px] px-1.5 py-0.5 rounded border ${
-                whyNow.model_type === "sample"
-                  ? "bg-amber-500/10 text-amber-400 border-amber-500/30"
-                  : "bg-blue-500/10 text-blue-400 border-blue-500/30"
-              }`}
-            >
+            <span className="text-[10px] font-mono text-blue-400">
               {modelLabel}
             </span>
           </div>
@@ -114,11 +108,11 @@ export default function WhyNowCard({ whyNow, zoneId }: WhyNowCardProps) {
             {whyNow.drivers.map((d, i) => (
               <div
                 key={i}
-                className="flex items-center justify-between py-2 border-b border-slate-700/30 last:border-0"
+                className="flex items-center justify-between py-1.5 border-b border-slate-700/30 last:border-0"
               >
                 <div className="flex items-center gap-2 flex-1 min-w-0">
                   <span
-                    className={`text-base font-bold shrink-0 ${DIRECTION_COLOR[d.direction]}`}
+                    className={`text-sm font-bold shrink-0 ${DIRECTION_COLOR[d.direction]}`}
                   >
                     {DIRECTION_ICON[d.direction]}
                   </span>
@@ -126,22 +120,17 @@ export default function WhyNowCard({ whyNow, zoneId }: WhyNowCardProps) {
                     <p className="text-xs text-slate-300 font-medium truncate">
                       {d.display_name}
                     </p>
-                    <p className="text-[10px] text-slate-500 truncate">
-                      {d.description}
-                    </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                <div className="flex items-center gap-2 shrink-0 ml-2">
                   {d.contribution !== undefined && (
-                    <span className="text-[10px] font-mono text-slate-300 bg-slate-800 border border-slate-700 px-1.5 py-0.5 rounded">
+                    <span className="text-[10px] font-mono text-slate-300 tabular-nums">
                       +{d.contribution.toFixed(4)}
                     </span>
                   )}
-                  <span
-                    className={`text-[9px] px-1.5 py-0.5 rounded border ${
+                  <span className={`text-[9px] px-1 rounded uppercase tracking-wider ${
                       FRESHNESS_CLASSES[d.freshness] ?? FRESHNESS_CLASSES.Unavailable
-                    }`}
-                  >
+                    }`}>
                     {d.freshness}
                   </span>
                 </div>
@@ -149,7 +138,7 @@ export default function WhyNowCard({ whyNow, zoneId }: WhyNowCardProps) {
             ))}
           </div>
 
-          <p className="text-[10px] text-slate-600 border-t border-slate-700 pt-2">
+          <p className="text-[9px] text-slate-500 border-t border-slate-700/50 pt-2 leading-tight">
             {modelFooter}
           </p>
         </>
