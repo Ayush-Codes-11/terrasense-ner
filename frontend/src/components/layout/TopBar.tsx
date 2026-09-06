@@ -10,20 +10,6 @@ export default function TopBar({ districtMeta }: TopBarProps) {
   const location = useLocation();
   const isFieldReport = location.pathname === "/field-report";
 
-  const dataMode = districtMeta?.data_mode ?? "sample";
-  const dataModeLabel =
-    dataMode === "real"
-      ? "Live data"
-      : dataMode === "mixed"
-        ? "Mixed (partial real)"
-        : "Sample data";
-  const dataModeColor =
-    dataMode === "real"
-      ? "text-green-400"
-      : dataMode === "mixed"
-        ? "text-yellow-400"
-        : "text-amber-400";
-
   return (
     <header className="flex items-center justify-between px-4 py-2.5 bg-slate-900 border-b border-slate-700 shrink-0 z-10">
       {/* Left: Logo + District */}
@@ -67,14 +53,28 @@ export default function TopBar({ districtMeta }: TopBarProps) {
         </div>
       </div>
 
-      {/* Centre: Data mode badge */}
-      <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-md bg-slate-800 border border-slate-700">
-        <span
-          className={`w-1.5 h-1.5 rounded-full live-dot ${dataMode === "real" ? "bg-green-400" : "bg-amber-400"}`}
-        />
-        <span className={`text-xs font-medium ${dataModeColor}`}>
-          {dataModeLabel}
-        </span>
+      {/* Centre: Data provenance badges */}
+      <div className="hidden sm:flex items-center gap-3 px-3 py-1.5 rounded-md bg-slate-800 border border-slate-700">
+        <div className="flex items-center gap-1.5">
+          <span className="text-[10px] text-slate-400">Terrain:</span>
+          <span className="text-[10px] font-semibold text-green-400 bg-green-950/60 px-1.5 py-0.5 rounded border border-green-500/30">
+            REAL DEM
+          </span>
+        </div>
+        <div className="h-3 w-px bg-slate-700" />
+        <div className="flex items-center gap-1.5">
+          <span className="text-[10px] text-slate-400">Rainfall:</span>
+          <span className="text-[10px] font-semibold text-amber-400 bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-500/30">
+            SAMPLE scenario
+          </span>
+        </div>
+        <div className="h-3 w-px bg-slate-700" />
+        <div className="flex items-center gap-1.5">
+          <span className="text-[10px] text-slate-400">Soil wetness:</span>
+          <span className="text-[10px] font-semibold text-amber-400 bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-500/30">
+            SAMPLE
+          </span>
+        </div>
       </div>
 
       {/* Right: Timestamp + Nav */}

@@ -225,22 +225,35 @@ export default function Dashboard() {
           <div className="flex flex-col gap-1.5">
             {[
               {
-                label: "FastAPI Backend",
-                status: apiStatus,
-                ok: apiOk,
+                label: "Terrain",
+                status: "REAL DEM",
+                ok: true,
+              },
+              {
+                label: "Rainfall",
+                status: "SAMPLE scenario",
+                ok: null,
+              },
+              {
+                label: "Soil wetness",
+                status: "SAMPLE",
+                ok: null,
+              },
+              {
+                label: "Geospatial Exposure",
+                status: geoExposureStatus,
+                ok: geoExposureOk,
               },
               {
                 label: "Risk Engine",
                 status: riskEngineStatus,
                 ok: riskEngineOk,
               },
-              { label: "Weather Data", status: "Sample scenario", ok: null },
               {
-                label: "Geospatial Exposure",
-                status: geoExposureStatus,
-                ok: geoExposureOk,
+                label: "FastAPI Backend",
+                status: apiStatus,
+                ok: apiOk,
               },
-              { label: "Field Reports", status: "Phase 8", ok: null },
             ].map(({ label, status, ok }) => (
               <div
                 key={label}
@@ -263,7 +276,7 @@ export default function Dashboard() {
                         ? "text-green-400"
                         : ok === false
                           ? "text-amber-400"
-                          : "text-slate-600"
+                          : "text-slate-400"
                     }
                   >
                     {status}
@@ -275,7 +288,7 @@ export default function Dashboard() {
 
           {/* Data mode note */}
           <div className="mt-auto text-[10px] text-slate-600 border-t border-slate-700 pt-2">
-            Phase 4 · Prototype Scorer · FastAPI backend · Sample GeoJSON
+            Phase 7 · Copernicus GLO-30 DEM · Real OSM Exposure · Prototype Scorer
           </div>
         </div>
       </div>

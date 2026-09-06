@@ -49,6 +49,7 @@ export interface Zone {
   soil_wetness_index?: number;
   normalized_features?: NormalizedFeatures;
   contributors?: Contributor[];
+  feature_provenance?: Record<string, string>;
   data_meta: DataMeta;
 }
 

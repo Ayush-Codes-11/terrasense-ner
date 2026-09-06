@@ -243,26 +243,39 @@ def process_pilot_zonal_terrain(
                 masked_elev, masked_transform = mask(src, [poly_utm], crop=True, nodata=nodata_val)
                 masked_elev_2d = masked_elev[0]
 
+                # Distinguish true zone interior from crop bounding box exterior
+                masked_elev_ma, _ = mask(src, [poly_utm], crop=True, filled=False)
+                inside_zone_mask = ~masked_elev_ma[0].mask
+                zone_pixel_count = int(inside_zone_mask.sum())
+
                 # Compute slope on cropped zone with padding
                 z_slope, z_aspect, z_valid = compute_metric_slope_and_aspect(
                     masked_elev_2d, dx=dx, dy=dy, nodata=nodata_val
                 )
 
-                # Extract valid interior pixels
-                valid_elev = masked_elev_2d[z_valid]
+                # True valid elevation pixels strictly inside the zone
+                valid_elev_mask = inside_zone_mask & (masked_elev_2d != nodata_val) & ~np.isnan(masked_elev_2d) & (masked_elev_2d > -500.0)
+                valid_elev = masked_elev_2d[valid_elev_mask]
+
+                source_nodata_count = zone_pixel_count - int(valid_elev_mask.sum())
+                source_nodata_frac = round(source_nodata_count / zone_pixel_count, 4) if zone_pixel_count > 0 else 0.0
+
+                # Valid slope pixels where Horn 8-neighbor gradient was successfully evaluated
                 valid_slope = z_slope[~np.isnan(z_slope)]
                 valid_aspect = z_aspect[~np.isnan(z_aspect)]
 
-                total_cells = int(masked_elev_2d.size)
+                total_crop_cells = int(masked_elev_2d.size)
                 valid_count = int(len(valid_slope))
-                nodata_count = total_cells - valid_count
-                nodata_frac = round(nodata_count / total_cells, 4) if total_cells > 0 else 0.0
+                proc_mask_frac = round((total_crop_cells - valid_count) / total_crop_cells, 4) if total_crop_cells > 0 else 0.0
 
-                if valid_count > 0:
+                if len(valid_elev) > 0:
                     elev_mean = round(float(np.mean(valid_elev)), 1)
                     elev_min = round(float(np.min(valid_elev)), 1)
                     elev_max = round(float(np.max(valid_elev)), 1)
+                else:
+                    elev_mean = elev_min = elev_max = 0.0
 
+                if valid_count > 0:
                     slope_mean = round(float(np.mean(valid_slope)), 2)
                     slope_median = round(float(np.median(valid_slope)), 2)
                     slope_p90 = round(float(np.percentile(valid_slope, 90)), 2)
@@ -271,7 +284,6 @@ def process_pilot_zonal_terrain(
 
                     circ_aspect, cardinal = calculate_circular_mean_aspect(valid_aspect)
                 else:
-                    elev_mean = elev_min = elev_max = 0.0
                     slope_mean = slope_median = slope_p90 = slope_max = slope_min = 0.0
                     circ_aspect = None
                     cardinal = "N/A"
@@ -281,7 +293,7 @@ def process_pilot_zonal_terrain(
                     "mean_elevation_m": elev_mean,
                     "min_elevation_m": elev_min,
                     "max_elevation_m": elev_max,
-                    "elevation_range_m": round(elev_max - elev_min, 1) if valid_count > 0 else 0.0,
+                    "elevation_range_m": round(elev_max - elev_min, 1) if len(valid_elev) > 0 else 0.0,
                     "mean_slope_deg": slope_mean,
                     "median_slope_deg": slope_median,
                     "p90_slope_deg": slope_p90,
@@ -290,7 +302,10 @@ def process_pilot_zonal_terrain(
                     "circular_mean_aspect_deg": circ_aspect,
                     "dominant_aspect_cardinal": cardinal,
                     "valid_pixel_count": valid_count,
-                    "nodata_fraction": nodata_frac,
+                    "zone_pixel_count": zone_pixel_count,
+                    "source_nodata_fraction_within_zone": source_nodata_frac,
+                    "processing_window_mask_fraction": proc_mask_frac,
+                    "nodata_fraction": source_nodata_frac,
                     "data_type": "REAL_DEM",
                     "source": "Copernicus DEM GLO-30 Public — distributed via AWS Open Data/Sinergise",
                     "processing_crs": UTM_CRS,

@@ -230,23 +230,22 @@ def test_feasibility_file_exists():
 
 def test_feasibility_outcome(feasibility):
     """
-    Feasibility outcome must be STATIC_SUSCEPTIBILITY_MODEL_MAY_BE_FEASIBLE
-    given the real GSI data (geolocated records but 0 event dates).
+    Feasibility outcome must be TEMPORAL_RAINFALL_TRIGGER_MODEL_NOT_FEASIBLE_WITH_CURRENT_PUBLIC_GSI_INVENTORY
+    given the complete real GSI data (geolocated records but 0 event dates).
     """
     assert feasibility is not None
     outcome = feasibility.get("feasibility_outcome")
-    assert outcome == "STATIC_SUSCEPTIBILITY_MODEL_MAY_BE_FEASIBLE", (
-        f"Expected STATIC_SUSCEPTIBILITY_MODEL_MAY_BE_FEASIBLE, got: {outcome}"
-    )
+    expected = "TEMPORAL_RAINFALL_TRIGGER_MODEL_NOT_FEASIBLE_WITH_CURRENT_PUBLIC_GSI_INVENTORY"
+    assert outcome == expected, f"Expected {expected}, got: {outcome}"
 
 
 def test_feasibility_not_fabricated(feasibility):
     """Feasibility report must not claim trained-model feasibility based on fabricated data."""
     assert feasibility is not None
-    audit = feasibility.get("audit_results", {})
+    dqs = feasibility.get("date_quality_summary") or feasibility.get("audit_results", {})
     # The real dataset has 0 exact dates — ensure this is preserved
-    assert audit.get("exact_date_records", 0) == 0, (
-        f"Expected 0 exact_date_records, got {audit.get('exact_date_records')}. "
+    assert dqs.get("exact_date_records", 0) == 0, (
+        f"Expected 0 exact_date_records, got {dqs.get('exact_date_records')}. "
         "Ensure no fabricated dates were inserted."
     )
 

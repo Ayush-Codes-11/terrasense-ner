@@ -55,6 +55,7 @@ export async function getAllZoneRisks(): Promise<Zone[]> {
       soil_wetness_index?: number;
       normalized_features?: Zone["normalized_features"];
       contributors?: Zone["contributors"];
+      feature_provenance?: Record<string, string>;
       data_meta: Zone["data_meta"];
     }>;
   }>("/risk/current");
@@ -74,6 +75,7 @@ export async function getAllZoneRisks(): Promise<Zone[]> {
     soil_wetness_index: z.soil_wetness_index ?? z.soil_moisture,
     normalized_features: z.normalized_features,
     contributors: z.contributors,
+    feature_provenance: z.feature_provenance,
     data_meta: z.data_meta,
   }));
 }
@@ -96,6 +98,7 @@ export async function getZoneRisk(zoneId: string): Promise<Zone> {
     soil_wetness_index?: number;
     normalized_features?: Zone["normalized_features"];
     contributors?: Zone["contributors"];
+    feature_provenance?: Record<string, string>;
     data_meta: Zone["data_meta"];
   }>(`/risk/current/${encodeURIComponent(zoneId)}`);
 
@@ -114,6 +117,7 @@ export async function getZoneRisk(zoneId: string): Promise<Zone> {
     soil_wetness_index: z.soil_wetness_index ?? z.soil_moisture,
     normalized_features: z.normalized_features,
     contributors: z.contributors,
+    feature_provenance: z.feature_provenance,
     data_meta: z.data_meta,
   };
 }

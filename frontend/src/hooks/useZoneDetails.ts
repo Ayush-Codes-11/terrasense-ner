@@ -93,19 +93,33 @@ export function useZoneDetails(
     const whyNow: WhyNowData = {
       zone_id: apiZoneRisk.zone_id,
       model_type: "prototype",
-      drivers: (apiZoneRisk.contributors ?? []).map((c) => ({
-        feature: c.component ?? c.feature,
-        display_name: c.display_name ?? c.feature,
-        direction:
-          c.contribution > 0.15
-            ? "up"
-            : c.contribution > 0.05
-              ? "neutral"
-              : "down",
-        description: `Prototype weighted contribution: +${c.contribution.toFixed(4)} (weight: ${c.weight ?? "N/A"})`,
-        freshness: "Sample",
-        contribution: c.contribution,
-      })),
+      drivers: (apiZoneRisk.contributors ?? []).map((c) => {
+        const isTerrain =
+          c.component === "terrain" ||
+          (c.display_name && c.display_name.toLowerCase().includes("terrain")) ||
+          c.feature.toLowerCase().includes("slope");
+
+        const slopeVal =
+          apiZoneRisk.slope_deg !== undefined
+            ? apiZoneRisk.slope_deg.toFixed(2)
+            : "";
+
+        return {
+          feature: c.component ?? c.feature,
+          display_name: isTerrain ? "Terrain slope" : (c.display_name ?? c.feature),
+          direction:
+            c.contribution > 0.15
+              ? "up"
+              : c.contribution > 0.05
+                ? "neutral"
+                : "down",
+          description: isTerrain
+            ? `Terrain slope: ${slopeVal}° mean — real Copernicus GLO-30 DEM`
+            : `Prototype weighted contribution: +${c.contribution.toFixed(4)} (weight: ${c.weight ?? "N/A"})`,
+          freshness: isTerrain ? "Real" : "Sample",
+          contribution: c.contribution,
+        };
+      }),
       data_meta: apiZoneRisk.data_meta,
     };
 
