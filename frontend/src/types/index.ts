@@ -234,7 +234,7 @@ export interface PriorityData {
 // ----- Why Now (feature attribution) -----
 
 export type FeatureDirection = "up" | "down" | "neutral";
-export type FeatureFreshness = "Real" | "Sample" | "Static" | "Unavailable";
+export type FeatureFreshness = "Real" | "REAL DEM" | "Sample" | "Static" | "Unavailable";
 
 export interface FeatureDriver {
   feature: string;

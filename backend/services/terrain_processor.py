@@ -209,24 +209,37 @@ def process_pilot_zonal_terrain(
         raise FileNotFoundError(f"DEM file not found: {dem_tif}")
 
     utm_tif = _TERRAIN_DIR / "copernicus_glo30_utm46n.tif"
+    derivatives_tif = _TERRAIN_DIR / "copernicus_glo30_derivatives_utm46n.tif"
     print(f"Reprojecting DEM to UTM Zone 46N: {utm_tif}...")
     reproject_dem_to_utm(dem_tif, utm_tif, dst_crs=UTM_CRS, target_res=30.0)
 
+    # 1. Compute terrain derivatives ONCE across the continuous projected DEM
     with rasterio.open(utm_tif) as src:
         elev_arr = src.read(1)
         nodata_val = src.nodata
         dx, dy = src.res
         utm_crs = src.crs
+        deriv_meta = src.meta.copy()
 
-        print(f"Computing metric slope and aspect on {src.width}x{src.height} grid (dx={dx:.1f}m, dy={dy:.1f}m)...")
+        print(f"Computing continuous metric slope and aspect on {src.width}x{src.height} grid (dx={dx:.1f}m, dy={dy:.1f}m)...")
         slope_arr, aspect_arr, full_valid_mask = compute_metric_slope_and_aspect(
             elev_arr, dx=dx, dy=dy, nodata=nodata_val
         )
 
-        # Coordinate transformer from EPSG:4326 to UTM 46N
-        proj_to_utm = pyproj.Transformer.from_crs("EPSG:4326", utm_crs, always_xy=True).transform
+        # 2. Write continuous 3-band raster: Band 1=Elevation, Band 2=Slope(deg), Band 3=Aspect(deg)
+        deriv_meta.update(count=3, dtype="float32", nodata=-999999.0)
+        with rasterio.open(derivatives_tif, "w", **deriv_meta) as dst:
+            dst.write(elev_arr.astype("float32"), 1)
+            dst.write(np.where(np.isnan(slope_arr), -999999.0, slope_arr).astype("float32"), 2)
+            dst.write(np.where(np.isnan(aspect_arr), -999999.0, aspect_arr).astype("float32"), 3)
+            dst.set_band_description(1, "elevation_m")
+            dst.set_band_description(2, "slope_deg")
+            dst.set_band_description(3, "aspect_deg")
 
-        # Load grid features
+    # 3. Mask continuous derivatives to each zone polygon and calculate zonal statistics
+    with rasterio.open(derivatives_tif) as deriv_src:
+        proj_to_utm = pyproj.Transformer.from_crs("EPSG:4326", deriv_src.crs, always_xy=True).transform
+
         with open(grid_geojson, encoding="utf-8") as f:
             grid_fc = json.load(f)
 
@@ -238,44 +251,41 @@ def process_pilot_zonal_terrain(
             poly_wgs84 = shape(feat["geometry"])
             poly_utm = shapely_transform(proj_to_utm, poly_wgs84)
 
-            # Mask raster with zone polygon
             try:
-                masked_elev, masked_transform = mask(src, [poly_utm], crop=True, nodata=nodata_val)
-                masked_elev_2d = masked_elev[0]
+                # Mask all 3 continuous bands simultaneously with polygon
+                masked_data, _ = mask(deriv_src, [poly_utm], crop=True, nodata=-999999.0)
+                masked_ma, _ = mask(deriv_src, [poly_utm], crop=True, filled=False)
 
-                # Distinguish true zone interior from crop bounding box exterior
-                masked_elev_ma, _ = mask(src, [poly_utm], crop=True, filled=False)
-                inside_zone_mask = ~masked_elev_ma[0].mask
+                # inside_zone_mask identifies cells strictly inside the zone polygon
+                inside_zone_mask = ~masked_ma[0].mask
                 zone_pixel_count = int(inside_zone_mask.sum())
 
-                # Compute slope on cropped zone with padding
-                z_slope, z_aspect, z_valid = compute_metric_slope_and_aspect(
-                    masked_elev_2d, dx=dx, dy=dy, nodata=nodata_val
-                )
+                z_elev = masked_data[0][inside_zone_mask]
+                z_slope = masked_data[1][inside_zone_mask]
+                z_aspect = masked_data[2][inside_zone_mask]
 
-                # True valid elevation pixels strictly inside the zone
-                valid_elev_mask = inside_zone_mask & (masked_elev_2d != nodata_val) & ~np.isnan(masked_elev_2d) & (masked_elev_2d > -500.0)
-                valid_elev = masked_elev_2d[valid_elev_mask]
+                # True valid in-zone cells
+                valid_elev = z_elev[(z_elev != -999999.0) & (z_elev > -500.0) & ~np.isnan(z_elev)]
+                valid_slope = z_slope[(z_slope != -999999.0) & (z_slope >= 0.0) & (z_slope <= 90.0) & ~np.isnan(z_slope)]
+                valid_aspect = z_aspect[(z_aspect != -999999.0) & (z_aspect >= 0.0) & (z_aspect < 360.0) & ~np.isnan(z_aspect)]
 
-                source_nodata_count = zone_pixel_count - int(valid_elev_mask.sum())
+                valid_elev_count = int(len(valid_elev))
+                valid_slope_count = int(len(valid_slope))
+
+                source_nodata_count = zone_pixel_count - valid_elev_count
                 source_nodata_frac = round(source_nodata_count / zone_pixel_count, 4) if zone_pixel_count > 0 else 0.0
 
-                # Valid slope pixels where Horn 8-neighbor gradient was successfully evaluated
-                valid_slope = z_slope[~np.isnan(z_slope)]
-                valid_aspect = z_aspect[~np.isnan(z_aspect)]
+                total_crop_cells = int(masked_data[0].size)
+                proc_mask_frac = round((total_crop_cells - zone_pixel_count) / total_crop_cells, 4) if total_crop_cells > 0 else 0.0
 
-                total_crop_cells = int(masked_elev_2d.size)
-                valid_count = int(len(valid_slope))
-                proc_mask_frac = round((total_crop_cells - valid_count) / total_crop_cells, 4) if total_crop_cells > 0 else 0.0
-
-                if len(valid_elev) > 0:
+                if valid_elev_count > 0:
                     elev_mean = round(float(np.mean(valid_elev)), 1)
                     elev_min = round(float(np.min(valid_elev)), 1)
                     elev_max = round(float(np.max(valid_elev)), 1)
                 else:
                     elev_mean = elev_min = elev_max = 0.0
 
-                if valid_count > 0:
+                if valid_slope_count > 0:
                     slope_mean = round(float(np.mean(valid_slope)), 2)
                     slope_median = round(float(np.median(valid_slope)), 2)
                     slope_p90 = round(float(np.percentile(valid_slope, 90)), 2)
@@ -293,7 +303,7 @@ def process_pilot_zonal_terrain(
                     "mean_elevation_m": elev_mean,
                     "min_elevation_m": elev_min,
                     "max_elevation_m": elev_max,
-                    "elevation_range_m": round(elev_max - elev_min, 1) if len(valid_elev) > 0 else 0.0,
+                    "elevation_range_m": round(elev_max - elev_min, 1) if valid_elev_count > 0 else 0.0,
                     "mean_slope_deg": slope_mean,
                     "median_slope_deg": slope_median,
                     "p90_slope_deg": slope_p90,
@@ -301,7 +311,9 @@ def process_pilot_zonal_terrain(
                     "min_slope_deg": slope_min,
                     "circular_mean_aspect_deg": circ_aspect,
                     "dominant_aspect_cardinal": cardinal,
-                    "valid_pixel_count": valid_count,
+                    "valid_pixel_count": valid_slope_count,
+                    "valid_elevation_pixel_count": valid_elev_count,
+                    "valid_slope_pixel_count": valid_slope_count,
                     "zone_pixel_count": zone_pixel_count,
                     "source_nodata_fraction_within_zone": source_nodata_frac,
                     "processing_window_mask_fraction": proc_mask_frac,
@@ -310,7 +322,15 @@ def process_pilot_zonal_terrain(
                     "source": "Copernicus DEM GLO-30 Public — distributed via AWS Open Data/Sinergise",
                     "processing_crs": UTM_CRS,
                     "grid_resolution_m": 30.0,
-                    "slope_derivation_method": "Horn 8-neighbor gradient in UTM 46N metric coordinates",
+                    "slope_derivation_method": "Horn 8-neighbor gradient computed on continuous DEM before zonal masking",
+                }
+
+            except Exception as e:
+                print(f"Error processing zone {zid}: {e}")
+                zones_terrain[zid] = {
+                    "zone_id": zid,
+                    "error": str(e),
+                    "data_type": "REAL_DEM",
                 }
 
             except Exception as e:

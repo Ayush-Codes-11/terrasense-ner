@@ -28,6 +28,8 @@ const DIRECTION_COLOR: Record<FeatureDirection, string> = {
 };
 
 const FRESHNESS_CLASSES: Record<string, string> = {
+  "REAL DEM": "bg-green-500/10 text-green-400 border-green-500/30",
+  REAL: "bg-green-500/10 text-green-400 border-green-500/30",
   Real: "bg-green-500/10 text-green-400 border-green-500/30",
   Sample: "bg-amber-500/10 text-amber-400 border-amber-500/30",
   Static: "bg-slate-500/10 text-slate-400 border-slate-500/30",

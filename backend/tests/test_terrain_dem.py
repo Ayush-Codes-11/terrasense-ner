@@ -255,3 +255,66 @@ def test_risk_forecast_c03_has_provenance(test_client):
     assert prov.get("elevation") == "REAL_DEM"
     assert prov.get("rainfall") == "SAMPLE_MOCK"
     assert prov.get("soil_wetness") == "SAMPLE_MOCK"
+
+
+# ─── 16. Boundary cell slope calculation (continuous vs masked DEM) ─────────
+
+def test_boundary_cell_receives_slope_from_outside_terrain():
+    """
+    Proves that a polygon-boundary cell receives a valid slope value using terrain
+    immediately outside the zone polygon, demonstrating that slopes are computed
+    on the continuous DEM before zonal masking (preventing artificial boundary dropouts).
+    """
+    import numpy as np
+    from backend.services.terrain_processor import compute_metric_slope_and_aspect
+
+    # 1. Create a continuous 10x10 synthetic DEM (an inclined plane z = 2*x + 1*y in 30m cells)
+    dx, dy = 30.0, 30.0
+    y_coords, x_coords = np.mgrid[0:10, 0:10]
+    synthetic_dem = (2.0 * x_coords * dx + 1.0 * y_coords * dy).astype(np.float32)
+
+    # 2. Define an interior 6x6 polygon box: rows 2..7, cols 2..7 (total 36 cells)
+    row_start, row_end = 2, 8
+    col_start, col_end = 2, 8
+    poly_mask = np.zeros((10, 10), dtype=bool)
+    poly_mask[row_start:row_end, col_start:col_end] = True
+    assert poly_mask.sum() == 36
+
+    # --- METHOD A: Flawed approach (masking to nodata BEFORE slope computation) ---
+    masked_dem_flawed = np.where(poly_mask, synthetic_dem, -999999.0)
+    flawed_slope, _, _ = compute_metric_slope_and_aspect(
+        masked_dem_flawed, dx=dx, dy=dy, nodata=-999999.0
+    )
+    in_polygon_flawed = flawed_slope[poly_mask]
+    valid_flawed_count = int((~np.isnan(in_polygon_flawed)).sum())
+    # In flawed method, the 20 boundary cells of the 6x6 box see nodata and become NaN.
+    # Only the inner 4x4 (16 cells) survive:
+    assert valid_flawed_count == 16, f"Flawed method should only compute 16 interior cells, got {valid_flawed_count}"
+
+    # --- METHOD B: Correct approach (computing slope on continuous DEM FIRST, then masking) ---
+    continuous_slope, _, _ = compute_metric_slope_and_aspect(
+        synthetic_dem, dx=dx, dy=dy, nodata=-999999.0
+    )
+    in_polygon_correct = continuous_slope[poly_mask]
+    valid_correct_count = int((~np.isnan(in_polygon_correct)).sum())
+    # All 36 cells of the polygon have valid slope because the Horn kernel used outside terrain:
+    assert valid_correct_count == 36, f"Continuous method should have all 36 cells valid, got {valid_correct_count}"
+
+    # All boundary cells have the true continuous slope value of the plane:
+    expected_slope_deg = float(np.degrees(np.arctan(np.sqrt(2.0**2 + 1.0**2))))
+    assert np.allclose(in_polygon_correct, expected_slope_deg, atol=0.01)
+
+
+def test_all_zones_have_zero_artificial_boundary_dropouts(zones):
+    """
+    In the real Copernicus DEM zonal statistics, every in-zone DEM cell
+    must have a valid slope value (valid_slope_pixel_count == zone_pixel_count).
+    There should be 0 boundary dropouts across all 25 pilot zones.
+    """
+    for zid, z in zones.items():
+        zc = z.get("zone_pixel_count", z.get("valid_pixel_count"))
+        sc = z.get("valid_slope_pixel_count", z.get("valid_pixel_count"))
+        assert zc == sc, (
+            f"Zone {zid} has slope dropouts: {zc} zone cells vs {sc} slope cells "
+            f"({zc - sc} cells dropped)"
+        )

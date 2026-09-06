@@ -116,7 +116,7 @@ export function useZoneDetails(
           description: isTerrain
             ? `Terrain slope: ${slopeVal}° mean — real Copernicus GLO-30 DEM`
             : `Prototype weighted contribution: +${c.contribution.toFixed(4)} (weight: ${c.weight ?? "N/A"})`,
-          freshness: isTerrain ? "Real" : "Sample",
+          freshness: isTerrain ? "REAL DEM" : "Sample",
           contribution: c.contribution,
         };
       }),
