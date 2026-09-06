@@ -42,9 +42,15 @@ export async function getAllZoneRisks(): Promise<Zone[]> {
       zone_id: string;
       risk_category: string;
       risk_score: number;
+      score?: number;
+      score_type?: string;
+      is_probability?: boolean;
+      is_calibrated?: boolean;
+      computed_by?: string;
       slope: number;
       elevation: number;
       soil_moisture: number;
+      contributors?: Zone["contributors"];
       data_meta: Zone["data_meta"];
     }>;
   }>("/risk/current");
@@ -52,10 +58,16 @@ export async function getAllZoneRisks(): Promise<Zone[]> {
   return data.zones.map((z) => ({
     zone_id: z.zone_id,
     risk: z.risk_category as Zone["risk"],
-    risk_score: z.risk_score,
+    risk_score: z.score ?? z.risk_score,
+    score: z.score ?? z.risk_score,
+    score_type: z.score_type,
+    is_probability: z.is_probability,
+    is_calibrated: z.is_calibrated,
+    computed_by: z.computed_by,
     slope_deg: z.slope,
     elevation_m: z.elevation,
     soil_moisture_index: z.soil_moisture,
+    contributors: z.contributors,
     data_meta: z.data_meta,
   }));
 }
@@ -67,19 +79,31 @@ export async function getZoneRisk(zoneId: string): Promise<Zone> {
     zone_id: string;
     risk_category: string;
     risk_score: number;
+    score?: number;
+    score_type?: string;
+    is_probability?: boolean;
+    is_calibrated?: boolean;
+    computed_by?: string;
     slope: number;
     elevation: number;
     soil_moisture: number;
+    contributors?: Zone["contributors"];
     data_meta: Zone["data_meta"];
   }>(`/risk/current/${encodeURIComponent(zoneId)}`);
 
   return {
     zone_id: z.zone_id,
     risk: z.risk_category as Zone["risk"],
-    risk_score: z.risk_score,
+    risk_score: z.score ?? z.risk_score,
+    score: z.score ?? z.risk_score,
+    score_type: z.score_type,
+    is_probability: z.is_probability,
+    is_calibrated: z.is_calibrated,
+    computed_by: z.computed_by,
     slope_deg: z.slope,
     elevation_m: z.elevation,
     soil_moisture_index: z.soil_moisture,
+    contributors: z.contributors,
     data_meta: z.data_meta,
   };
 }

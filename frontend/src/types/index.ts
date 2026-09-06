@@ -17,16 +17,29 @@ export interface DataMeta {
   is_live?: boolean;    // optional: false for sample responses
 }
 
-// ----- Zone / Grid -----
+export interface Contributor {
+  feature: string;
+  contribution: number;
+  component?: string;
+  display_name?: string;
+  normalized_input?: number;
+  weight?: number;
+}
 
 export interface Zone {
   zone_id: string;
   name?: string;
   risk: RiskLevel;
   risk_score: number; // 0.0 – 1.0
+  score?: number;
+  score_type?: string;
+  is_probability?: boolean;
+  is_calibrated?: boolean;
+  computed_by?: string;
   slope_deg?: number;
   elevation_m?: number;
   soil_moisture_index?: number;
+  contributors?: Contributor[];
   data_meta: DataMeta;
 }
 
@@ -125,6 +138,7 @@ export interface FeatureDriver {
   direction: FeatureDirection;
   description: string;
   freshness: FeatureFreshness;
+  contribution?: number;
 }
 
 export interface WhyNowData {

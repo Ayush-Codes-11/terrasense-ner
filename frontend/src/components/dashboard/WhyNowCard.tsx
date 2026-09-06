@@ -47,7 +47,7 @@ export default function WhyNowCard({ whyNow, zoneId }: WhyNowCardProps) {
     whyNow?.model_type === "xgboost"
       ? "SHAP value attribution from XGBoost model. No accuracy claims are made."
       : whyNow?.model_type === "prototype"
-        ? "Feature attribution from Prototype Weighted Scorer. No accuracy claims are made."
+        ? "Transparent prototype feature contributions. Not a calibrated probability model."
         : "Illustrative drivers from SAMPLE_MOCK scenario data. Risk engine connected in Phase 4.";
 
   return (
@@ -127,13 +127,20 @@ export default function WhyNowCard({ whyNow, zoneId }: WhyNowCardProps) {
                     </p>
                   </div>
                 </div>
-                <span
-                  className={`text-[9px] px-1.5 py-0.5 rounded border shrink-0 ml-2 ${
-                    FRESHNESS_CLASSES[d.freshness] ?? FRESHNESS_CLASSES.Unavailable
-                  }`}
-                >
-                  {d.freshness}
-                </span>
+                <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                  {d.contribution !== undefined && (
+                    <span className="text-[10px] font-mono text-slate-300 bg-slate-800 border border-slate-700 px-1.5 py-0.5 rounded">
+                      +{d.contribution.toFixed(4)}
+                    </span>
+                  )}
+                  <span
+                    className={`text-[9px] px-1.5 py-0.5 rounded border ${
+                      FRESHNESS_CLASSES[d.freshness] ?? FRESHNESS_CLASSES.Unavailable
+                    }`}
+                  >
+                    {d.freshness}
+                  </span>
+                </div>
               </div>
             ))}
           </div>

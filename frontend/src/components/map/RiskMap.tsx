@@ -104,12 +104,16 @@ function roadWeight(type: string): number {
   return type === "national_highway" ? 3 : type === "state_highway" ? 2.5 : 2;
 }
 
+import type { Zone } from "../../types";
+
 // ---- Props ----
 
 interface RiskMapProps {
   geoData: GeoJSONData;
   selectedZoneId: string | null;
   onZoneSelect: (props: ZoneGeoJSONProperties) => void;
+  zoneRisks?: Map<string, Zone> | null;
+  isRiskFallback?: boolean;
 }
 
 // ---- Main component ----
@@ -118,15 +122,18 @@ export default function RiskMap({
   geoData,
   selectedZoneId,
   onZoneSelect,
+  zoneRisks,
+  isRiskFallback = false,
 }: RiskMapProps) {
   const { gridRisk, roads, villages, hospitals, loading, error } = geoData;
 
-  // Style function for risk zones — key changes on selection to force re-render
+  // Style function for risk zones — uses API computed risk if available, else sample GeoJSON
   const riskStyle = useCallback(
     (feature?: Feature<Geometry, ZoneGeoJSONProperties>): PathOptions => {
-      const cat = feature?.properties?.risk_category ?? "LOW";
-      const isSelected =
-        feature?.properties?.zone_id === selectedZoneId;
+      const zoneId = feature?.properties?.zone_id;
+      const computedZone = zoneId ? zoneRisks?.get(zoneId) : undefined;
+      const cat = computedZone?.risk ?? feature?.properties?.risk_category ?? "LOW";
+      const isSelected = feature?.properties?.zone_id === selectedZoneId;
       return {
         fillColor: riskColor(cat),
         fillOpacity: isSelected ? 0.65 : 0.35,
@@ -135,13 +142,32 @@ export default function RiskMap({
         opacity: 0.9,
       };
     },
-    [selectedZoneId]
+    [selectedZoneId, zoneRisks]
   );
 
   // Bind click + hover to each zone polygon
   const onEachZone = useCallback(
     (feature: Feature, layer: Layer) => {
       const props = feature.properties as ZoneGeoJSONProperties;
+      const computedZone = zoneRisks?.get(props.zone_id);
+      const scoreStr =
+        computedZone?.score !== undefined
+          ? computedZone.score.toFixed(4)
+          : props.risk_score.toFixed(2);
+      const cat = computedZone?.risk ?? props.risk_category;
+      const catLabel = cat.replace("_", " ");
+
+      layer.bindPopup(
+        `<div style="font-size:11px;line-height:1.4;color:#0f172a;min-width:120px;">
+          <div style="font-weight:700;font-size:12px;margin-bottom:2px;">Zone ${props.zone_id}</div>
+          <div>Risk Level: <strong>${catLabel}</strong></div>
+          <div>Prototype Score: <strong>${scoreStr}</strong></div>
+          <div style="font-size:9px;color:#64748b;margin-top:4px;border-top:1px solid #e2e8f0;padding-top:2px;">
+            ${isRiskFallback ? "SAMPLE_MOCK fallback" : "Computed via Prototype Scorer"}
+          </div>
+        </div>`
+      );
+
       layer.on({
         click: () => onZoneSelect(props),
         mouseover: (e) => {
@@ -156,16 +182,23 @@ export default function RiskMap({
         },
       });
     },
-    [selectedZoneId, onZoneSelect]
+    [selectedZoneId, onZoneSelect, zoneRisks, isRiskFallback]
   );
 
   return (
     <div className="relative w-full h-full rounded-lg overflow-hidden border border-slate-700">
-      {/* Sample data banner */}
-      <div className="absolute top-2 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-amber-500/40 text-[10px] text-amber-400 font-medium pointer-events-none">
-        <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-        Sample data · not geospatially accurate · Aizawl pilot area
-      </div>
+      {/* Risk Engine / Data banner */}
+      {isRiskFallback ? (
+        <div className="absolute top-2 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-amber-500/40 text-[10px] text-amber-400 font-medium pointer-events-none">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+          Sample fallback · backend offline · not geospatially accurate
+        </div>
+      ) : (
+        <div className="absolute top-2 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-green-500/40 text-[10px] text-green-400 font-medium pointer-events-none">
+          <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
+          Prototype scorer active · Risk colours computed via FastAPI · Aizawl pilot
+        </div>
+      )}
 
       {/* Loading overlay */}
       {loading && (
@@ -226,7 +259,7 @@ export default function RiskMap({
           <LayersControl.Overlay checked name="⬛ Risk Zones (sample)">
             {gridRisk && (
               <GeoJSON
-                key={`risk-${selectedZoneId ?? "none"}`}
+                key={`risk-${selectedZoneId ?? "none"}-${isRiskFallback ? "fallback" : "live"}-${zoneRisks?.size ?? 0}`}
                 data={gridRisk as GeoJsonObject}
                 style={
                   riskStyle as (

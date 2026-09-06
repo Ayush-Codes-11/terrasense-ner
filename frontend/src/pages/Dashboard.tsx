@@ -1,11 +1,14 @@
 // ============================================================
-// Dashboard — main page (Phase 3 update)
-// Changes from Phase 2:
-//   - useZoneDetails hook fetches forecast from FastAPI on zone click
-//   - Falls back to local GeoJSON transformer if backend is down
-//   - API status indicator in System Status bar (green = api, amber = local fallback)
-//   - ForecastCard driven by API data when available
-//   - WhyNow still uses local transformer (backend endpoint added in Phase 7)
+// Dashboard — main page (Phase 4 update)
+// Changes from Phase 3:
+//   - useAllZoneRisks hook fetches all 25 zones' current risk from
+//     FastAPI (/risk/current), dynamically computed by ml.prototype_scorer.
+//   - RiskMap receives zoneRisksMap so map polygon colours reflect
+//     computed prototype scores rather than precomputed GeoJSON attributes.
+//   - useZoneDetails fetches both forecast and computed zone risk + contributors.
+//   - WhyNowCard displays real prototype feature contributions.
+//   - System Status updates: "Risk Engine" -> "Prototype scorer active" (green).
+//   - Graceful fallback: If backend fails, visibly labels "Sample fallback".
 // ============================================================
 
 import { useState, useMemo } from "react";
@@ -19,11 +22,9 @@ import EmergencyPriorityCard from "../components/dashboard/EmergencyPriorityCard
 import WhyNowCard from "../components/dashboard/WhyNowCard";
 import ReportList from "../components/reports/ReportList";
 import { useGeoJSONData } from "../hooks/useGeoJSONData";
+import { useAllZoneRisks } from "../hooks/useAllZoneRisks";
 import { useZoneDetails } from "../hooks/useZoneDetails";
-import {
-  propsToZone,
-  propsToWhyNow,
-} from "../utils/zoneTransformers";
+import { propsToZone } from "../utils/zoneTransformers";
 import type { ZoneGeoJSONProperties } from "../types/geojson";
 import type { Zone } from "../types";
 
@@ -34,29 +35,48 @@ export default function Dashboard() {
 
   const selectedZoneId = selectedZoneProps?.zone_id ?? null;
 
-  // Fetch forecast from API (falls back to local transformer if backend is down)
-  const { forecast, loading: forecastLoading, apiOnline, source: forecastSource } =
-    useZoneDetails(selectedZoneId, selectedZoneProps);
-
-  // Derive zone for RiskSeverityCard from local GeoJSON (immediate, no API call)
-  const selectedZone = useMemo(
-    () => (selectedZoneProps ? propsToZone(selectedZoneProps) : null),
-    [selectedZoneProps]
-  );
-
-  // Why Now still uses local transformer (Phase 7 adds backend endpoint)
-  const whyNow = useMemo(
-    () => (selectedZoneProps ? propsToWhyNow(selectedZoneProps) : null),
-    [selectedZoneProps]
-  );
-
-  // All zones for district-level breakdown in RiskSeverityCard
-  const allZones = useMemo((): Zone[] => {
+  // Derive fallback zones from raw GeoJSON (used if backend is down)
+  const fallbackZones = useMemo((): Zone[] => {
     if (!geoData.gridRisk) return [];
     return geoData.gridRisk.features
       .filter((f): f is Feature => f.type === "Feature" && !!f.properties)
       .map((f) => propsToZone(f.properties as ZoneGeoJSONProperties));
   }, [geoData.gridRisk]);
+
+  // Fetch all zone risks computed by backend prototype scorer
+  const {
+    zoneRisksMap,
+    zonesList,
+    isFallback: isRiskFallback,
+    apiOnline: allZonesApiOnline,
+  } = useAllZoneRisks(fallbackZones);
+
+  // Fetch selected zone forecast & current risk details (with contributors)
+  const {
+    forecast,
+    selectedZone: apiSelectedZone,
+    whyNow,
+    loading: forecastLoading,
+    apiOnline: zoneDetailsApiOnline,
+    source: forecastSource,
+  } = useZoneDetails(selectedZoneId, selectedZoneProps);
+
+  // Use API selected zone if available, else local fallback
+  const selectedZone = useMemo(() => {
+    if (apiSelectedZone) return apiSelectedZone;
+    if (selectedZoneId && zoneRisksMap.has(selectedZoneId)) {
+      return zoneRisksMap.get(selectedZoneId)!;
+    }
+    return selectedZoneProps ? propsToZone(selectedZoneProps) : null;
+  }, [apiSelectedZone, selectedZoneId, zoneRisksMap, selectedZoneProps]);
+
+  // Consolidated API health status
+  const apiOnline =
+    allZonesApiOnline === true || zoneDetailsApiOnline === true
+      ? true
+      : allZonesApiOnline === false && zoneDetailsApiOnline === false
+        ? false
+        : allZonesApiOnline ?? zoneDetailsApiOnline;
 
   // System status indicators
   const geoLayersOk = geoData.error ? false : geoData.gridRisk ? true : null;
@@ -70,9 +90,18 @@ export default function Dashboard() {
     apiOnline === true
       ? "Connected"
       : apiOnline === false
-        ? "Offline (local fallback)"
-        : "Awaiting zone selection";
+        ? "Offline (Sample fallback)"
+        : "Checking…";
   const apiOk = apiOnline === true ? true : apiOnline === false ? false : null;
+
+  const riskEngineStatus =
+    apiOnline === true
+      ? "Prototype scorer active"
+      : apiOnline === false
+        ? "Sample fallback (engine offline)"
+        : "Initialising…";
+  const riskEngineOk =
+    apiOnline === true ? true : apiOnline === false ? false : null;
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-slate-900">
@@ -87,6 +116,8 @@ export default function Dashboard() {
             geoData={geoData}
             selectedZoneId={selectedZoneId}
             onZoneSelect={setSelectedZoneProps}
+            zoneRisks={zoneRisksMap}
+            isRiskFallback={isRiskFallback}
           />
         </div>
 
@@ -99,19 +130,19 @@ export default function Dashboard() {
                 <span className="text-xs text-blue-400 font-medium">
                   Zone {selectedZoneId} selected
                 </span>
-                {selectedZoneProps && (
+                {selectedZone && (
                   <span
                     className={`text-[10px] font-semibold ${
-                      selectedZoneProps.risk_category === "VERY_HIGH"
+                      selectedZone.risk === "VERY_HIGH"
                         ? "text-red-400"
-                        : selectedZoneProps.risk_category === "HIGH"
+                        : selectedZone.risk === "HIGH"
                           ? "text-orange-400"
-                          : selectedZoneProps.risk_category === "MODERATE"
+                          : selectedZone.risk === "MODERATE"
                             ? "text-yellow-400"
                             : "text-green-400"
                     }`}
                   >
-                    {selectedZoneProps.risk_category.replace("_", " ")}
+                    {selectedZone.risk.replace("_", " ")}
                   </span>
                 )}
                 {/* Data source badge */}
@@ -123,13 +154,30 @@ export default function Dashboard() {
                         : "bg-amber-500/10 text-amber-400 border-amber-500/30"
                     }`}
                   >
-                    {forecastSource === "api" ? "API" : "local"}
+                    {forecastSource === "api"
+                      ? "Prototype Scorer"
+                      : "Sample fallback"}
                   </span>
                 )}
                 {forecastLoading && (
-                  <svg className="w-3 h-3 text-blue-400 animate-spin" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                  <svg
+                    className="w-3 h-3 text-blue-400 animate-spin"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v8z"
+                    />
                   </svg>
                 )}
               </div>
@@ -148,7 +196,7 @@ export default function Dashboard() {
             </div>
           )}
 
-          <RiskSeverityCard zones={allZones} selectedZone={selectedZone} />
+          <RiskSeverityCard zones={zonesList} selectedZone={selectedZone} />
           <ForecastCard forecast={forecast} zoneId={selectedZoneId} />
           <ExposureCard exposure={null} zoneId={selectedZoneId} />
           <EmergencyPriorityCard priority={null} zoneId={selectedZoneId} />
@@ -177,11 +225,15 @@ export default function Dashboard() {
               },
               {
                 label: "Risk Engine",
-                status: "Not connected — Phase 4",
-                ok: null,
+                status: riskEngineStatus,
+                ok: riskEngineOk,
               },
               { label: "Weather Data", status: "Sample mode", ok: null },
-              { label: "Geospatial Layers", status: geoLayersStatus, ok: geoLayersOk },
+              {
+                label: "Geospatial Layers",
+                status: geoLayersStatus,
+                ok: geoLayersOk,
+              },
               { label: "Field Reports", status: "Phase 8", ok: null },
             ].map(({ label, status, ok }) => (
               <div
@@ -217,7 +269,7 @@ export default function Dashboard() {
 
           {/* Data mode note */}
           <div className="mt-auto text-[10px] text-slate-600 border-t border-slate-700 pt-2">
-            Phase 3 · FastAPI backend · Sample GeoJSON
+            Phase 4 · Prototype Scorer · FastAPI backend · Sample GeoJSON
           </div>
         </div>
       </div>

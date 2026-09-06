@@ -8,7 +8,7 @@ RULE: Every response touching risk data must carry a DataMeta object.
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -31,7 +31,7 @@ SAMPLE_META = DataMeta(
     data_type="SAMPLE_MOCK",
     source="TerraSense demo dataset v0.1",
     is_live=False,
-    note="All values are fabricated for UI/API testing. Phase 5 connects real data.",
+    note="All input values are SAMPLE_MOCK for UI/API testing. Phase 5 connects real data.",
 )
 
 
@@ -40,6 +40,7 @@ SAMPLE_META = DataMeta(
 class HealthResponse(BaseModel):
     status: str
     data_mode: str
+    risk_engine: str = "prototype_scorer_active"
     version: str
     disclaimer: str
     endpoints: List[str]
@@ -57,16 +58,41 @@ class ZonesResponse(BaseModel):
 
 # ── Current Risk ──────────────────────────────────────────────────────────────
 
+class ContributorSchema(BaseModel):
+    feature: str
+    contribution: float
+    component: Optional[str] = None
+    display_name: Optional[str] = None
+    normalized_input: Optional[float] = None
+    weight: Optional[float] = None
+
+
 class ZoneRisk(BaseModel):
     zone_id: str
     risk_category: str
-    risk_score: float
+    risk_score: float   # Kept for backward compatibility
+    score: float        # Explicit prototype risk score [0, 1]
+    score_type: str = "prototype_relative_risk_score"
+    is_probability: bool = False
+    is_calibrated: bool = False
+    computed_by: str = "prototype_scorer_v1"
+
     slope: float
     elevation: float
     soil_moisture: float
     rain_24h: float
     rain_3d: float
-    rain_7d: float
+    rain_7d: Optional[float] = None
+
+    # Transparent component breakdown
+    terrain_component: Optional[float] = None
+    recent_rainfall_component: Optional[float] = None
+    antecedent_rainfall_component: Optional[float] = None
+    soil_wetness_component: Optional[float] = None
+
+    # Sorted by absolute contribution descending
+    contributors: Optional[List[ContributorSchema]] = None
+
     data_meta: DataMeta
 
 
@@ -78,21 +104,33 @@ class AllZonesRiskResponse(BaseModel):
 
 # ── Forecast ─────────────────────────────────────────────────────────────────
 
+class NowWindow(BaseModel):
+    risk: str
+    risk_score: float
+    mode: str = "PROTOTYPE_COMPUTED"
+    score_type: str = "prototype_relative_risk_score"
+    is_probability: bool = False
+    is_calibrated: bool = False
+    computed_by: str = "prototype_scorer_v1"
+
+
 class ForecastWindow(BaseModel):
     risk: str
     risk_score: float
     antecedent_rain_mm: float
+    mode: str = "SAMPLE_MOCK"
+    phase: str = "Phase 5 pending"
 
 
 class ZoneForecastResponse(BaseModel):
     """
-    Matches the TypeScript ZoneForecast interface in frontend/src/types/index.ts.
-    antecedent_rain_mm values are pre-computed in the sample dataset.
-    Phase 4 backend will compute these dynamically from the rainfall accumulator.
+    NOW is computed dynamically by ml.prototype_scorer.
+    +24h, +48h, +72h windows are marked SAMPLE_MOCK (Phase 5 pending).
     """
     zone_id: str
     current: str          # maps to ZoneForecast.current in TS
-    current_score: float
+    current_score: float  # maps to ZoneForecast.current_score in TS
+    now: NowWindow
     forecast: Dict[str, ForecastWindow]  # keys: "24h", "48h", "72h"
     data_meta: DataMeta
 
@@ -101,7 +139,7 @@ class ZoneForecastResponse(BaseModel):
 
 class WeatherResponse(BaseModel):
     """
-    Rainfall inputs for a zone. All values SAMPLE_MOCK in Phase 3.
+    Rainfall inputs for a zone. All values SAMPLE_MOCK in Phase 3/4.
     Phase 5+ replaces with real IMD/GPM observations.
     """
     zone_id: str
