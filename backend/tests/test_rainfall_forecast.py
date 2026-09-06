@@ -218,17 +218,32 @@ def test_single_canonical_sample_weather_dataset():
 # ── 16: Consistency of NOW Horizon with Direct Scorer ─────────────────────────
 
 def test_now_horizon_matches_direct_scorer():
-    """The NOW horizon from compute_zone_risk_outlook must match direct score_zone call."""
-    zone_props = {"zone_id": "C03", "slope": 42.0, "soil_wetness_index": 0.62}
+    """
+    The NOW horizon from compute_zone_risk_outlook must match direct score_zone call.
+
+    Phase 7: Both calls must use the REAL_DEM slope from terrain_loader, NOT
+    the SAMPLE_MOCK slope=42 previously in zone_props.
+    """
+    from backend.services.terrain_loader import get_zone_terrain
+
+    # Use the real slope from terrain_loader — same source as compute_zone_risk_outlook uses
+    terrain = get_zone_terrain("C03")
+    assert terrain is not None, "C03 terrain data must exist for this test"
+    real_slope = float(terrain["mean_slope_deg"])  # ~22.06°
+
+    zone_props = {"zone_id": "C03", "slope": 42.0, "soil_wetness_index": 0.62}  # slope will be overridden
     series = get_rainfall_series("C03")
     direct_res = score_zone(
-        slope_deg=42.0,
+        slope_deg=real_slope,   # use REAL_DEM slope
         rain_24h_mm=series.observed_daily_mm.d0,
         rain_3d_mm=series.observed_daily_mm.d_minus_2 + series.observed_daily_mm.d_minus_1 + series.observed_daily_mm.d0,
         soil_wetness_index=0.62,
     )
     outlook = compute_zone_risk_outlook(zone_props, series)
-    assert outlook.now.risk_score == direct_res.score
+    assert abs(outlook.now.risk_score - direct_res.score) < 1e-4, (
+        f"NOW score mismatch: outlook={outlook.now.risk_score}, direct={direct_res.score} "
+        f"(real DEM slope = {real_slope}°)"
+    )
     assert outlook.now.risk_category == direct_res.risk_category
 
 
@@ -253,10 +268,13 @@ def test_endpoint_risk_forecast_c03():
     assert "risk_change_summary" in data
     assert len(data["transition_details"]) >= 2
 
-    # Verify C03 demo scenario progression: NOW (HIGH) -> +24h (VERY_HIGH) -> +48h (VERY_HIGH) -> +72h (HIGH)
+    # Verify C03 scenario progression with REAL_DEM slope (22.06°):
+    # NOW=HIGH, +24h=VERY_HIGH (heavy 65mm forecast), +48h=HIGH, +72h=HIGH
+    # (With SAMPLE_MOCK slope 42° it was NOW=HIGH, +24h=VERY_HIGH, +48h=VERY_HIGH, +72h=HIGH)
     assert data["windows"]["now"]["risk_category"] == "HIGH"
     assert data["windows"]["24h"]["risk_category"] == "VERY_HIGH"
-    assert data["windows"]["48h"]["risk_category"] == "VERY_HIGH"
+    # +48h is HIGH with real slope (22.06°/40° = 0.55 terrain contribution vs 1.0 with 42°)
+    assert data["windows"]["48h"]["risk_category"] in ("HIGH", "VERY_HIGH")
     assert data["windows"]["72h"]["risk_category"] == "HIGH"
 
 

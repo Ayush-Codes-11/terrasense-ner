@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <meta name="google-site-verification" content="google753e459cb3ebfbc8.html" />
+
+    <link rel="canonical" href="https://bhusanket.gsi.gov.in/">
+    <!-- <title>GSI Public Portal</title> -->
+    
+  
+    <link rel="stylesheet" href="./css/PublicPortal.css">
+    <link rel="stylesheet" href="./css/alert.css">
+    <link rel="stylesheet" href="./css/public_dashboard.css">
+    <link rel="stylesheet" href="./external/css/bootstrap/bootstrap.min.css">
+    <!-- Alertify -->
+    <link rel="stylesheet" href="./external/css/alertify/alertify.min.css">
+    <link rel="stylesheet" href="./external/css/alertify/default.min.css">
+    <script src="./external/js/alertify/alertify.min.js"></script>
+
+    <link rel="stylesheet" href="./external/css/fontawesome/all.min.css">
+    <script src="json/config.json"></script>
+
+    <!-- Include amcharts js -->
+    <script src="./external/js/amcharts/core.js"></script>
+    <script src="./external/js/amcharts/charts.js"></script>
+    <script src="./external/js/amcharts/animated.js"></script>
+
+</head>
+
+<body>
+    <header>
+        <div id="headerContainer"></div>
+    </header>
+
+    <div class="container-fluid pt-2 mx-auto" id="homepage">
+        <div class="row">
+            <div class="col-lg-12 col-sm-12 w-100">
+                <div class="custom-card card-full">
+                    <div class="card" id="home_pic">
+                        <div class="card-body" id="home_pic_body">
+                            <div id="Top_Left_Content" class="carousel slide" data-bs-ride="carousel" data-bs-wrap="true" data-bs-interval="4000">
+                                <div id="Pdfimg" class="carousel-inner">
+                                    <div class="carousel-item active">
+                                        <img src="./pics/Banners/Section1.png" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+                                    <!-- <div class="carousel-item active">
+                                        <img src="./pics/Banners/PM_tenpointAgenda.png" class="d-block w-100"
+                                            alt="PM tenpoint Agenda"
+                                            data-pdf="./Public_Portal_Dashboard_pdf/PM_s Ten Point Agenda for Disaster Risk Reduction.pdf">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/SendaiFramework.jpg" class="d-block w-100"
+                                            alt="Sendai Framework" data-pdf="./Public_Portal_Dashboard_pdf/SENDAI Framework.pdf">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/vision2030.jpg" class="d-block w-100" alt="vision 2030"
+                                            data-pdf="./Public_Portal_Dashboard_pdf/GSI Vision 2030.pdf">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/startergyPaper.png" class="d-block w-100" alt="startergy Paper"
+                                            data-pdf="./Public_Portal_Dashboard_pdf/GSI Strategy Paper 2030.pdf">
+                                    </div> -->
+                                    <!-- <div class="carousel-item">
+                                        <img src="./pics/Banners/Scheduled Maintenance.png" class="d-block w-100" alt="Schedule Maintenance">
+                                    </div> -->
+                                    <!-- <div class="carousel-item">
+                                        <img src="./pics/Banners/japan_conference.png" class="d-block w-100" alt="japann conference"
+                                            data-pdf="https://bhusanket.gsi.gov.in/Public_Portal_News_pdf/Note_on_ICL_meeting_at_Kyoto_Japan.pdf">
+                                    </div> -->
+
+                                    <!-- <div class="carousel-item">
+                                        <img src="./pics/Banners/Frame 11808474.png" class="d-block w-100" alt="IMD foundation day">
+                                    </div> -->
+
+                                    <!-- <div class="carousel-item">
+                                        <img src="./pics/Banners/Frame 11808475.png" class="d-block w-100" alt="IMD presentation">
+                                    </div> -->
+
+                                    <!-- <div class="carousel-item">
+                                        <img src="./pics/Banners/presentation_nlfc.png" class="d-block w-100" alt="NLFC presentation">
+                                    </div> -->
+
+                                    <!-- <div class="carousel-item">
+                                        <img src="./pics/Banners/Wayanad.jpg" class="d-block w-100" alt="NLFC presentation">
+                                    </div> -->
+
+                                    <!-- <div class="carousel-item">
+                                        <img src="./pics/Banners/KERALAGSI.jpg" class="d-block w-100" alt="NLFC presentation">
+                                    </div> -->
+                                    <!-- <div class="carousel-item">
+                                        <img src="./pics/Banners/CNR 1.jpg" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/cwc1.jpg" class="d-block w-100" alt="NLFC presentation">
+                                    </div> -->
+                                    <!-- <div class="carousel-item">
+                                        <img src="./pics/Banners/Morth1.jpg" class="d-block w-100" alt="NLFC presentation">
+                                    </div> -->
+                                    <!-- <div class="carousel-item">
+                                        <img src="./pics/Banners/For Upload 2.jpg" class="d-block w-100" alt="NLFC presentation">
+                                    </div> -->
+                                    <!-- <div class="carousel-item">
+                                        <img src="./pics/Banners/section1.png" class="d-block w-100" alt="NLFC presentation">
+                                    </div> -->
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/NLFC_2nd_Anniversary.png" class="d-block w-100" alt="NLFC_2nd_Anniversary">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/corosol1.png" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/GSI_and_NCMRWF_signed.png" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/For Upload 1.jpg" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/Joint_field_visit_of_GSI_and_CNR‑IRPI.png" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/MOU_With_IITM.png" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="./pics/Frame 1.png" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+
+                                    <!-- <div class="carousel-item">
+                                        <img src="./pics/Banners/bulletin_discontinued.png" class="d-block w-100" alt="NLFC presentation">
+                                    </div> -->
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/Rudraprayag_Operational.jpg" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/Technical meeting.jpg" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/Emergency Response.jpg" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/MoUs with five NER states.jpg" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/AnnualReliefCommissionerConference.jpg" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/GSI participated in a joint meeting with CNR-IRPI.jpg" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/carousel_BhooskhalanApp.jpg" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="./pics/Monsoon_discussion.jpg" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+
+                                    <div class="carousel-item">
+                                        <img src="./pics/training_2025.jpg" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/CNR 1.jpg" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/For Upload 2.jpg" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/cwc1.jpg" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/Morth1.jpg" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/PM_tenpointAgenda.png" class="d-block w-100"
+                                            alt="PM tenpoint Agenda"
+                                            data-pdf="./Public_Portal_Dashboard_pdf/PM_s Ten Point Agenda for Disaster Risk Reduction.pdf">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/SendaiFramework.jpg" class="d-block w-100"
+                                            alt="Sendai Framework" data-pdf="./Public_Portal_Dashboard_pdf/SENDAI Framework.pdf">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/vision2030.jpg" class="d-block w-100" alt="vision 2030"
+                                            data-pdf="./Public_Portal_Dashboard_pdf/GSI Vision 2030.pdf">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/startergyPaper.png" class="d-block w-100" alt="startergy Paper"
+                                            data-pdf="./Public_Portal_Dashboard_pdf/GSI Strategy Paper 2030.pdf">
+                                    </div>
+                                   
+                                    
+                                    <!-- <div class="carousel-item">
+                                        <img src="./pics/training_2025.jpg" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="./pics/Monsoon_discussion.jpg" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/carousel_BhooskhalanApp.jpg" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/GSI participated in a joint meeting with CNR-IRPI.jpg" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/AnnualReliefCommissionerConference.jpg" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/MoUs with five NER states.jpg" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/Emergency Response.jpg" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/Technical meeting.jpg" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/Rudraprayag_Operational.jpg" class="d-block w-100" alt="NLFC presentation">
+                                    </div> -->
+                                    <!-- <div class="carousel-item">
+                                        <img src="./pics/Banners/bulletin_discontinued.png" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+                                    <!-- <div class="carousel-item">
+                                        <img src="./pics/Banners/Disaster_risk_mitigation.png" class="d-block w-100" alt="NLFC presentation">
+                                    </div> -->
+                                    <!-- <div class="carousel-item">
+                                        <img src="./pics/Frame 1.png" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/MOU_With_IITM.png" class="d-block w-100" alt="NLFC presentation">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="./pics/Banners/Joint_field_visit_of_GSI_and_CNR‑IRPI.png" class="d-block w-100" alt="NLFC presentation">
+                                    </div> --> -->
+
+
+
+                                </div>
+                                <button class="carousel-control-prev" type="button" data-bs-target="#Top_Left_Content"
+                                    data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" id="Preview"></span>
+                                    <span class="sr-only">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#Top_Left_Content"
+                                    data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="sr-only">Next</span>
+                                </button>
+                            </div>
+                            <div class="modal" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="pdfModalLabel">PDF Viewer</h5>
+                                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <iframe id="pdfViewer" width="100%" height="440"
+                                                title="PDF Viewer"></iframe>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-3 col-sm-12">
+                <div class="custom-card card-1-1 w-100" id="bulletin_card">
+                    <div class="card-body p-0" id="bulletin_body">
+                        <div id="bulletin" class="d-flex align-items-center justify-content-between p-3">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-file-alt mr-2" id="report_icon"></i>
+                            </div>
+                            <span class="text-center flex-grow-1 h4" id="bulletin_text">Landslide Forecast
+                                Bulletin</span>
+                            <a href="./viewBulletin.html">
+                                <i class="fas fa-arrow-right" id="arrow_icon"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="custom-card card-1-1 w-100" id="nlsm10k_card">
+                    <div class="card-body p-0" id="nlsm10k_body">
+                        <div id="nlsm10k" class="d-flex align-items-center justify-content-between p-3">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-file-alt mr-2" id="nlsm10k_icon"></i>
+                            </div>
+                            <span class="text-center flex-grow-1 h4" id="nlsm10k_text">LSM 10K Maps</span>
+                            <a href="./NLSM_10K_Map.html">
+                                <i class="fas fa-arrow-right" id="nlsm10k_arrow"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="custom-card card-1-1 w-100" id="nlsm10k_card">
+                    <div class="card-body p-0" id="nlsm10k_body">
+                        <div id="nlsm10k" class="d-flex align-items-center justify-content-between p-3">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-file-alt mr-2" id="nlsm10k_icon"></i>
+                            </div>
+                            <span class="text-center flex-grow-1 h4" id="nlsm10k_text">Landslide  Impact Probability Map</span>
+                            <a href="./impactmap.html">
+                                <i class="fas fa-arrow-right" id="nlsm10k_arrow"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="custom-card card-1-2 w-100" id="news_card">
+                    <div class="card-body news_card" id="news_body">
+                        <div id="News_Div">
+                            <div id="New_Heading" class="text-center">Recent News
+                                <a href="./ArchivedNews.html" id="archiveNews" class="ml-4">(View Archive)</a>
+                            </div>
+                            <div id="New_Content">
+                                <div id="mapLoader" class="text-center mx-auto mt-4">
+                                    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;">
+                                        <span class="sr-only">Loading...</span>
+                                    </div>
+                                </div>
+                                <div id="errormsg" class="d-none text-center mx-auto mt-4">
+                                    <h4 class="text-center">Unable to fetch data from the server </h4>
+                                </div>
+                                <div id="news-feed">
+                                    <div class="news-item"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-sm-12">
+                <div class="custom-card card-2-1 w-100" id="ProjectRedirect" onclick="redirectToProject()">
+                    <div class="text-content">
+                        <div class="title">Project Status </div>
+                        <div id="chartLoader" class="text-center mx-auto mt-5 pt-5 d-none">
+                            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                        </div>
+                        <div id="chartErrorMsg" class="text-center d-none">
+                            <h5 class="text-center mt-5 pt-5 fw-bold">Unable to fetch data from the
+                                server </h5>
+                        </div>
+                        <div class="legend mt-4" style="font-size:0.7rem;">
+
+                            <a href="#" onclick="redirectToProject('meso'); return false;" class="d-block text-decoration-none">
+                              <span class="meso"></span> Meso Scale Projects
+                            </a>
+                          
+                            <a href="#" onclick="redirectToProject('macro'); return false;" class="d-block text-decoration-none">
+                              <span class="macro"></span> Macro Scale Projects
+                            </a>
+                          
+                            <a href="#" onclick="redirectToProject('micro'); return false;" class="d-block text-decoration-none">
+                              <span class="micro"></span> Micro Scale Projects
+                            </a>
+                            <a href="#" onclick="redirectToProject('resourceanddevelopment'); return false;" class="d-block text-decoration-none">
+                                <span class="ResearchAndDevelopment"></span> Research & Development Projects
+                            </a>
+                          
+                          </div>
+                    </div>
+                    <div id="chart-container">
+                        <canvas id="projectStatusChart"></canvas>
+                    </div>
+                </div>
+                <div class="custom-card card-2-2 w-100">
+                    <div class="card-body" id="bulletinMap_body">
+                        <!-- Carousel -->
+                        <div id="Top_Left_Content3" class="carousel slide">
+                            <!-- <div class="carousel-inner" onclick="openInNewTabLfsApp();$('#pdfModal').modal('hide');"> -->
+                            <div class="carousel-inner" onclick="window.open('lfs.html', '_blank')">  
+                                <div id="mapdiv" class="carousel-item active">
+                                    <img src="./pics/LFS/LFS1.jpg" style="height: 310px;object-fit: scale-down;"
+                                        class="d-block w-100" alt="Image 1">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            
+            <div class="col-lg-3 col-sm-12">
+                <!-- <div class="custom-card card-2-1 w-100" id="LandslideReport"
+                    onclick="window.location.href='statewiseLandslideReport.html'">
+                    <div class="text-content text-center">
+                        <div class="title" style="font-size: 18px; font-weight: bold;margin-top: 20px">State Wise Landslide Report</div>
+                        <div class="number" style="font-size: 40px; font-weight: bold; color: #333;">1118</div>
+                        <p style="color: rgb(59, 68, 233); font-weight: bold; margin-top: 25px;font-size: 15px">
+                            Download reports
+                        </p>
+                    </div>
+                </div> -->
+
+                <div class="custom-card card-3-1 w-100" id="mapdiv"
+                     onclick="window.location.href='statewiseLandslideReport.html'">
+                    <div class="text-content">
+                        <div class="title" style="font-size: 18px; font-weight: bold;">State Wise Landslide Report</div>
+                        <div class="number" style="font-size: 40px; font-weight: bold; color: #333;">1179</div>
+                        <div style="color: rgb(55, 0, 255);font-weight: bold;margin-top: 0.5px;font-size: 14px;">Download report</div>
+                    </div>
+                    <div class="image-container">
+                        <img src="./pics/home_page/landslide_no_bg.png" alt="Recent Landslide Count">
+                    </div>
+                    
+                </div>
+
+                <div class="custom-card card-2-2 w-100">
+                    <div class="card-body" id="bulletinMap_body">
+                        <!-- Carousel -->
+                        <div id="Top_Left_Content3" class="carousel slide">
+                            <div class="carousel-inner" onclick="window.open('sectormap.html', '_blank')">
+                                <div id="mapdiv" class="carousel-item active">
+                                    <img src="./pics/home_page/Sector_Map3.png" style="height: 310px;object-fit: scale-down;"
+                                        class="d-block w-100" alt="Image 1">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            
+            <div class="col-lg-3 col-sm-12">
+                <!-- <div class="custom-card card-3-1 w-100" id="mapdiv"
+                    onclick="openInNewTabLandslideApp();$('#pdfModal').modal('hide');"> -->
+
+                <div class="custom-card card-3-1 w-100" id="mapdiv"
+                    onclick="window.open('./pics/landslide_report.pdf','_blank');$('#pdfModal').modal('hide');">
+
+                    <!-- <div class="custom-card card-3-1 w-100" id="mapdiv"> -->
+                    <div class="text-content">
+                        <div class="title" style="font-size: 18px; font-weight: bold;">Landslide Inventory (Field Validated)</div>
+                        <div class="number" id="RecentlandslideCount"></div>
+                        <div style="color: rgb(55, 0, 255);font-weight: bold;margin-top: 0.5px;font-size: 14px;">Download Data</div>
+                    </div>
+                    <div class="image-container">
+                        <img src="./pics/home_page/recentLandslide.png" alt="Recent Landslide Count">
+                    </div>
+                    
+                </div>
+                <div class="custom-card card-3-2 w-100">
+                    <div class="card-body" id="susptibility_body">
+                        <!-- Carousel -->
+                        <div id="Top_Left_Content2" class="carousel slide" data-bs-ride="carousel" data-bs-interval="2000">
+                            <ol class="carousel-indicators">
+                                <li data-bs-target="#Top_Left_Content2" data-bs-slide-to="0" class="active"></li>
+                                <li data-bs-target="#Top_Left_Content2" data-bs-slide-to="1"></li>
+                                <li data-bs-target="#Top_Left_Content2" data-bs-slide-to="2"></li>
+                                <li data-bs-target="#Top_Left_Content2" data-bs-slide-to="3"></li>
+                                <li data-bs-target="#Top_Left_Content2" data-bs-slide-to="4"></li>
+                                <li data-bs-target="#Top_Left_Content2" data-bs-slide-to="5"></li>
+                                <li data-bs-target="#Top_Left_Content2" data-bs-slide-to="6"></li>
+                                <li data-bs-target="#Top_Left_Content2" data-bs-slide-to="7"></li>
+                                <li data-bs-target="#Top_Left_Content2" data-bs-slide-to="8"></li>
+                                <li data-bs-target="#Top_Left_Content2" data-bs-slide-to="9"></li>
+                                <li data-bs-target="#Top_Left_Content2" data-bs-slide-to="10"></li>
+                                <li data-bs-target="#Top_Left_Content2" data-bs-slide-to="11"></li>
+                                <li data-bs-target="#Top_Left_Content2" data-bs-slide-to="12"></li>
+                                <li data-bs-target="#Top_Left_Content2" data-bs-slide-to="13"></li>
+                                <li data-bs-target="#Top_Left_Content2" data-bs-slide-to="14"></li>
+                                <li data-bs-target="#Top_Left_Content2" data-bs-slide-to="15"></li>
+                                <li data-bs-target="#Top_Left_Content2" data-bs-slide-to="16"></li>
+                                <li data-bs-target="#Top_Left_Content2" data-bs-slide-to="17"></li>
+                            </ol>
+                            <div class="carousel-inner" id="mapdiv"
+                                onclick="openInNewTabSuseApp();$('#pdfModal').modal('hide');">
+                                <div id="carousel-item" class="carousel-item active">
+                                    <img src="./pics/Susceptibility/India.png" class="d-block w-100" alt="India Susceptibility">
+                                </div>
+                                <div class="carousel-item">
+                                    <img src="./pics/Susceptibility/AP.png" class="d-block w-100" alt="AP Susceptibility">
+                                </div>
+                                <div class="carousel-item">
+                                    <img src="./pics/Susceptibility/ARP.png" class="d-block w-100" alt="ARP Susceptibility">
+                                </div>
+                                <div class="carousel-item">
+                                    <img src="./pics/Susceptibility/Assam.png" class="d-block w-100" alt="Assam Susceptibility">
+                                </div>
+                                <div class="carousel-item">
+                                    <img src="./pics/Susceptibility/HP.png" class="d-block w-100" alt="HP Susceptibility">
+                                </div>
+                                <div class="carousel-item">
+                                    <img src="./pics/Susceptibility/J&K.png" class="d-block w-100" alt="J&K Susceptibility">
+                                </div>
+                                <div class="carousel-item">
+                                    <img src="./pics/Susceptibility/K&G.png" class="d-block w-100" alt="K&G Susceptibility">
+                                </div>
+                                <div class="carousel-item">
+                                    <img src="./pics/Susceptibility/Kerala.png" class="d-block w-100" alt="Kerala Susceptibility">
+                                </div>
+                                <div class="carousel-item">
+                                    <img src="./pics/Susceptibility/Manipur.png" class="d-block w-100" alt="Manipur Susceptibility">
+                                </div>
+                                <div class="carousel-item">
+                                    <img src="./pics/Susceptibility/Meghalaya.png" class="d-block w-100" alt="Meghalaya Susceptibility">
+                                </div>
+                                <div class="carousel-item">
+                                    <img src="./pics/Susceptibility/MH.png" class="d-block w-100" alt="MH Susceptibility">
+                                </div>
+                                <div class="carousel-item">
+                                    <img src="./pics/Susceptibility/Mizoram.png" class="d-block w-100" alt="Mizoram Susceptibility">
+                                </div>
+                                <div class="carousel-item">
+                                    <img src="./pics/Susceptibility/Nagaland.png" class="d-block w-100" alt="Nagaland Susceptibility">
+                                </div>
+                                <div class="carousel-item">
+                                    <img src="./pics/Susceptibility/Sikkim.png" class="d-block w-100" alt="Sikkim Susceptibility">
+                                </div>
+                                <div class="carousel-item">
+                                    <img src="./pics/Susceptibility/TN.png" class="d-block w-100" alt="TN Susceptibility">
+                                </div>
+                                <div class="carousel-item">
+                                    <img src="./pics/Susceptibility/Tripura.png" class="d-block w-100" alt="Tripura Susceptibility">
+                                </div>
+                                <div class="carousel-item">
+                                    <img src="./pics/Susceptibility/UT.png" class="d-block w-100" alt="UT Susceptibility">
+                                </div>
+                                <div class="carousel-item">
+                                    <img src="./pics/Susceptibility/WB.png" class="d-block w-100" alt="WB Susceptibility">
+                                </div>
+                            </div>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#Top_Left_Content2"
+                                data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" id="Preview"></span>
+                                <span class="sr-only">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#Top_Left_Content2"
+                                data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="sr-only">Next</span>
+                            </button>
+                        </div>
+                        <!-- Modal -->
+                        <div class="modal" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel"
+                            aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="pdfModalLabel">PDF Viewer</h5>
+                                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <iframe id="pdfViewer" width="100%" height="440" title="PDF Viewer"></iframe>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="footercontainer"></div>
+
+    <!-- Bootstrap and Font Awesome scripts -->
+    <script src="./external/js/jquery/jquery-3.5.1.slim.min.js"></script>
+    <script src="./external/js/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="./external/js/chart/chart.js"></script>
+    <script src="js/header.js"></script>
+    <script src="./js/2dchart.js"></script>
+    <script src="./js/alert.js"></script>
+    <script src="js/serverError.js"></script>
+    <script src="./js/index.js"></script>
+    <script src="./js/newsFeed.js"></script>
+
+    <script>
+        /*
+        $(document).ready(function () {
+            $('.carousel-item img').click(function () {
+                var pdfPath = $(this).data('pdf');
+                if(pdfPath){
+                    $('#pdfViewer').attr('src', pdfPath);
+                    $('#pdfModal').modal('show');
+                }
+            });
+        });
+        */
+
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll('.carousel-item img').forEach(function (img) {
+                img.addEventListener('click', function () {
+                    var pdfPath = img.getAttribute('data-pdf');
+                    if (pdfPath) {
+                        document.getElementById('pdfViewer').setAttribute('src', pdfPath);
+                        var modal = new bootstrap.Modal(document.getElementById('pdfModal'));
+                        modal.show();
+                    }
+                });
+            });
+        });
+
+
+        // document.addEventListener("DOMContentLoaded", function () {
+        //     var myCarousel = document.querySelectorAll('.carousel');
+        //     myCarousel.forEach(function (carousel) {
+        //         new bootstrap.Carousel(carousel, {
+        //             interval: 4000,
+        //             ride: 'carousel',
+        //             pause: 'hover',
+        //             wrap: true
+        //         });
+        //     });
+        // });
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+            if (!sessionStorage.getItem("visited")) {
+                sessionStorage.setItem("visited", true);
+                safetyAlert();
+            } else if (performance.navigation.type === performance.navigation.TYPE_RELOAD) {
+                safetyAlert();
+            }
+        });
+    </script>
+</body>
+
+</html>

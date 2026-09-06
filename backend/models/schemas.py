@@ -104,6 +104,15 @@ class ZoneRisk(BaseModel):
     # Sorted by absolute contribution descending (actual weighted contributions)
     contributors: Optional[List[ContributorSchema]] = None
 
+    # Feature-level data provenance (Phase 7)
+    feature_provenance: Optional[Dict[str, str]] = Field(
+        default=None,
+        description=(
+            "Data source for each feature input. "
+            "'REAL_DEM' = Copernicus GLO-30; 'SAMPLE_MOCK' = synthetic sample value."
+        ),
+    )
+
     data_meta: DataMeta
 
 
@@ -158,6 +167,15 @@ class ZoneForecastResponse(BaseModel):
     # Deterministic transition explanation
     risk_change_summary: str
     transition_details: List[str]
+
+    # Feature-level data provenance (Phase 7)
+    feature_provenance: Optional[Dict[str, str]] = Field(
+        default=None,
+        description=(
+            "Data source for each feature input. "
+            "'REAL_DEM' = Copernicus GLO-30; 'SAMPLE_MOCK' = synthetic sample value."
+        ),
+    )
 
     data_meta: DataMeta
 

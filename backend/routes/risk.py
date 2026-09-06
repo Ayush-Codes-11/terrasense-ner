@@ -54,11 +54,20 @@ def _props_to_zone_risk(p: dict) -> ZoneRisk:
         rain_24h = float(p.get("rain_24h", 0.0))
         rain_3d = float(p.get("rain_3d", 0.0))
 
-    slope = float(p.get("slope", 0.0))
-    elevation = float(p.get("elevation", 0.0)) if "elevation" in p else None
     sw_val = float(p.get("soil_wetness_index") if "soil_wetness_index" in p else p.get("soil_moisture", 0.3))
 
+    # Phase 7: terrain from REAL_DEM via terrain_loader
+    from services.terrain_loader import get_zone_terrain
+    terrain = get_zone_terrain(zid)
+    if terrain:
+        slope = float(terrain["mean_slope_deg"])
+        elevation = float(terrain["mean_elevation_m"])
+    else:
+        slope = float(p.get("slope", 0.0))
+        elevation = float(p.get("elevation", 0.0)) if "elevation" in p else None
+
     scoring_props = {
+        "zone_id": zid,
         "slope": slope,
         "elevation": elevation,
         "rain_24h": rain_24h,
@@ -87,6 +96,16 @@ def _props_to_zone_risk(p: dict) -> ZoneRisk:
         soil_wetness=res.normalized_features.soil_wetness,
     )
 
+    # Retrieve provenance attached by compute_zone_risk
+    provenance = getattr(res, "feature_provenance", None) or {
+        "slope": "REAL_DEM" if terrain else "SAMPLE_MOCK",
+        "elevation": "REAL_DEM" if terrain else "SAMPLE_MOCK",
+        "rainfall": "SAMPLE_MOCK",
+        "soil_wetness": "SAMPLE_MOCK",
+    }
+    used_slope = getattr(res, "used_slope_deg", slope)
+    used_elev = getattr(res, "used_elevation_m", elevation)
+
     return ZoneRisk(
         zone_id=zid,
         risk_category=res.risk_category,
@@ -96,8 +115,8 @@ def _props_to_zone_risk(p: dict) -> ZoneRisk:
         is_probability=res.is_probability,
         is_calibrated=res.is_calibrated,
         computed_by=res.computed_by,
-        slope=slope,
-        elevation=elevation if elevation is not None else 0.0,
+        slope=used_slope,
+        elevation=used_elev if used_elev is not None else 0.0,
         soil_moisture=sw_val,
         soil_wetness_index=sw_val,
         rain_24h=rain_24h,
@@ -105,11 +124,12 @@ def _props_to_zone_risk(p: dict) -> ZoneRisk:
         rain_7d=float(p.get("rain_7d", 0.0)) if "rain_7d" in p else None,
         normalized_features=normalized_features,
         contributors=contributors,
+        feature_provenance=provenance,
         data_meta=DataMeta(
             data_type="SAMPLE_MOCK",
-            source="TerraSense Prototype Scorer (Canonical SAMPLE_MOCK rainfall)",
+            source="TerraSense Prototype Scorer — terrain: Copernicus GLO-30 REAL_DEM; rainfall: SAMPLE_MOCK",
             is_live=False,
-            note="Score computed by ml.prototype_scorer using canonical sample input features.",
+            note="Slope and elevation from real 30 m DEM. Rainfall and soil wetness remain SAMPLE_MOCK.",
         ),
     )
 
@@ -179,10 +199,11 @@ def _props_to_forecast(p: dict) -> ZoneForecastResponse:
         transition_details=outlook.transition_details,
         data_meta=DataMeta(
             data_type="SAMPLE_MOCK",
-            source="TerraSense Prototype Scorer + Rolling Rainfall",
+            source="TerraSense Prototype Scorer — terrain: Copernicus GLO-30 REAL_DEM; rainfall: SAMPLE_MOCK",
             is_live=False,
             note=_OUTLOOK_NOTE,
         ),
+        feature_provenance=outlook.feature_provenance,
     )
 
 

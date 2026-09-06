@@ -41,6 +41,7 @@ from backend.services.rainfall_accumulator import (
     HorizonRainfall,
     RollingAccumulationResult,
 )
+from backend.services.terrain_loader import get_zone_terrain
 
 
 @dataclass
@@ -81,6 +82,14 @@ class RiskOutlookResult:
     # Deterministic transition explanation
     risk_change_summary: str
     transition_details: List[str]
+
+    # Feature provenance (Phase 7)
+    feature_provenance: Dict[str, str] = field(default_factory=lambda: {
+        "slope": "SAMPLE_MOCK",
+        "elevation": "SAMPLE_MOCK",
+        "rainfall": "SAMPLE_MOCK",
+        "soil_wetness": "SAMPLE_MOCK",
+    })
 
 
 def _build_deterministic_explanation(
@@ -167,9 +176,12 @@ def compute_zone_risk_outlook(
     """
     Computes a complete 4-horizon weather-linked landslide-risk outlook.
 
+    Phase 7: slope and elevation are read from the Copernicus GLO-30 REAL_DEM
+    terrain_loader. GeoJSON zone_props are used only as fallback.
+
     Parameters
     ----------
-    zone_props       : Static zone properties (slope, elevation, soil moisture).
+    zone_props       : Static zone properties (soil moisture, rainfall).
     rainfall_series  : Optional pre-loaded RainfallSeries. If omitted, loaded from canonical service.
 
     Returns
@@ -177,10 +189,21 @@ def compute_zone_risk_outlook(
     RiskOutlookResult with NOW, +24h, +48h, +72h all computed by prototype scorer.
     """
     zid = str(zone_props["zone_id"]).upper()
-    slope = float(zone_props.get("slope", 0.0))
-    elevation = float(zone_props.get("elevation", 0.0)) if "elevation" in zone_props else None
 
-    # Soil wetness index: constant across horizons in Phase 5
+    # ── Terrain: prefer REAL_DEM, fall back to GeoJSON props ──
+    terrain = get_zone_terrain(zid)
+    if terrain:
+        slope = float(terrain["mean_slope_deg"])
+        elevation = float(terrain["mean_elevation_m"])
+        slope_provenance = "REAL_DEM"
+        elev_provenance = "REAL_DEM"
+    else:
+        slope = float(zone_props.get("slope", 0.0))
+        elevation = float(zone_props.get("elevation", 0.0)) if "elevation" in zone_props else None
+        slope_provenance = "SAMPLE_MOCK"
+        elev_provenance = "SAMPLE_MOCK"
+
+    # Soil wetness index: constant across horizons (SAMPLE_MOCK, not SMAP)
     sw = (
         zone_props.get("soil_wetness_index")
         if "soil_wetness_index" in zone_props
@@ -266,4 +289,10 @@ def compute_zone_risk_outlook(
         h72=h72_res,
         risk_change_summary=summary,
         transition_details=details,
+        feature_provenance={
+            "slope": slope_provenance,
+            "elevation": elev_provenance,
+            "rainfall": "SAMPLE_MOCK",
+            "soil_wetness": "SAMPLE_MOCK",
+        },
     )

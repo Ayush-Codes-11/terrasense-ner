@@ -19,6 +19,7 @@ from routes.weather import router as weather_router
 from routes.geodata import router as geodata_router
 from routes.exposure import router as exposure_router
 from routes.priority import router as priority_router
+from routes.terrain import router as terrain_router
 
 # ── App ────────────────────────────────────────────────────────────────────────
 
@@ -64,6 +65,7 @@ app.include_router(weather_router)       # /weather/{id}
 app.include_router(geodata_router)       # /geodata/osm/*
 app.include_router(exposure_router)      # /exposure/{id}
 app.include_router(priority_router)      # /priority/{id}
+app.include_router(terrain_router)       # /terrain/status, /terrain/{zone_id}
 
 
 

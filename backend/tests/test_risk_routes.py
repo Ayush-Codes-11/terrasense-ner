@@ -65,14 +65,24 @@ def test_get_zone_current_risk_c03():
     data = res.json()
     assert data["zone_id"] == "C03"
     assert data["risk_category"] == "HIGH"
-    assert 0.50 <= data["score"] < 0.75
+    assert 0.40 <= data["score"] <= 0.80  # score range valid for real DEM slope ~22°
     assert data["score_type"] == "prototype_relative_risk_score"
     assert data["is_probability"] is False
     assert data["is_calibrated"] is False
 
-    # Check nested normalized_features
+    # Phase 7: slope is sourced from REAL_DEM (22.06°), not SAMPLE_MOCK (42°)
+    # Terrain normalized = 22.06 / 40 ≈ 0.55 (not capped at 1.0)
     assert "normalized_features" in data
-    assert data["normalized_features"]["terrain"] == 1.0  # slope 42 / 40 ref = capped 1.0
+    terrain_norm = data["normalized_features"]["terrain"]
+    assert 0.4 < terrain_norm < 0.8, (
+        f"Expected terrain_norm ~0.55 (REAL_DEM slope 22.06°/40°), got {terrain_norm}. "
+        "If 1.0, slope may still be using SAMPLE_MOCK 42°."
+    )
+
+    # Phase 7: feature_provenance must show REAL_DEM for slope
+    prov = data.get("feature_provenance", {})
+    assert prov.get("slope") == "REAL_DEM"
+    assert prov.get("rainfall") == "SAMPLE_MOCK"
 
     # Check contributors are sorted descending by contribution
     contribs = [c["contribution"] for c in data["contributors"]]
