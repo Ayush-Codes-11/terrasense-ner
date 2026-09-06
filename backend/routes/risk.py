@@ -49,10 +49,12 @@ def _props_to_zone_risk(p: dict) -> ZoneRisk:
             + series.observed_daily_mm.d_minus_1
             + series.observed_daily_mm.d0
         )
+        obs_rain_prov = getattr(series, "observed_provenance", "SAMPLE_MOCK")
     except Exception:
         # Fallback to properties if series not available
         rain_24h = float(p.get("rain_24h", 0.0))
         rain_3d = float(p.get("rain_3d", 0.0))
+        obs_rain_prov = "SAMPLE_MOCK"
 
     sw_val = float(p.get("soil_wetness_index") if "soil_wetness_index" in p else p.get("soil_moisture", 0.3))
 
@@ -73,6 +75,8 @@ def _props_to_zone_risk(p: dict) -> ZoneRisk:
         "rain_24h": rain_24h,
         "rain_3d": rain_3d,
         "soil_wetness_index": sw_val,
+        "observed_rainfall_provenance": obs_rain_prov,
+        "forecast_rainfall_provenance": "SAMPLE_MOCK",
     }
 
     res = compute_zone_risk(scoring_props)

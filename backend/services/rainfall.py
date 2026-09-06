@@ -35,15 +35,26 @@ REAL-DATA GUARDRAILS FOR FUTURE WEATHER ADAPTERS (PHASE 5+ DOCUMENTATION):
 from __future__ import annotations
 
 import json
+import math
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 _BACKEND_DIR = Path(__file__).resolve().parent.parent
 _REPO_ROOT = _BACKEND_DIR.parent
 _DATA_DIR = _REPO_ROOT / "data" if (_REPO_ROOT / "data").exists() else _BACKEND_DIR / "data"
 _SAMPLE_WEATHER_PATH = _DATA_DIR / "sample" / "sample_weather.json"
+
+
+try:
+    from services.gpm_loader import get_zone_gpm_observed
+except ImportError:
+    try:
+        from backend.services.gpm_loader import get_zone_gpm_observed
+    except ImportError:
+        def get_zone_gpm_observed(z: str):
+            return None
 
 
 @dataclass
@@ -69,6 +80,10 @@ class RainfallSeries:
     is_live: bool
     source: str
     note: str
+    observed_provenance: str = "SAMPLE_MOCK"
+    forecast_provenance: str = "SAMPLE_MOCK"
+    observation_timestamp: Optional[str] = None
+    observed_buckets_meta: Optional[Dict[str, Any]] = None
 
 
 @lru_cache(maxsize=1)
@@ -83,11 +98,11 @@ def get_rainfall_series(zone_id: str) -> RainfallSeries:
     """
     Retrieves canonical rainfall observations and forecast intervals for a zone.
 
-    data/sample/sample_weather.json is the sole authoritative SAMPLE_MOCK weather scenario dataset.
-    This canonical rainfall adapter NEVER derives runtime values from legacy forecast_24h,
-    forecast_48h, forecast_72h, forecast_risk_*, or forecast_score_* GeoJSON fields.
-    Future phases will swap this data source for IMD/GPM adapters without altering
-    the RainfallSeries interface or accumulator contracts.
+    Phase 8:
+    - Observed daily buckets (D-2, D-1, D0) are sourced from REAL NASA GPM IMERG
+      via services.gpm_loader if available.
+    - Future forecast intervals (+24h, +48h, +72h) remain SAMPLE_MOCK scenarios.
+    - If GPM data is unavailable or invalid, falls back gracefully to SAMPLE_FALLBACK.
     """
     zid = zone_id.upper()
     weather_dict = _load_sample_weather_file()
@@ -99,24 +114,12 @@ def get_rainfall_series(zone_id: str) -> RainfallSeries:
     obs_raw = raw.get("observed_daily_mm", {})
     fcst_raw = raw.get("forecast_interval_mm", {})
 
-    # Validation: ensure non-null and non-negative
-    for key in ["d_minus_2", "d_minus_1", "d0"]:
-        if key not in obs_raw or obs_raw[key] is None:
-            raise ValueError(f"Missing required observed rainfall bucket '{key}' for zone {zid}")
-        if float(obs_raw[key]) < 0:
-            raise ValueError(f"Negative observed rainfall for bucket '{key}' in zone {zid}: {obs_raw[key]}")
-
+    # Validation of forecast intervals (always present)
     for key in ["0_24h", "24_48h", "48_72h"]:
         if key not in fcst_raw or fcst_raw[key] is None:
             raise ValueError(f"Missing required forecast rainfall interval '{key}' for zone {zid}")
         if float(fcst_raw[key]) < 0:
             raise ValueError(f"Negative forecast rainfall for interval '{key}' in zone {zid}: {fcst_raw[key]}")
-
-    observed = ObservedRainfall(
-        d_minus_2=float(obs_raw["d_minus_2"]),
-        d_minus_1=float(obs_raw["d_minus_1"]),
-        d0=float(obs_raw["d0"]),
-    )
 
     forecast = ForecastIntervalRainfall(
         interval_0_24h=float(fcst_raw["0_24h"]),
@@ -124,14 +127,59 @@ def get_rainfall_series(zone_id: str) -> RainfallSeries:
         interval_48_72h=float(fcst_raw["48_72h"]),
     )
 
-    meta = raw.get("data_meta", {})
+    # Check for Real GPM IMERG observations
+    gpm_data = get_zone_gpm_observed(zid) if callable(get_zone_gpm_observed) else None
+
+    if gpm_data and "observed_daily_mm" in gpm_data:
+        gpm_obs = gpm_data["observed_daily_mm"]
+        d2 = float(gpm_obs["d_minus_2"])
+        d1 = float(gpm_obs["d_minus_1"])
+        d0 = float(gpm_obs["d0"])
+
+        for k, v in [("d_minus_2", d2), ("d_minus_1", d1), ("d0", d0)]:
+            if v < 0 or not math.isfinite(v):
+                raise ValueError(f"Invalid real GPM rainfall for '{k}' in zone {zid}: {v}")
+
+        observed = ObservedRainfall(d_minus_2=d2, d_minus_1=d1, d0=d0)
+        observed_prov = "REAL_GPM"
+        data_type = "REAL_GPM"
+        obs_buckets_meta = gpm_data.get("observed_buckets")
+        obs_timestamp = gpm_data.get("observed_buckets", {}).get("d0", {}).get("window_end_utc")
+        source = "NASA GPM IMERG Late Precipitation L3 1 day 0.1° V07 (GPM_3IMERGDL)"
+        note = (
+            "Observed rainfall from NASA GPM IMERG (~0.1° native grid). "
+            "Future forecast intervals are SAMPLE_MOCK scenario."
+        )
+    else:
+        # Fallback to sample weather
+        for key in ["d_minus_2", "d_minus_1", "d0"]:
+            if key not in obs_raw or obs_raw[key] is None:
+                raise ValueError(f"Missing required observed rainfall bucket '{key}' for zone {zid}")
+            if float(obs_raw[key]) < 0:
+                raise ValueError(f"Negative observed rainfall for bucket '{key}' in zone {zid}: {obs_raw[key]}")
+
+        observed = ObservedRainfall(
+            d_minus_2=float(obs_raw["d_minus_2"]),
+            d_minus_1=float(obs_raw["d_minus_1"]),
+            d0=float(obs_raw["d0"]),
+        )
+        observed_prov = "SAMPLE_MOCK"
+        data_type = raw.get("data_type", "SAMPLE_MOCK")
+        obs_buckets_meta = None
+        obs_timestamp = None
+        source = raw.get("data_meta", {}).get("source", "TerraSense Synthetic Scenario Weather Generator")
+        note = "SAMPLE_FALLBACK: Real GPM data not loaded. Using sample mock rainfall."
 
     return RainfallSeries(
         zone_id=zid,
         observed_daily_mm=observed,
         forecast_interval_mm=forecast,
-        data_type=raw.get("data_type", "SAMPLE_MOCK"),
-        is_live=meta.get("is_live", False),
-        source=meta.get("source", "TerraSense Synthetic Scenario Weather Generator"),
-        note=meta.get("note", "SAMPLE_MOCK non-overlapping rainfall data. Not real weather predictions."),
+        data_type=data_type,
+        is_live=False,
+        source=source,
+        note=note,
+        observed_provenance=observed_prov,
+        forecast_provenance="SAMPLE_MOCK",
+        observation_timestamp=obs_timestamp,
+        observed_buckets_meta=obs_buckets_meta,
     )

@@ -266,13 +266,17 @@ def compute_zone_risk_outlook(
             "soil_wetness": res.normalized_features.soil_wetness,
         }
 
+        # Differentiate observed horizon (REAL_GPM or SAMPLE_MOCK) from future mixed horizons
+        obs_prov = getattr(rainfall_series, "observed_provenance", "SAMPLE_MOCK")
+        horizon_input_type = obs_prov if h_name == "now" else ("MIXED_PROTOTYPE" if obs_prov == "REAL_GPM" else "SAMPLE_MOCK")
+
         scored_horizons.append(
             ForecastHorizonResult(
                 horizon=h_name,
                 risk_category=res.risk_category,
                 risk_score=res.score,
                 mode="PROTOTYPE_COMPUTED",
-                input_data_type="SAMPLE_MOCK",
+                input_data_type=horizon_input_type,
                 score_type=res.score_type,
                 is_probability=res.is_probability,
                 is_calibrated=res.is_calibrated,
@@ -287,6 +291,9 @@ def compute_zone_risk_outlook(
 
     now_res, h24_res, h48_res, h72_res = scored_horizons
     summary, details = _build_deterministic_explanation(now_res, h24_res, h48_res, h72_res)
+
+    obs_rain_prov = getattr(rainfall_series, "observed_provenance", "SAMPLE_MOCK")
+    fcst_rain_prov = getattr(rainfall_series, "forecast_provenance", "SAMPLE_MOCK")
 
     return RiskOutlookResult(
         zone_id=zid,
@@ -303,7 +310,9 @@ def compute_zone_risk_outlook(
         feature_provenance={
             "slope": slope_provenance,
             "elevation": elev_provenance,
-            "rainfall": "SAMPLE_MOCK",
+            "observed_rainfall": obs_rain_prov,
+            "forecast_rainfall": fcst_rain_prov,
             "soil_wetness": "SAMPLE_MOCK",
+            "rainfall": obs_rain_prov,
         },
     )

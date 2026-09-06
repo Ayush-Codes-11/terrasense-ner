@@ -268,12 +268,11 @@ def test_endpoint_risk_forecast_c03():
     assert "risk_change_summary" in data
     assert len(data["transition_details"]) >= 2
 
-    # Verify C03 scenario progression with REAL_DEM slope (22.06°):
-    # NOW=HIGH, +24h=VERY_HIGH (heavy 65mm forecast), +48h=HIGH, +72h=HIGH
-    # (With SAMPLE_MOCK slope 42° it was NOW=HIGH, +24h=VERY_HIGH, +48h=VERY_HIGH, +72h=HIGH)
-    assert data["windows"]["now"]["risk_category"] == "HIGH"
-    assert data["windows"]["24h"]["risk_category"] == "VERY_HIGH"
-    # +48h is HIGH with real slope (22.06°/40° = 0.55 terrain contribution vs 1.0 with 42°)
+    # Verify C03 scenario progression with REAL_DEM slope (22.06°) & REAL_GPM observed rain:
+    # NOW=MODERATE (score ~0.44 with real GPM 63.8mm 3d-antecedent vs 87mm mock),
+    # +24h=HIGH (heavy 65mm forecast scenario), +48h=HIGH, +72h=HIGH
+    assert data["windows"]["now"]["risk_category"] == "MODERATE"
+    assert data["windows"]["24h"]["risk_category"] in ("HIGH", "VERY_HIGH")
     assert data["windows"]["48h"]["risk_category"] in ("HIGH", "VERY_HIGH")
     assert data["windows"]["72h"]["risk_category"] == "HIGH"
 
@@ -283,7 +282,7 @@ def test_endpoint_weather_c03():
     assert res.status_code == 200
     data = res.json()
     assert data["zone_id"] == "C03"
-    assert data["observed_daily_mm"]["d0"] == 32.0
+    assert data["observed_daily_mm"]["d0"] == 32.4
     assert data["forecast_interval_mm"]["0_24h"] == 65.0
-    assert data["rolling_3d_accumulation_mm"]["now"] == 87.0
-    assert data["rolling_3d_accumulation_mm"]["24h"] == 127.0
+    assert round(data["rolling_3d_accumulation_mm"]["now"], 1) == 63.8
+    assert round(data["rolling_3d_accumulation_mm"]["24h"], 1) == 117.2

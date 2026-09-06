@@ -185,13 +185,18 @@ class ZoneForecastResponse(BaseModel):
 class WeatherResponse(BaseModel):
     """
     Canonical rainfall series & rolling accumulation for a zone.
-    All inputs remain SAMPLE_MOCK in Phase 5.
+    Phase 8: observed daily buckets sourced from real NASA GPM IMERG if available;
+    forecast intervals remain SAMPLE_MOCK scenario.
     """
     zone_id: str
     observed_daily_mm: Dict[str, float]
     forecast_interval_mm: Dict[str, float]
     rolling_3d_accumulation_mm: Dict[str, float]
     recent_24h_mm: Dict[str, float]
+    observed_provenance: Optional[str] = "SAMPLE_MOCK"
+    forecast_provenance: Optional[str] = "SAMPLE_MOCK"
+    observation_timestamp: Optional[str] = None
+    observed_buckets: Optional[Dict[str, Any]] = None
     data_meta: DataMeta
 
 

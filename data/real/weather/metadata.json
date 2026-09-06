@@ -1,0 +1,45 @@
+{
+  "collection": "GPM_3IMERGDL",
+  "collection_version": "07",
+  "algorithm_generation": "V07",
+  "granule_processing_version": "V07C",
+  "collection_concept_id": "C2723754859-GES_DISC",
+  "source": "NASA Global Precipitation Measurement (GPM) IMERG Late Run",
+  "product": "NASA GPM IMERG Late Precipitation L3 1 day 0.1\u00b0 V07 (GPM_3IMERGDL)",
+  "source_variable": "precipitation",
+  "source_unit": "mm/day",
+  "observation_duration": "1 complete UTC day per bucket",
+  "native_spatial_resolution_deg": 0.1,
+  "temporal_resolution": "1 day (daily accumulation)",
+  "reference_timestamp_utc": "2026-09-04T23:59:59Z",
+  "retrieved_at_utc": "2026-09-06T14:36:26.951549+00:00",
+  "pilot_district": "Aizawl District, Mizoram, India",
+  "total_zones": 25,
+  "unique_native_cells_count": 4,
+  "native_cells": {
+    "CELL_LAT23.65_LON92.65": {
+      "lat_center": 23.65,
+      "lon_center": 92.65
+    },
+    "CELL_LAT23.65_LON92.75": {
+      "lat_center": 23.65,
+      "lon_center": 92.75
+    },
+    "CELL_LAT23.75_LON92.65": {
+      "lat_center": 23.75,
+      "lon_center": 92.65
+    },
+    "CELL_LAT23.75_LON92.75": {
+      "lat_center": 23.75,
+      "lon_center": 92.75
+    }
+  },
+  "days": {
+    "d_minus_2": "2026-09-02",
+    "d_minus_1": "2026-09-03",
+    "d0": "2026-09-04"
+  },
+  "is_live": false,
+  "attribution": "NASA Global Precipitation Measurement (GPM) Integrated Multi-satellitE Retrievals for GPM (IMERG), archived and distributed by NASA GES DISC.",
+  "notes": "GPM IMERG estimates are satellite-derived precipitation measurements at ~0.1 deg (~10 km) native grid. Values represent recent observed precipitation triggers; future rainfall windows remain scenario-based."
+}

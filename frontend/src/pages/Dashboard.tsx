@@ -230,7 +230,12 @@ export default function Dashboard() {
                 ok: true,
               },
               {
-                label: "Rainfall",
+                label: "Observed Rain",
+                status: "REAL GPM (0.1°)",
+                ok: true,
+              },
+              {
+                label: "Forecast Rain",
                 status: "SAMPLE scenario",
                 ok: null,
               },
@@ -288,7 +293,7 @@ export default function Dashboard() {
 
           {/* Data mode note */}
           <div className="mt-auto text-[10px] text-slate-600 border-t border-slate-700 pt-2">
-            Phase 7 · Copernicus GLO-30 DEM · Real OSM Exposure · Prototype Scorer
+            Phase 8 · Copernicus DEM · NASA GPM IMERG Observed Rain · Real OSM Exposure · Prototype Scorer
           </div>
         </div>
       </div>

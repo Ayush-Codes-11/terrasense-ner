@@ -8,10 +8,20 @@ from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException
 from models.schemas import DataMeta, WeatherResponse
+from services.gpm_loader import get_gpm_provenance_status
 from services.rainfall import get_rainfall_series
 from services.rainfall_accumulator import compute_zone_rolling_rainfall
 
 router = APIRouter(prefix="/weather")
+
+
+@router.get("/status")
+def get_weather_status():
+    """
+    Returns provenance and metadata status of observed precipitation (NASA GPM IMERG)
+    and forecast scenario status.
+    """
+    return get_gpm_provenance_status()
 
 
 @router.get("/{zone_id}", response_model=WeatherResponse)
@@ -55,6 +65,10 @@ def get_zone_weather(zone_id: str):
             "48h": rolling.h48.recent_24h_mm,
             "72h": rolling.h72.recent_24h_mm,
         },
+        observed_provenance=series.observed_provenance,
+        forecast_provenance=series.forecast_provenance,
+        observation_timestamp=series.observation_timestamp,
+        observed_buckets=series.observed_buckets_meta,
         data_meta=DataMeta(
             data_type=series.data_type,
             source=series.source,
@@ -62,3 +76,4 @@ def get_zone_weather(zone_id: str):
             note=series.note,
         ),
     )
+

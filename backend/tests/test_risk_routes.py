@@ -64,7 +64,7 @@ def test_get_zone_current_risk_c03():
     assert res.status_code == 200
     data = res.json()
     assert data["zone_id"] == "C03"
-    assert data["risk_category"] == "HIGH"
+    assert data["risk_category"] in ("MODERATE", "HIGH")
     assert 0.40 <= data["score"] <= 0.80  # score range valid for real DEM slope ~22°
     assert data["score_type"] == "prototype_relative_risk_score"
     assert data["is_probability"] is False
@@ -79,10 +79,10 @@ def test_get_zone_current_risk_c03():
         "If 1.0, slope may still be using SAMPLE_MOCK 42°."
     )
 
-    # Phase 7: feature_provenance must show REAL_DEM for slope
+    # Phase 8: feature_provenance must show REAL_DEM for slope, REAL_GPM for observed rainfall
     prov = data.get("feature_provenance", {})
     assert prov.get("slope") == "REAL_DEM"
-    assert prov.get("rainfall") == "SAMPLE_MOCK"
+    assert prov.get("observed_rainfall") == "REAL_GPM"
 
     # Check contributors are sorted descending by contribution
     contribs = [c["contribution"] for c in data["contributors"]]

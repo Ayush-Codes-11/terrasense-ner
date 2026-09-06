@@ -8,7 +8,7 @@
 // ============================================================
 
 import { useState, useEffect } from "react";
-import type { Zone, ZoneForecast, WhyNowData, ExposureData, PriorityData } from "../types";
+import type { Zone, ZoneForecast, WhyNowData, ExposureData, PriorityData, FeatureFreshness } from "../types";
 import type { ZoneGeoJSONProperties } from "../types/geojson";
 import {
   getZoneForecast,
@@ -99,24 +99,57 @@ export function useZoneDetails(
           (c.display_name && c.display_name.toLowerCase().includes("terrain")) ||
           c.feature.toLowerCase().includes("slope");
 
+        const isRecentRain =
+          c.component === "recent_rainfall" ||
+          (c.display_name && c.display_name.toLowerCase().includes("recent")) ||
+          c.feature.toLowerCase().includes("24h");
+
+        const isAntecedentRain =
+          c.component === "antecedent_rainfall" ||
+          (c.display_name && c.display_name.toLowerCase().includes("antecedent")) ||
+          c.feature.toLowerCase().includes("3d");
+
+        const hasRealGpm =
+          apiZoneRisk.feature_provenance?.observed_rainfall === "REAL_GPM" ||
+          apiZoneRisk.feature_provenance?.rainfall === "REAL_GPM";
+
+        const isObservedRain = (isRecentRain || isAntecedentRain) && hasRealGpm;
+
         const slopeVal =
           apiZoneRisk.slope_deg !== undefined
             ? apiZoneRisk.slope_deg.toFixed(2)
             : "";
 
+        let freshness: FeatureFreshness = "Sample";
+        let description = `Prototype weighted contribution: +${c.contribution.toFixed(4)} (weight: ${c.weight ?? "N/A"})`;
+
+        if (isTerrain) {
+          freshness = "REAL DEM";
+          description = `Terrain slope: ${slopeVal}° mean — real Copernicus GLO-30 DEM`;
+        } else if (isObservedRain) {
+          freshness = "REAL GPM";
+          description = isRecentRain
+            ? `Recent 24h rainfall: observed NASA GPM IMERG Late (~0.1° grid)`
+            : `3-day antecedent rainfall: observed NASA GPM IMERG Late (~0.1° grid)`;
+        }
+
         return {
           feature: c.component ?? c.feature,
-          display_name: isTerrain ? "Terrain slope" : (c.display_name ?? c.feature),
+          display_name: isTerrain
+            ? "Terrain slope"
+            : isRecentRain
+              ? "Recent 24h rainfall (observed)"
+              : isAntecedentRain
+                ? "3-day antecedent rainfall (observed)"
+                : (c.display_name ?? c.feature),
           direction:
             c.contribution > 0.15
               ? "up"
               : c.contribution > 0.05
                 ? "neutral"
                 : "down",
-          description: isTerrain
-            ? `Terrain slope: ${slopeVal}° mean — real Copernicus GLO-30 DEM`
-            : `Prototype weighted contribution: +${c.contribution.toFixed(4)} (weight: ${c.weight ?? "N/A"})`,
-          freshness: isTerrain ? "REAL DEM" : "Sample",
+          description,
+          freshness,
           contribution: c.contribution,
         };
       }),

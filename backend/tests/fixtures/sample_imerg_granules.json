@@ -1,0 +1,48 @@
+{
+  "collection": "GPM_3IMERGDL",
+  "collection_version": "07",
+  "algorithm_generation": "V07",
+  "granule_processing_version": "V07C",
+  "collection_concept_id": "C2723754859-GES_DISC",
+  "source_variable": "precipitation",
+  "source_unit": "mm/day",
+  "native_spatial_resolution_deg": 0.1,
+  "granules": [
+    {
+      "day_index": "d_minus_2",
+      "granule_id": "3B-DAY-L.MS.MRG.3IMERG.20260902-S000000-E235959.V07C.nc4",
+      "window_start_utc": "2026-09-02T00:00:00Z",
+      "window_end_utc": "2026-09-02T23:59:59Z",
+      "cells": [
+        {"lat_center": 23.65, "lon_center": 92.65, "cell_id": "SW", "precipitation_mm_day": 12.5},
+        {"lat_center": 23.65, "lon_center": 92.75, "cell_id": "SE", "precipitation_mm_day": 10.8},
+        {"lat_center": 23.75, "lon_center": 92.65, "cell_id": "NW", "precipitation_mm_day": 14.2},
+        {"lat_center": 23.75, "lon_center": 92.75, "cell_id": "NE", "precipitation_mm_day": 11.6}
+      ]
+    },
+    {
+      "day_index": "d_minus_1",
+      "granule_id": "3B-DAY-L.MS.MRG.3IMERG.20260903-S000000-E235959.V07C.nc4",
+      "window_start_utc": "2026-09-03T00:00:00Z",
+      "window_end_utc": "2026-09-03T23:59:59Z",
+      "cells": [
+        {"lat_center": 23.65, "lon_center": 92.65, "cell_id": "SW", "precipitation_mm_day": 20.1},
+        {"lat_center": 23.65, "lon_center": 92.75, "cell_id": "SE", "precipitation_mm_day": 18.4},
+        {"lat_center": 23.75, "lon_center": 92.65, "cell_id": "NW", "precipitation_mm_day": 22.0},
+        {"lat_center": 23.75, "lon_center": 92.75, "cell_id": "NE", "precipitation_mm_day": 19.8}
+      ]
+    },
+    {
+      "day_index": "d0",
+      "granule_id": "3B-DAY-L.MS.MRG.3IMERG.20260904-S000000-E235959.V07C.nc4",
+      "window_start_utc": "2026-09-04T00:00:00Z",
+      "window_end_utc": "2026-09-04T23:59:59Z",
+      "cells": [
+        {"lat_center": 23.65, "lon_center": 92.65, "cell_id": "SW", "precipitation_mm_day": 34.2},
+        {"lat_center": 23.65, "lon_center": 92.75, "cell_id": "SE", "precipitation_mm_day": 29.5},
+        {"lat_center": 23.75, "lon_center": 92.65, "cell_id": "NW", "precipitation_mm_day": 38.0},
+        {"lat_center": 23.75, "lon_center": 92.75, "cell_id": "NE", "precipitation_mm_day": 32.4}
+      ]
+    }
+  ]
+}

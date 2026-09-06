@@ -64,6 +64,13 @@ export default function TopBar({ districtMeta }: TopBarProps) {
         <div className="h-3 w-px bg-slate-700" />
         <div className="flex items-center gap-1.5">
           <span className="text-[10px] text-slate-400">Rainfall:</span>
+          <span className="text-[10px] font-semibold text-green-400 bg-green-950/60 px-1.5 py-0.5 rounded border border-green-500/30">
+            REAL GPM observed
+          </span>
+        </div>
+        <div className="h-3 w-px bg-slate-700" />
+        <div className="flex items-center gap-1.5">
+          <span className="text-[10px] text-slate-400">Future rain:</span>
           <span className="text-[10px] font-semibold text-amber-400 bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-500/30">
             SAMPLE scenario
           </span>

@@ -51,6 +51,8 @@ def test_backend_bundle_self_contained():
         backend_data / "sample" / "sample_weather.json",
         backend_data / "real" / "terrain" / "zonal_terrain.json",
         backend_data / "real" / "terrain" / "metadata.json",
+        backend_data / "real" / "weather" / "gpm_imerg_observed.json",
+        backend_data / "real" / "weather" / "metadata.json",
         backend_data / "real" / "osm" / "critical_facilities.geojson",
         backend_data / "real" / "osm" / "roads.geojson",
         backend_data / "real" / "osm" / "settlements.geojson",

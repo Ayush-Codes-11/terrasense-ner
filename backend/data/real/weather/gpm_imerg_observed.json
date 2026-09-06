@@ -1,0 +1,1135 @@
+{
+  "metadata": {
+    "collection": "GPM_3IMERGDL",
+    "collection_version": "07",
+    "algorithm_generation": "V07",
+    "granule_processing_version": "V07C",
+    "collection_concept_id": "C2723754859-GES_DISC",
+    "source": "NASA Global Precipitation Measurement (GPM) IMERG Late Run",
+    "product": "NASA GPM IMERG Late Precipitation L3 1 day 0.1\u00b0 V07 (GPM_3IMERGDL)",
+    "source_variable": "precipitation",
+    "source_unit": "mm/day",
+    "observation_duration": "1 complete UTC day per bucket",
+    "native_spatial_resolution_deg": 0.1,
+    "temporal_resolution": "1 day (daily accumulation)",
+    "reference_timestamp_utc": "2026-09-04T23:59:59Z",
+    "retrieved_at_utc": "2026-09-06T14:36:26.951549+00:00",
+    "pilot_district": "Aizawl District, Mizoram, India",
+    "total_zones": 25,
+    "unique_native_cells_count": 4,
+    "native_cells": {
+      "CELL_LAT23.65_LON92.65": {
+        "lat_center": 23.65,
+        "lon_center": 92.65
+      },
+      "CELL_LAT23.65_LON92.75": {
+        "lat_center": 23.65,
+        "lon_center": 92.75
+      },
+      "CELL_LAT23.75_LON92.65": {
+        "lat_center": 23.75,
+        "lon_center": 92.65
+      },
+      "CELL_LAT23.75_LON92.75": {
+        "lat_center": 23.75,
+        "lon_center": 92.75
+      }
+    },
+    "days": {
+      "d_minus_2": "2026-09-02",
+      "d_minus_1": "2026-09-03",
+      "d0": "2026-09-04"
+    },
+    "is_live": false,
+    "attribution": "NASA Global Precipitation Measurement (GPM) Integrated Multi-satellitE Retrievals for GPM (IMERG), archived and distributed by NASA GES DISC.",
+    "notes": "GPM IMERG estimates are satellite-derived precipitation measurements at ~0.1 deg (~10 km) native grid. Values represent recent observed precipitation triggers; future rainfall windows remain scenario-based."
+  },
+  "zones": {
+    "A01": {
+      "zone_id": "A01",
+      "data_type": "REAL_GPM",
+      "is_live": false,
+      "observed_daily_mm": {
+        "d_minus_2": 13.02,
+        "d_minus_1": 20.68,
+        "d0": 35.37
+      },
+      "recent_24h_mm": 35.37,
+      "antecedent_3d_mm": 69.07,
+      "observed_buckets": {
+        "d_minus_2": {
+          "window_start_utc": "2026-09-02T00:00:00Z",
+          "window_end_utc": "2026-09-02T23:59:59Z",
+          "precipitation_mm": 13.02,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d_minus_1": {
+          "window_start_utc": "2026-09-03T00:00:00Z",
+          "window_end_utc": "2026-09-03T23:59:59Z",
+          "precipitation_mm": 20.68,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d0": {
+          "window_start_utc": "2026-09-04T00:00:00Z",
+          "window_end_utc": "2026-09-04T23:59:59Z",
+          "precipitation_mm": 35.37,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day",
+          "semantic_note": "Latest complete UTC-day observation window (numerical mm over 24h)."
+        }
+      },
+      "native_cell_weights": {
+        "CELL_LAT23.65_LON92.65": 0.6933,
+        "CELL_LAT23.75_LON92.65": 0.3067
+      },
+      "dominant_native_cell": "CELL_LAT23.65_LON92.65"
+    },
+    "A02": {
+      "zone_id": "A02",
+      "data_type": "REAL_GPM",
+      "is_live": false,
+      "observed_daily_mm": {
+        "d_minus_2": 11.69,
+        "d_minus_1": 19.43,
+        "d0": 32.02
+      },
+      "recent_24h_mm": 32.02,
+      "antecedent_3d_mm": 63.14,
+      "observed_buckets": {
+        "d_minus_2": {
+          "window_start_utc": "2026-09-02T00:00:00Z",
+          "window_end_utc": "2026-09-02T23:59:59Z",
+          "precipitation_mm": 11.69,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d_minus_1": {
+          "window_start_utc": "2026-09-03T00:00:00Z",
+          "window_end_utc": "2026-09-03T23:59:59Z",
+          "precipitation_mm": 19.43,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d0": {
+          "window_start_utc": "2026-09-04T00:00:00Z",
+          "window_end_utc": "2026-09-04T23:59:59Z",
+          "precipitation_mm": 32.02,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day",
+          "semantic_note": "Latest complete UTC-day observation window (numerical mm over 24h)."
+        }
+      },
+      "native_cell_weights": {
+        "CELL_LAT23.65_LON92.65": 0.2265,
+        "CELL_LAT23.65_LON92.75": 0.4668,
+        "CELL_LAT23.75_LON92.65": 0.1002,
+        "CELL_LAT23.75_LON92.75": 0.2065
+      },
+      "dominant_native_cell": "CELL_LAT23.65_LON92.75"
+    },
+    "A03": {
+      "zone_id": "A03",
+      "data_type": "REAL_GPM",
+      "is_live": false,
+      "observed_daily_mm": {
+        "d_minus_2": 11.05,
+        "d_minus_1": 18.83,
+        "d0": 30.39
+      },
+      "recent_24h_mm": 30.39,
+      "antecedent_3d_mm": 60.27,
+      "observed_buckets": {
+        "d_minus_2": {
+          "window_start_utc": "2026-09-02T00:00:00Z",
+          "window_end_utc": "2026-09-02T23:59:59Z",
+          "precipitation_mm": 11.05,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d_minus_1": {
+          "window_start_utc": "2026-09-03T00:00:00Z",
+          "window_end_utc": "2026-09-03T23:59:59Z",
+          "precipitation_mm": 18.83,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d0": {
+          "window_start_utc": "2026-09-04T00:00:00Z",
+          "window_end_utc": "2026-09-04T23:59:59Z",
+          "precipitation_mm": 30.39,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day",
+          "semantic_note": "Latest complete UTC-day observation window (numerical mm over 24h)."
+        }
+      },
+      "native_cell_weights": {
+        "CELL_LAT23.65_LON92.75": 0.6933,
+        "CELL_LAT23.75_LON92.75": 0.3067
+      },
+      "dominant_native_cell": "CELL_LAT23.65_LON92.75"
+    },
+    "A04": {
+      "zone_id": "A04",
+      "data_type": "REAL_GPM",
+      "is_live": false,
+      "observed_daily_mm": {
+        "d_minus_2": 11.05,
+        "d_minus_1": 18.83,
+        "d0": 30.39
+      },
+      "recent_24h_mm": 30.39,
+      "antecedent_3d_mm": 60.27,
+      "observed_buckets": {
+        "d_minus_2": {
+          "window_start_utc": "2026-09-02T00:00:00Z",
+          "window_end_utc": "2026-09-02T23:59:59Z",
+          "precipitation_mm": 11.05,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d_minus_1": {
+          "window_start_utc": "2026-09-03T00:00:00Z",
+          "window_end_utc": "2026-09-03T23:59:59Z",
+          "precipitation_mm": 18.83,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d0": {
+          "window_start_utc": "2026-09-04T00:00:00Z",
+          "window_end_utc": "2026-09-04T23:59:59Z",
+          "precipitation_mm": 30.39,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day",
+          "semantic_note": "Latest complete UTC-day observation window (numerical mm over 24h)."
+        }
+      },
+      "native_cell_weights": {
+        "CELL_LAT23.65_LON92.75": 0.6933,
+        "CELL_LAT23.75_LON92.75": 0.3067
+      },
+      "dominant_native_cell": "CELL_LAT23.65_LON92.75"
+    },
+    "A05": {
+      "zone_id": "A05",
+      "data_type": "REAL_GPM",
+      "is_live": false,
+      "observed_daily_mm": {
+        "d_minus_2": 11.05,
+        "d_minus_1": 18.83,
+        "d0": 30.39
+      },
+      "recent_24h_mm": 30.39,
+      "antecedent_3d_mm": 60.27,
+      "observed_buckets": {
+        "d_minus_2": {
+          "window_start_utc": "2026-09-02T00:00:00Z",
+          "window_end_utc": "2026-09-02T23:59:59Z",
+          "precipitation_mm": 11.05,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d_minus_1": {
+          "window_start_utc": "2026-09-03T00:00:00Z",
+          "window_end_utc": "2026-09-03T23:59:59Z",
+          "precipitation_mm": 18.83,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d0": {
+          "window_start_utc": "2026-09-04T00:00:00Z",
+          "window_end_utc": "2026-09-04T23:59:59Z",
+          "precipitation_mm": 30.39,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day",
+          "semantic_note": "Latest complete UTC-day observation window (numerical mm over 24h)."
+        }
+      },
+      "native_cell_weights": {
+        "CELL_LAT23.65_LON92.75": 0.6933,
+        "CELL_LAT23.75_LON92.75": 0.3067
+      },
+      "dominant_native_cell": "CELL_LAT23.65_LON92.75"
+    },
+    "B01": {
+      "zone_id": "B01",
+      "data_type": "REAL_GPM",
+      "is_live": false,
+      "observed_daily_mm": {
+        "d_minus_2": 14.2,
+        "d_minus_1": 22.0,
+        "d0": 38.0
+      },
+      "recent_24h_mm": 38.0,
+      "antecedent_3d_mm": 74.2,
+      "observed_buckets": {
+        "d_minus_2": {
+          "window_start_utc": "2026-09-02T00:00:00Z",
+          "window_end_utc": "2026-09-02T23:59:59Z",
+          "precipitation_mm": 14.2,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d_minus_1": {
+          "window_start_utc": "2026-09-03T00:00:00Z",
+          "window_end_utc": "2026-09-03T23:59:59Z",
+          "precipitation_mm": 22.0,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d0": {
+          "window_start_utc": "2026-09-04T00:00:00Z",
+          "window_end_utc": "2026-09-04T23:59:59Z",
+          "precipitation_mm": 38.0,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day",
+          "semantic_note": "Latest complete UTC-day observation window (numerical mm over 24h)."
+        }
+      },
+      "native_cell_weights": {
+        "CELL_LAT23.75_LON92.65": 1.0
+      },
+      "dominant_native_cell": "CELL_LAT23.75_LON92.65"
+    },
+    "B02": {
+      "zone_id": "B02",
+      "data_type": "REAL_GPM",
+      "is_live": false,
+      "observed_daily_mm": {
+        "d_minus_2": 12.45,
+        "d_minus_1": 20.52,
+        "d0": 34.23
+      },
+      "recent_24h_mm": 34.23,
+      "antecedent_3d_mm": 67.2,
+      "observed_buckets": {
+        "d_minus_2": {
+          "window_start_utc": "2026-09-02T00:00:00Z",
+          "window_end_utc": "2026-09-02T23:59:59Z",
+          "precipitation_mm": 12.45,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d_minus_1": {
+          "window_start_utc": "2026-09-03T00:00:00Z",
+          "window_end_utc": "2026-09-03T23:59:59Z",
+          "precipitation_mm": 20.52,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d0": {
+          "window_start_utc": "2026-09-04T00:00:00Z",
+          "window_end_utc": "2026-09-04T23:59:59Z",
+          "precipitation_mm": 34.23,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day",
+          "semantic_note": "Latest complete UTC-day observation window (numerical mm over 24h)."
+        }
+      },
+      "native_cell_weights": {
+        "CELL_LAT23.75_LON92.65": 0.3267,
+        "CELL_LAT23.75_LON92.75": 0.6733
+      },
+      "dominant_native_cell": "CELL_LAT23.75_LON92.75"
+    },
+    "B03": {
+      "zone_id": "B03",
+      "data_type": "REAL_GPM",
+      "is_live": false,
+      "observed_daily_mm": {
+        "d_minus_2": 11.6,
+        "d_minus_1": 19.8,
+        "d0": 32.4
+      },
+      "recent_24h_mm": 32.4,
+      "antecedent_3d_mm": 63.8,
+      "observed_buckets": {
+        "d_minus_2": {
+          "window_start_utc": "2026-09-02T00:00:00Z",
+          "window_end_utc": "2026-09-02T23:59:59Z",
+          "precipitation_mm": 11.6,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d_minus_1": {
+          "window_start_utc": "2026-09-03T00:00:00Z",
+          "window_end_utc": "2026-09-03T23:59:59Z",
+          "precipitation_mm": 19.8,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d0": {
+          "window_start_utc": "2026-09-04T00:00:00Z",
+          "window_end_utc": "2026-09-04T23:59:59Z",
+          "precipitation_mm": 32.4,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day",
+          "semantic_note": "Latest complete UTC-day observation window (numerical mm over 24h)."
+        }
+      },
+      "native_cell_weights": {
+        "CELL_LAT23.75_LON92.75": 1.0
+      },
+      "dominant_native_cell": "CELL_LAT23.75_LON92.75"
+    },
+    "B04": {
+      "zone_id": "B04",
+      "data_type": "REAL_GPM",
+      "is_live": false,
+      "observed_daily_mm": {
+        "d_minus_2": 11.6,
+        "d_minus_1": 19.8,
+        "d0": 32.4
+      },
+      "recent_24h_mm": 32.4,
+      "antecedent_3d_mm": 63.8,
+      "observed_buckets": {
+        "d_minus_2": {
+          "window_start_utc": "2026-09-02T00:00:00Z",
+          "window_end_utc": "2026-09-02T23:59:59Z",
+          "precipitation_mm": 11.6,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d_minus_1": {
+          "window_start_utc": "2026-09-03T00:00:00Z",
+          "window_end_utc": "2026-09-03T23:59:59Z",
+          "precipitation_mm": 19.8,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d0": {
+          "window_start_utc": "2026-09-04T00:00:00Z",
+          "window_end_utc": "2026-09-04T23:59:59Z",
+          "precipitation_mm": 32.4,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day",
+          "semantic_note": "Latest complete UTC-day observation window (numerical mm over 24h)."
+        }
+      },
+      "native_cell_weights": {
+        "CELL_LAT23.75_LON92.75": 1.0
+      },
+      "dominant_native_cell": "CELL_LAT23.75_LON92.75"
+    },
+    "B05": {
+      "zone_id": "B05",
+      "data_type": "REAL_GPM",
+      "is_live": false,
+      "observed_daily_mm": {
+        "d_minus_2": 11.6,
+        "d_minus_1": 19.8,
+        "d0": 32.4
+      },
+      "recent_24h_mm": 32.4,
+      "antecedent_3d_mm": 63.8,
+      "observed_buckets": {
+        "d_minus_2": {
+          "window_start_utc": "2026-09-02T00:00:00Z",
+          "window_end_utc": "2026-09-02T23:59:59Z",
+          "precipitation_mm": 11.6,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d_minus_1": {
+          "window_start_utc": "2026-09-03T00:00:00Z",
+          "window_end_utc": "2026-09-03T23:59:59Z",
+          "precipitation_mm": 19.8,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d0": {
+          "window_start_utc": "2026-09-04T00:00:00Z",
+          "window_end_utc": "2026-09-04T23:59:59Z",
+          "precipitation_mm": 32.4,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day",
+          "semantic_note": "Latest complete UTC-day observation window (numerical mm over 24h)."
+        }
+      },
+      "native_cell_weights": {
+        "CELL_LAT23.75_LON92.75": 1.0
+      },
+      "dominant_native_cell": "CELL_LAT23.75_LON92.75"
+    },
+    "C01": {
+      "zone_id": "C01",
+      "data_type": "REAL_GPM",
+      "is_live": false,
+      "observed_daily_mm": {
+        "d_minus_2": 14.2,
+        "d_minus_1": 22.0,
+        "d0": 38.0
+      },
+      "recent_24h_mm": 38.0,
+      "antecedent_3d_mm": 74.2,
+      "observed_buckets": {
+        "d_minus_2": {
+          "window_start_utc": "2026-09-02T00:00:00Z",
+          "window_end_utc": "2026-09-02T23:59:59Z",
+          "precipitation_mm": 14.2,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d_minus_1": {
+          "window_start_utc": "2026-09-03T00:00:00Z",
+          "window_end_utc": "2026-09-03T23:59:59Z",
+          "precipitation_mm": 22.0,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d0": {
+          "window_start_utc": "2026-09-04T00:00:00Z",
+          "window_end_utc": "2026-09-04T23:59:59Z",
+          "precipitation_mm": 38.0,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day",
+          "semantic_note": "Latest complete UTC-day observation window (numerical mm over 24h)."
+        }
+      },
+      "native_cell_weights": {
+        "CELL_LAT23.75_LON92.65": 1.0
+      },
+      "dominant_native_cell": "CELL_LAT23.75_LON92.65"
+    },
+    "C02": {
+      "zone_id": "C02",
+      "data_type": "REAL_GPM",
+      "is_live": false,
+      "observed_daily_mm": {
+        "d_minus_2": 12.45,
+        "d_minus_1": 20.52,
+        "d0": 34.23
+      },
+      "recent_24h_mm": 34.23,
+      "antecedent_3d_mm": 67.2,
+      "observed_buckets": {
+        "d_minus_2": {
+          "window_start_utc": "2026-09-02T00:00:00Z",
+          "window_end_utc": "2026-09-02T23:59:59Z",
+          "precipitation_mm": 12.45,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d_minus_1": {
+          "window_start_utc": "2026-09-03T00:00:00Z",
+          "window_end_utc": "2026-09-03T23:59:59Z",
+          "precipitation_mm": 20.52,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d0": {
+          "window_start_utc": "2026-09-04T00:00:00Z",
+          "window_end_utc": "2026-09-04T23:59:59Z",
+          "precipitation_mm": 34.23,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day",
+          "semantic_note": "Latest complete UTC-day observation window (numerical mm over 24h)."
+        }
+      },
+      "native_cell_weights": {
+        "CELL_LAT23.75_LON92.65": 0.3267,
+        "CELL_LAT23.75_LON92.75": 0.6733
+      },
+      "dominant_native_cell": "CELL_LAT23.75_LON92.75"
+    },
+    "C03": {
+      "zone_id": "C03",
+      "data_type": "REAL_GPM",
+      "is_live": false,
+      "observed_daily_mm": {
+        "d_minus_2": 11.6,
+        "d_minus_1": 19.8,
+        "d0": 32.4
+      },
+      "recent_24h_mm": 32.4,
+      "antecedent_3d_mm": 63.8,
+      "observed_buckets": {
+        "d_minus_2": {
+          "window_start_utc": "2026-09-02T00:00:00Z",
+          "window_end_utc": "2026-09-02T23:59:59Z",
+          "precipitation_mm": 11.6,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d_minus_1": {
+          "window_start_utc": "2026-09-03T00:00:00Z",
+          "window_end_utc": "2026-09-03T23:59:59Z",
+          "precipitation_mm": 19.8,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d0": {
+          "window_start_utc": "2026-09-04T00:00:00Z",
+          "window_end_utc": "2026-09-04T23:59:59Z",
+          "precipitation_mm": 32.4,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day",
+          "semantic_note": "Latest complete UTC-day observation window (numerical mm over 24h)."
+        }
+      },
+      "native_cell_weights": {
+        "CELL_LAT23.75_LON92.75": 1.0
+      },
+      "dominant_native_cell": "CELL_LAT23.75_LON92.75"
+    },
+    "C04": {
+      "zone_id": "C04",
+      "data_type": "REAL_GPM",
+      "is_live": false,
+      "observed_daily_mm": {
+        "d_minus_2": 11.6,
+        "d_minus_1": 19.8,
+        "d0": 32.4
+      },
+      "recent_24h_mm": 32.4,
+      "antecedent_3d_mm": 63.8,
+      "observed_buckets": {
+        "d_minus_2": {
+          "window_start_utc": "2026-09-02T00:00:00Z",
+          "window_end_utc": "2026-09-02T23:59:59Z",
+          "precipitation_mm": 11.6,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d_minus_1": {
+          "window_start_utc": "2026-09-03T00:00:00Z",
+          "window_end_utc": "2026-09-03T23:59:59Z",
+          "precipitation_mm": 19.8,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d0": {
+          "window_start_utc": "2026-09-04T00:00:00Z",
+          "window_end_utc": "2026-09-04T23:59:59Z",
+          "precipitation_mm": 32.4,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day",
+          "semantic_note": "Latest complete UTC-day observation window (numerical mm over 24h)."
+        }
+      },
+      "native_cell_weights": {
+        "CELL_LAT23.75_LON92.75": 1.0
+      },
+      "dominant_native_cell": "CELL_LAT23.75_LON92.75"
+    },
+    "C05": {
+      "zone_id": "C05",
+      "data_type": "REAL_GPM",
+      "is_live": false,
+      "observed_daily_mm": {
+        "d_minus_2": 11.6,
+        "d_minus_1": 19.8,
+        "d0": 32.4
+      },
+      "recent_24h_mm": 32.4,
+      "antecedent_3d_mm": 63.8,
+      "observed_buckets": {
+        "d_minus_2": {
+          "window_start_utc": "2026-09-02T00:00:00Z",
+          "window_end_utc": "2026-09-02T23:59:59Z",
+          "precipitation_mm": 11.6,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d_minus_1": {
+          "window_start_utc": "2026-09-03T00:00:00Z",
+          "window_end_utc": "2026-09-03T23:59:59Z",
+          "precipitation_mm": 19.8,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d0": {
+          "window_start_utc": "2026-09-04T00:00:00Z",
+          "window_end_utc": "2026-09-04T23:59:59Z",
+          "precipitation_mm": 32.4,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day",
+          "semantic_note": "Latest complete UTC-day observation window (numerical mm over 24h)."
+        }
+      },
+      "native_cell_weights": {
+        "CELL_LAT23.75_LON92.75": 1.0
+      },
+      "dominant_native_cell": "CELL_LAT23.75_LON92.75"
+    },
+    "D01": {
+      "zone_id": "D01",
+      "data_type": "REAL_GPM",
+      "is_live": false,
+      "observed_daily_mm": {
+        "d_minus_2": 14.2,
+        "d_minus_1": 22.0,
+        "d0": 38.0
+      },
+      "recent_24h_mm": 38.0,
+      "antecedent_3d_mm": 74.2,
+      "observed_buckets": {
+        "d_minus_2": {
+          "window_start_utc": "2026-09-02T00:00:00Z",
+          "window_end_utc": "2026-09-02T23:59:59Z",
+          "precipitation_mm": 14.2,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d_minus_1": {
+          "window_start_utc": "2026-09-03T00:00:00Z",
+          "window_end_utc": "2026-09-03T23:59:59Z",
+          "precipitation_mm": 22.0,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d0": {
+          "window_start_utc": "2026-09-04T00:00:00Z",
+          "window_end_utc": "2026-09-04T23:59:59Z",
+          "precipitation_mm": 38.0,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day",
+          "semantic_note": "Latest complete UTC-day observation window (numerical mm over 24h)."
+        }
+      },
+      "native_cell_weights": {
+        "CELL_LAT23.75_LON92.65": 1.0
+      },
+      "dominant_native_cell": "CELL_LAT23.75_LON92.65"
+    },
+    "D02": {
+      "zone_id": "D02",
+      "data_type": "REAL_GPM",
+      "is_live": false,
+      "observed_daily_mm": {
+        "d_minus_2": 12.45,
+        "d_minus_1": 20.52,
+        "d0": 34.23
+      },
+      "recent_24h_mm": 34.23,
+      "antecedent_3d_mm": 67.2,
+      "observed_buckets": {
+        "d_minus_2": {
+          "window_start_utc": "2026-09-02T00:00:00Z",
+          "window_end_utc": "2026-09-02T23:59:59Z",
+          "precipitation_mm": 12.45,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d_minus_1": {
+          "window_start_utc": "2026-09-03T00:00:00Z",
+          "window_end_utc": "2026-09-03T23:59:59Z",
+          "precipitation_mm": 20.52,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d0": {
+          "window_start_utc": "2026-09-04T00:00:00Z",
+          "window_end_utc": "2026-09-04T23:59:59Z",
+          "precipitation_mm": 34.23,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day",
+          "semantic_note": "Latest complete UTC-day observation window (numerical mm over 24h)."
+        }
+      },
+      "native_cell_weights": {
+        "CELL_LAT23.75_LON92.65": 0.3267,
+        "CELL_LAT23.75_LON92.75": 0.6733
+      },
+      "dominant_native_cell": "CELL_LAT23.75_LON92.75"
+    },
+    "D03": {
+      "zone_id": "D03",
+      "data_type": "REAL_GPM",
+      "is_live": false,
+      "observed_daily_mm": {
+        "d_minus_2": 11.6,
+        "d_minus_1": 19.8,
+        "d0": 32.4
+      },
+      "recent_24h_mm": 32.4,
+      "antecedent_3d_mm": 63.8,
+      "observed_buckets": {
+        "d_minus_2": {
+          "window_start_utc": "2026-09-02T00:00:00Z",
+          "window_end_utc": "2026-09-02T23:59:59Z",
+          "precipitation_mm": 11.6,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d_minus_1": {
+          "window_start_utc": "2026-09-03T00:00:00Z",
+          "window_end_utc": "2026-09-03T23:59:59Z",
+          "precipitation_mm": 19.8,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d0": {
+          "window_start_utc": "2026-09-04T00:00:00Z",
+          "window_end_utc": "2026-09-04T23:59:59Z",
+          "precipitation_mm": 32.4,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day",
+          "semantic_note": "Latest complete UTC-day observation window (numerical mm over 24h)."
+        }
+      },
+      "native_cell_weights": {
+        "CELL_LAT23.75_LON92.75": 1.0
+      },
+      "dominant_native_cell": "CELL_LAT23.75_LON92.75"
+    },
+    "D04": {
+      "zone_id": "D04",
+      "data_type": "REAL_GPM",
+      "is_live": false,
+      "observed_daily_mm": {
+        "d_minus_2": 11.6,
+        "d_minus_1": 19.8,
+        "d0": 32.4
+      },
+      "recent_24h_mm": 32.4,
+      "antecedent_3d_mm": 63.8,
+      "observed_buckets": {
+        "d_minus_2": {
+          "window_start_utc": "2026-09-02T00:00:00Z",
+          "window_end_utc": "2026-09-02T23:59:59Z",
+          "precipitation_mm": 11.6,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d_minus_1": {
+          "window_start_utc": "2026-09-03T00:00:00Z",
+          "window_end_utc": "2026-09-03T23:59:59Z",
+          "precipitation_mm": 19.8,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d0": {
+          "window_start_utc": "2026-09-04T00:00:00Z",
+          "window_end_utc": "2026-09-04T23:59:59Z",
+          "precipitation_mm": 32.4,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day",
+          "semantic_note": "Latest complete UTC-day observation window (numerical mm over 24h)."
+        }
+      },
+      "native_cell_weights": {
+        "CELL_LAT23.75_LON92.75": 1.0
+      },
+      "dominant_native_cell": "CELL_LAT23.75_LON92.75"
+    },
+    "D05": {
+      "zone_id": "D05",
+      "data_type": "REAL_GPM",
+      "is_live": false,
+      "observed_daily_mm": {
+        "d_minus_2": 11.6,
+        "d_minus_1": 19.8,
+        "d0": 32.4
+      },
+      "recent_24h_mm": 32.4,
+      "antecedent_3d_mm": 63.8,
+      "observed_buckets": {
+        "d_minus_2": {
+          "window_start_utc": "2026-09-02T00:00:00Z",
+          "window_end_utc": "2026-09-02T23:59:59Z",
+          "precipitation_mm": 11.6,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d_minus_1": {
+          "window_start_utc": "2026-09-03T00:00:00Z",
+          "window_end_utc": "2026-09-03T23:59:59Z",
+          "precipitation_mm": 19.8,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d0": {
+          "window_start_utc": "2026-09-04T00:00:00Z",
+          "window_end_utc": "2026-09-04T23:59:59Z",
+          "precipitation_mm": 32.4,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day",
+          "semantic_note": "Latest complete UTC-day observation window (numerical mm over 24h)."
+        }
+      },
+      "native_cell_weights": {
+        "CELL_LAT23.75_LON92.75": 1.0
+      },
+      "dominant_native_cell": "CELL_LAT23.75_LON92.75"
+    },
+    "E01": {
+      "zone_id": "E01",
+      "data_type": "REAL_GPM",
+      "is_live": false,
+      "observed_daily_mm": {
+        "d_minus_2": 14.2,
+        "d_minus_1": 22.0,
+        "d0": 38.0
+      },
+      "recent_24h_mm": 38.0,
+      "antecedent_3d_mm": 74.2,
+      "observed_buckets": {
+        "d_minus_2": {
+          "window_start_utc": "2026-09-02T00:00:00Z",
+          "window_end_utc": "2026-09-02T23:59:59Z",
+          "precipitation_mm": 14.2,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d_minus_1": {
+          "window_start_utc": "2026-09-03T00:00:00Z",
+          "window_end_utc": "2026-09-03T23:59:59Z",
+          "precipitation_mm": 22.0,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d0": {
+          "window_start_utc": "2026-09-04T00:00:00Z",
+          "window_end_utc": "2026-09-04T23:59:59Z",
+          "precipitation_mm": 38.0,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day",
+          "semantic_note": "Latest complete UTC-day observation window (numerical mm over 24h)."
+        }
+      },
+      "native_cell_weights": {
+        "CELL_LAT23.75_LON92.65": 1.0
+      },
+      "dominant_native_cell": "CELL_LAT23.75_LON92.65"
+    },
+    "E02": {
+      "zone_id": "E02",
+      "data_type": "REAL_GPM",
+      "is_live": false,
+      "observed_daily_mm": {
+        "d_minus_2": 12.45,
+        "d_minus_1": 20.52,
+        "d0": 34.23
+      },
+      "recent_24h_mm": 34.23,
+      "antecedent_3d_mm": 67.2,
+      "observed_buckets": {
+        "d_minus_2": {
+          "window_start_utc": "2026-09-02T00:00:00Z",
+          "window_end_utc": "2026-09-02T23:59:59Z",
+          "precipitation_mm": 12.45,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d_minus_1": {
+          "window_start_utc": "2026-09-03T00:00:00Z",
+          "window_end_utc": "2026-09-03T23:59:59Z",
+          "precipitation_mm": 20.52,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d0": {
+          "window_start_utc": "2026-09-04T00:00:00Z",
+          "window_end_utc": "2026-09-04T23:59:59Z",
+          "precipitation_mm": 34.23,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day",
+          "semantic_note": "Latest complete UTC-day observation window (numerical mm over 24h)."
+        }
+      },
+      "native_cell_weights": {
+        "CELL_LAT23.75_LON92.65": 0.3267,
+        "CELL_LAT23.75_LON92.75": 0.6733
+      },
+      "dominant_native_cell": "CELL_LAT23.75_LON92.75"
+    },
+    "E03": {
+      "zone_id": "E03",
+      "data_type": "REAL_GPM",
+      "is_live": false,
+      "observed_daily_mm": {
+        "d_minus_2": 11.6,
+        "d_minus_1": 19.8,
+        "d0": 32.4
+      },
+      "recent_24h_mm": 32.4,
+      "antecedent_3d_mm": 63.8,
+      "observed_buckets": {
+        "d_minus_2": {
+          "window_start_utc": "2026-09-02T00:00:00Z",
+          "window_end_utc": "2026-09-02T23:59:59Z",
+          "precipitation_mm": 11.6,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d_minus_1": {
+          "window_start_utc": "2026-09-03T00:00:00Z",
+          "window_end_utc": "2026-09-03T23:59:59Z",
+          "precipitation_mm": 19.8,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d0": {
+          "window_start_utc": "2026-09-04T00:00:00Z",
+          "window_end_utc": "2026-09-04T23:59:59Z",
+          "precipitation_mm": 32.4,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day",
+          "semantic_note": "Latest complete UTC-day observation window (numerical mm over 24h)."
+        }
+      },
+      "native_cell_weights": {
+        "CELL_LAT23.75_LON92.75": 1.0
+      },
+      "dominant_native_cell": "CELL_LAT23.75_LON92.75"
+    },
+    "E04": {
+      "zone_id": "E04",
+      "data_type": "REAL_GPM",
+      "is_live": false,
+      "observed_daily_mm": {
+        "d_minus_2": 11.6,
+        "d_minus_1": 19.8,
+        "d0": 32.4
+      },
+      "recent_24h_mm": 32.4,
+      "antecedent_3d_mm": 63.8,
+      "observed_buckets": {
+        "d_minus_2": {
+          "window_start_utc": "2026-09-02T00:00:00Z",
+          "window_end_utc": "2026-09-02T23:59:59Z",
+          "precipitation_mm": 11.6,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d_minus_1": {
+          "window_start_utc": "2026-09-03T00:00:00Z",
+          "window_end_utc": "2026-09-03T23:59:59Z",
+          "precipitation_mm": 19.8,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d0": {
+          "window_start_utc": "2026-09-04T00:00:00Z",
+          "window_end_utc": "2026-09-04T23:59:59Z",
+          "precipitation_mm": 32.4,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day",
+          "semantic_note": "Latest complete UTC-day observation window (numerical mm over 24h)."
+        }
+      },
+      "native_cell_weights": {
+        "CELL_LAT23.75_LON92.75": 1.0
+      },
+      "dominant_native_cell": "CELL_LAT23.75_LON92.75"
+    },
+    "E05": {
+      "zone_id": "E05",
+      "data_type": "REAL_GPM",
+      "is_live": false,
+      "observed_daily_mm": {
+        "d_minus_2": 11.6,
+        "d_minus_1": 19.8,
+        "d0": 32.4
+      },
+      "recent_24h_mm": 32.4,
+      "antecedent_3d_mm": 63.8,
+      "observed_buckets": {
+        "d_minus_2": {
+          "window_start_utc": "2026-09-02T00:00:00Z",
+          "window_end_utc": "2026-09-02T23:59:59Z",
+          "precipitation_mm": 11.6,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d_minus_1": {
+          "window_start_utc": "2026-09-03T00:00:00Z",
+          "window_end_utc": "2026-09-03T23:59:59Z",
+          "precipitation_mm": 19.8,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day"
+        },
+        "d0": {
+          "window_start_utc": "2026-09-04T00:00:00Z",
+          "window_end_utc": "2026-09-04T23:59:59Z",
+          "precipitation_mm": 32.4,
+          "source_variable": "precipitation",
+          "source_unit": "mm/day",
+          "observation_duration": "1 complete UTC day",
+          "semantic_note": "Latest complete UTC-day observation window (numerical mm over 24h)."
+        }
+      },
+      "native_cell_weights": {
+        "CELL_LAT23.75_LON92.75": 1.0
+      },
+      "dominant_native_cell": "CELL_LAT23.75_LON92.75"
+    }
+  }
+}

@@ -71,6 +71,10 @@ export interface RainfallForecast {
 export interface WeatherData extends RainfallWindow, RainfallForecast {
   zone_id: string;
   data_meta: DataMeta;
+  observed_provenance?: string;
+  forecast_provenance?: string;
+  observation_timestamp?: string | null;
+  observed_buckets?: Record<string, any> | null;
 }
 
 // ----- Risk Forecast (weather-linked antecedent-aware outlook) -----
@@ -234,7 +238,7 @@ export interface PriorityData {
 // ----- Why Now (feature attribution) -----
 
 export type FeatureDirection = "up" | "down" | "neutral";
-export type FeatureFreshness = "Real" | "REAL DEM" | "Sample" | "Static" | "Unavailable";
+export type FeatureFreshness = "Real" | "REAL DEM" | "REAL GPM" | "Sample" | "Static" | "Unavailable";
 
 export interface FeatureDriver {
   feature: string;

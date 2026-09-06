@@ -139,26 +139,47 @@ export async function getZoneForecast(zoneId: string): Promise<ZoneForecast> {
 export async function getZoneWeather(zoneId: string): Promise<WeatherData> {
   const w = await apiFetch<{
     zone_id: string;
-    rain_24h_mm: number;
-    rain_3d_mm: number;
-    rain_7d_mm: number;
-    forecast_24h_mm: number;
-    forecast_48h_mm: number;
-    forecast_72h_mm: number;
+    observed_daily_mm?: { d_minus_2: number; d_minus_1: number; d0: number };
+    forecast_interval_mm?: { "0_24h": number; "24_48h": number; "48_72h": number };
+    rolling_3d_accumulation_mm?: { now: number; "24h": number; "48h": number; "72h": number };
+    recent_24h_mm?: { now: number; "24h": number; "48h": number; "72h": number };
+    rain_24h_mm?: number;
+    rain_3d_mm?: number;
+    forecast_24h_mm?: number;
+    forecast_48h_mm?: number;
+    forecast_72h_mm?: number;
+    observed_provenance?: string;
+    forecast_provenance?: string;
+    observation_timestamp?: string | null;
+    observed_buckets?: Record<string, any> | null;
     data_meta: WeatherData["data_meta"];
   }>(`/weather/${encodeURIComponent(zoneId)}`);
+
+  const rain24 = w.recent_24h_mm?.now ?? w.observed_daily_mm?.d0 ?? w.rain_24h_mm ?? 0;
+  const rain3d = w.rolling_3d_accumulation_mm?.now ?? w.rain_3d_mm ?? 0;
+  const f24 = w.forecast_interval_mm?.["0_24h"] ?? w.forecast_24h_mm ?? 0;
+  const f48 = w.forecast_interval_mm?.["24_48h"] ?? w.forecast_48h_mm ?? 0;
+  const f72 = w.forecast_interval_mm?.["48_72h"] ?? w.forecast_72h_mm ?? 0;
 
   return {
     zone_id: w.zone_id,
     rain_1h_mm: null,
     rain_6h_mm: null,
-    rain_24h_mm: w.rain_24h_mm,
-    rain_3d_mm: w.rain_3d_mm,
-    forecast_0_24h_mm: w.forecast_24h_mm,
-    forecast_24_48h_mm: w.forecast_48h_mm,
-    forecast_48_72h_mm: w.forecast_72h_mm,
+    rain_24h_mm: rain24,
+    rain_3d_mm: rain3d,
+    forecast_0_24h_mm: f24,
+    forecast_24_48h_mm: f48,
+    forecast_48_72h_mm: f72,
+    observed_provenance: w.observed_provenance,
+    forecast_provenance: w.forecast_provenance,
+    observation_timestamp: w.observation_timestamp,
+    observed_buckets: w.observed_buckets,
     data_meta: w.data_meta,
   };
+}
+
+export async function getWeatherStatus(): Promise<Record<string, any>> {
+  return apiFetch<Record<string, any>>("/weather/status");
 }
 
 // ── District meta (Phase 5+) ──────────────────────────────────────────────────

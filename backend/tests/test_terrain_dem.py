@@ -236,7 +236,7 @@ def test_risk_current_c03_has_provenance(test_client):
     assert prov is not None, "feature_provenance missing from /risk/current/C03"
     assert prov.get("slope") == "REAL_DEM"
     assert prov.get("elevation") == "REAL_DEM"
-    assert prov.get("rainfall") == "SAMPLE_MOCK"
+    assert prov.get("observed_rainfall") == "REAL_GPM"
     assert prov.get("soil_wetness") == "SAMPLE_MOCK"
     # Slope reported should be ~22°, not 42°
     assert data.get("slope", 100) < 40, f"Expected real slope ~22°, got {data.get('slope')}"
@@ -253,7 +253,8 @@ def test_risk_forecast_c03_has_provenance(test_client):
     assert prov is not None, "feature_provenance missing from /risk/forecast/C03"
     assert prov.get("slope") == "REAL_DEM"
     assert prov.get("elevation") == "REAL_DEM"
-    assert prov.get("rainfall") == "SAMPLE_MOCK"
+    assert prov.get("observed_rainfall") == "REAL_GPM"
+    assert prov.get("forecast_rainfall") == "SAMPLE_MOCK"
     assert prov.get("soil_wetness") == "SAMPLE_MOCK"
 
 

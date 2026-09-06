@@ -82,12 +82,17 @@ def compute_zone_risk(zone_props: Dict[str, Any]) -> RiskResult:
             elevation_m=elevation,
         )
 
+        obs_rain_prov = zone_props.get("observed_rainfall_provenance", "SAMPLE_MOCK")
+        fcst_rain_prov = zone_props.get("forecast_rainfall_provenance", "SAMPLE_MOCK")
+
         # Attach feature provenance so routes can expose it
         result.feature_provenance = {
             "slope": slope_provenance,
             "elevation": elev_provenance,
-            "rainfall": "SAMPLE_MOCK",
+            "observed_rainfall": obs_rain_prov,
+            "forecast_rainfall": fcst_rain_prov,
             "soil_wetness": "SAMPLE_MOCK",
+            "rainfall": obs_rain_prov,
         }
         result.used_slope_deg = slope
         result.used_elevation_m = elevation
