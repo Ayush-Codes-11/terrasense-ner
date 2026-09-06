@@ -165,7 +165,7 @@ export function propsToWhyNow(props: ZoneGeoJSONProperties): WhyNowData {
       display_name: "Terrain slope angle",
       direction: "up",
       description: `${props.slope}° — steep terrain`,
-      freshness: "Static",
+      freshness: "REAL DEM",
     });
   } else if (props.slope > 20) {
     drivers.push({
@@ -173,7 +173,7 @@ export function propsToWhyNow(props: ZoneGeoJSONProperties): WhyNowData {
       display_name: "Terrain slope angle",
       direction: "neutral",
       description: `${props.slope}° — moderate gradient`,
-      freshness: "Static",
+      freshness: "REAL DEM",
     });
   } else {
     drivers.push({
@@ -181,7 +181,7 @@ export function propsToWhyNow(props: ZoneGeoJSONProperties): WhyNowData {
       display_name: "Terrain slope angle",
       direction: "down",
       description: `${props.slope}° — gentle terrain`,
-      freshness: "Static",
+      freshness: "REAL DEM",
     });
   }
 

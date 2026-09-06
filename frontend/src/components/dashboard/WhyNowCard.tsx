@@ -40,19 +40,25 @@ const FRESHNESS_CLASSES: Record<string, string> = {
 
 export default function WhyNowCard({ whyNow, zoneId }: WhyNowCardProps) {
   const isPlaceholder = !whyNow;
+  const isMixed = whyNow?.drivers?.some(d => d.freshness.includes("REAL")) && whyNow?.drivers?.some(d => d.freshness.includes("Sample") || d.freshness.includes("SAMPLE"));
+
   const modelLabel =
     whyNow?.model_type === "xgboost"
       ? "XGBoost + SHAP"
-      : whyNow?.model_type === "prototype"
-        ? "Prototype Weighted Scorer"
-        : "Sample Scenario Drivers";
+      : isMixed
+        ? "Mixed Provenance"
+        : whyNow?.model_type === "prototype"
+          ? "Prototype Weighted Scorer"
+          : "Sample Scenario Drivers";
 
   const modelFooter =
     whyNow?.model_type === "xgboost"
       ? "SHAP value attribution from XGBoost model. No accuracy claims are made."
-      : whyNow?.model_type === "prototype"
-        ? "Transparent prototype feature contributions. Not a calibrated probability model."
-        : "Illustrative drivers from SAMPLE_MOCK scenario data. Risk engine connected in Phase 4.";
+      : isMixed
+        ? "Risk drivers combine real terrain data with prototype rainfall and soil inputs."
+        : whyNow?.model_type === "prototype"
+          ? "Transparent prototype feature contributions. Not a calibrated probability model."
+          : "Illustrative drivers from SAMPLE_MOCK scenario data. Risk engine connected in Phase 4.";
 
   return (
     <div className="card p-4 flex flex-col gap-3">
