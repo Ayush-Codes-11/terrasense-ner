@@ -54,18 +54,16 @@ export default function TopBar({ districtMeta, lastUpdated, isOffline }: TopBarP
         </div>
       </div>
 
-      {/* Right: Timestamp */}
+      {/* Right: Timestamp — sourced from weather/status retrieved_at_utc (GPM ingestion time) */}
       <div className="flex items-center gap-3">
         <div className="hidden md:block text-right">
           <div className="text-[9px] text-slate-500 uppercase tracking-widest">
-            {isOffline ? "Last valid update" : "Last updated"}
+            {isOffline ? "Last valid update" : "Data ingested"}
           </div>
           <div className="text-[11px] text-slate-400 font-mono">
             {lastUpdated
               ? formatDateTime(lastUpdated)
-              : districtMeta?.last_updated
-                ? formatDateTime(districtMeta.last_updated)
-                : "—"}
+              : "Not available"}
           </div>
         </div>
       </div>

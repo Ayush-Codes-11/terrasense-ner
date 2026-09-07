@@ -141,6 +141,8 @@ interface RiskMapProps {
   onZoneSelect: (props: ZoneGeoJSONProperties) => void;
   zoneRisks?: Map<string, Zone> | null;
   isRiskFallback?: boolean;
+  /** True when API is reachable but returning SAMPLE/fixture data (not real observations) */
+  isDataSample?: boolean;
   reports?: any[];
   className?: string;
 }
@@ -153,6 +155,7 @@ export default function RiskMap({
   onZoneSelect,
   zoneRisks,
   isRiskFallback = false,
+  isDataSample = true,
   reports = [],
   className = "",
 }: RiskMapProps) {
@@ -221,14 +224,22 @@ export default function RiskMap({
   return (
     <div className={className || "relative w-full h-full"}>
       {isRiskFallback ? (
+        // API unreachable — serving local GeoJSON fallback
         <div className="absolute top-2 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-amber-500/40 text-[10px] text-amber-400 font-medium pointer-events-none">
           <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-          Sample fallback · backend offline
+          Offline · Local Fallback
+        </div>
+      ) : isDataSample ? (
+        // API reachable but data_mode = SAMPLE_MOCK
+        <div className="absolute top-2 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-sky-500/40 text-[10px] text-sky-400 font-medium pointer-events-none">
+          <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
+          API Connected · Sample Scenario
         </div>
       ) : (
+        // API reachable and data_mode = real/live
         <div className="absolute top-2 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-green-500/40 text-[10px] text-green-400 font-medium pointer-events-none">
           <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
-          Aizawl Pilot · Prototype Risk Grid
+          Backend Reachable · Real Dynamic Data
         </div>
       )}
 
