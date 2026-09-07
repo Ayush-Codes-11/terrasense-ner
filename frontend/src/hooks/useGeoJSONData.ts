@@ -2,6 +2,9 @@
 // useGeoJSONData — loads hazard grid and infrastructure layers
 // Phase 6: loads real OSM layers from backend /geodata/osm/*
 // with automatic fallback to public /data/sample/*.geojson
+// Updated: /zones from FastAPI backend is primary source for risk grid,
+// with /data/sample/grid-risk.geojson as fallback.
+// Validates 25-feature FeatureCollection and exposes explicit error if both fail.
 // ============================================================
 
 import { useState, useEffect } from "react";
@@ -19,12 +22,24 @@ export interface GeoJSONData {
 }
 
 const SAMPLE_BASE = "/data/sample";
-const API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "http://localhost:8000";
+const API_BASE = (
+  (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "http://localhost:8000"
+).replace(/\/+$/, "");
 
 async function fetchJSON<T>(url: string): Promise<T> {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`HTTP ${res.status} fetching ${url}`);
   return res.json() as Promise<T>;
+}
+
+function isValidRiskGrid(data: unknown): data is FeatureCollection {
+  if (!data || typeof data !== "object") return false;
+  const fc = data as Record<string, unknown>;
+  return (
+    fc.type === "FeatureCollection" &&
+    Array.isArray(fc.features) &&
+    fc.features.length === 25
+  );
 }
 
 export function useGeoJSONData(): GeoJSONData {
@@ -43,12 +58,36 @@ export function useGeoJSONData(): GeoJSONData {
     let cancelled = false;
 
     async function loadAll() {
-      // 1. Always load hazard grid from local sample geometry
+      // 1. Load hazard grid: /zones (primary) -> /data/sample/grid-risk.geojson (fallback)
       let gridRisk: FeatureCollection | null = null;
+      let gridError: string | null = null;
+
       try {
-        gridRisk = await fetchJSON<FeatureCollection>(`${SAMPLE_BASE}/grid-risk.geojson`);
-      } catch (e) {
-        console.warn("Could not load grid-risk.geojson", e);
+        const backendZones = await fetchJSON<unknown>(`${API_BASE}/zones`);
+        if (isValidRiskGrid(backendZones)) {
+          gridRisk = backendZones;
+        } else {
+          console.warn("Backend /zones did not return a valid 25-feature FeatureCollection");
+        }
+      } catch (err) {
+        console.warn("Failed to fetch risk grid from backend /zones, attempting fallback", err);
+      }
+
+      if (!gridRisk) {
+        try {
+          const sampleGrid = await fetchJSON<unknown>(`${SAMPLE_BASE}/grid-risk.geojson`);
+          if (isValidRiskGrid(sampleGrid)) {
+            gridRisk = sampleGrid;
+          } else {
+            console.warn("Fallback /data/sample/grid-risk.geojson is not a valid 25-feature FeatureCollection");
+          }
+        } catch (err) {
+          console.warn("Failed to fetch fallback /data/sample/grid-risk.geojson", err);
+        }
+      }
+
+      if (!gridRisk) {
+        gridError = "Failed to load risk grid (both backend /zones and fallback /data/sample/grid-risk.geojson failed)";
       }
 
       // 2. Try loading real OSM layers from backend
@@ -74,7 +113,7 @@ export function useGeoJSONData(): GeoJSONData {
             villages: settlementsFc,
             hospitals: facilitiesFc,
             loading: false,
-            error: null,
+            error: gridError,
             osmStatus: statusVal,
             isRealOsm: statusRes.is_real,
           });
@@ -99,17 +138,21 @@ export function useGeoJSONData(): GeoJSONData {
             villages: sampleVillages,
             hospitals: sampleHospitals,
             loading: false,
-            error: null,
+            error: gridError,
             osmStatus: "Sample fallback",
             isRealOsm: false,
           });
         }
       } catch (err: unknown) {
         if (!cancelled) {
+          const combinedError = gridError
+            ? `${gridError} | Failed to load sample layers: ${String(err)}`
+            : String(err);
           setState((prev) => ({
             ...prev,
+            gridRisk,
             loading: false,
-            error: String(err),
+            error: combinedError,
           }));
         }
       }

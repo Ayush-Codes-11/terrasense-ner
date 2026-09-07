@@ -6,13 +6,12 @@
 // Replaces MapPlaceholder. Do not import MapPlaceholder here.
 // ============================================================
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import {
   MapContainer,
   TileLayer,
   GeoJSON,
   CircleMarker,
-  Polyline,
   Popup,
   LayersControl,
   useMap,
@@ -34,6 +33,9 @@ import { RISK_COLORS } from "../../utils/risk";
 function MapResizeFix() {
   const map = useMap();
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      (window as any).__leaflet_map = map;
+    }
     requestAnimationFrame(() => {
       map.invalidateSize();
     });
@@ -158,6 +160,16 @@ export default function RiskMap({
 }: RiskMapProps) {
   const { gridRisk, roads, villages, hospitals, loading, error } = geoData;
 
+  // Canvas renderer instance specifically for rendering 1,485+ road ways
+  const roadCanvasRenderer = useMemo(() => L.canvas({ padding: 0.5 }), []);
+
+  const hasValidGrid = Boolean(
+    gridRisk &&
+    gridRisk.type === "FeatureCollection" &&
+    Array.isArray(gridRisk.features) &&
+    gridRisk.features.length > 0
+  );
+
   // Style function for risk zones — uses API computed risk if available, else sample GeoJSON
   const riskStyle = useCallback(
     (feature?: Feature<Geometry, ZoneGeoJSONProperties>): PathOptions => {
@@ -174,6 +186,109 @@ export default function RiskMap({
       };
     },
     [selectedZoneId, zoneRisks]
+  );
+
+  // Road styling on canvas
+  const roadStyle = useCallback(
+    (feature?: Feature): PathOptions => {
+      const props = feature?.properties as RoadGeoJSONProperties | undefined;
+      const highwayType = props?.highway ?? props?.road_type ?? "road";
+      const isExcluded = [
+        "steps",
+        "pedestrian",
+        "footway",
+        "path",
+        "cycleway",
+        "corridor",
+        "construction",
+        "proposed",
+      ].includes(highwayType);
+      return {
+        renderer: roadCanvasRenderer,
+        color: roadColor(highwayType),
+        weight: roadWeight(highwayType),
+        opacity: 0.8,
+        dashArray:
+          highwayType === "local_road" ||
+          highwayType === "service" ||
+          highwayType === "track" ||
+          isExcluded
+            ? "4 4"
+            : undefined,
+      };
+    },
+    [roadCanvasRenderer]
+  );
+
+  // Bind popup to roads
+  const onEachRoad = useCallback(
+    (feature: Feature, layer: Layer) => {
+      const props = feature.properties as RoadGeoJSONProperties;
+      const highwayType = props.highway ?? props.road_type ?? "road";
+      const isReal = props.data_type === "REAL_OSM" || geoData.isRealOsm;
+      const roadName =
+        props.name || props.ref || (isReal ? "Unnamed road (OSM)" : "Unnamed road");
+      const isExcluded = [
+        "steps",
+        "pedestrian",
+        "footway",
+        "path",
+        "cycleway",
+        "corridor",
+        "construction",
+        "proposed",
+      ].includes(highwayType);
+      const isTrack = highwayType === "track";
+      const isNoAccess =
+        props.access === "no" || props.vehicle === "no" || props.motor_vehicle === "no";
+      const isPrivate = props.access === "private";
+      const roadCategoryLabel = isTrack
+        ? "Track (non-priority)"
+        : isExcluded
+          ? "Pedestrian / non-motorized"
+          : isNoAccess
+            ? "Restricted access (no motor vehicles)"
+            : isPrivate
+              ? "Private / restricted access"
+              : "Motorable-class mapped road";
+
+      layer.bindPopup(
+        `<div style="font-size:11px;line-height:1.4;color:#0f172a;min-width:140px;">
+          <p style="font-weight:600;font-size:12px;margin-bottom:2px;">${roadName}</p>
+          <p style="color:#64748b;text-transform:capitalize;">
+            ${highwayType.replace(/_/g, " ")} · ${roadCategoryLabel}
+          </p>
+          ${
+            isReal
+              ? `<div style="margin-top:4px;border-top:1px solid #e2e8f0;padding-top:4px;">
+                  <span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-family:monospace;background:#022c22;color:#6ee7b7;border:1px solid #065f46;">
+                    REAL_OSM · © OSM contributors
+                  </span>
+                  ${
+                    props.surface
+                      ? `<p style="color:#64748b;font-size:10px;margin-top:2px;">Surface: ${props.surface}</p>`
+                      : ""
+                  }
+                  ${
+                    props.access
+                      ? `<p style="color:#d97706;font-size:10px;margin-top:2px;">Access: ${props.access}</p>`
+                      : ""
+                  }
+                  <p style="color:#64748b;font-size:10px;margin-top:4px;font-family:monospace;">
+                    Status: EXPOSED_NOT_VERIFIED_BLOCKED
+                  </p>
+                  <p style="color:#94a3b8;font-size:9px;font-style:italic;margin-top:2px;">
+                    Intersecting hazard zone; blockage not verified
+                  </p>
+                </div>`
+              : `<p style="color:#d97706;font-size:10px;margin-top:4px;font-family:monospace;">
+                  SAMPLE MOCK
+                </p>`
+          }
+        </div>`
+      );
+    },
+    [geoData.isRealOsm]
   );
 
   // Bind click + hover to each zone polygon
@@ -218,8 +333,17 @@ export default function RiskMap({
   );
 
   return (
-    <div className={className || "relative w-full h-full"}>
-      {isRiskFallback ? (
+    <div
+      className={className || "relative w-full h-full"}
+      data-testid="risk-map"
+      data-risk-zones={gridRisk?.features.length ?? 0}
+    >
+      {!hasValidGrid ? (
+        <div className="absolute top-2 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-rose-500/40 text-[10px] text-rose-400 font-medium pointer-events-none">
+          <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
+          {error ? `Risk Grid Error: ${error}` : "Risk grid unavailable · Failed to load"}
+        </div>
+      ) : isRiskFallback ? (
         <div className="absolute top-2 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-amber-500/40 text-[10px] text-amber-400 font-medium pointer-events-none">
           <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
           Sample fallback · backend offline
@@ -260,7 +384,7 @@ export default function RiskMap({
       )}
 
       {/* Error overlay */}
-      {error && (
+      {error && !gridRisk && (
         <div className="absolute inset-0 z-[999] flex items-center justify-center bg-slate-950/80 rounded-lg">
           <div className="text-center text-sm text-red-400 p-4">
             <p className="font-semibold">Failed to load GeoJSON</p>
@@ -321,78 +445,14 @@ export default function RiskMap({
 
           {/* ── Roads ── */}
           <LayersControl.Overlay checked name="Roads">
-            <>
-              {roads?.features.map((f, i) => {
-                const props = f.properties as RoadGeoJSONProperties;
-                const highwayType = props.highway ?? props.road_type ?? "road";
-                const isReal = props.data_type === "REAL_OSM" || geoData.isRealOsm;
-                const roadName = props.name || props.ref || (isReal ? "Unnamed road (OSM)" : "Unnamed road");
-                const coords = (
-                  f.geometry as GeoJSON.LineString
-                ).coordinates.map(([lon, lat]) => [lat, lon] as [number, number]);
-                const isExcluded = ["steps", "pedestrian", "footway", "path", "cycleway", "corridor", "construction", "proposed"].includes(highwayType);
-                const isTrack = highwayType === "track";
-                const isNoAccess = props.access === "no" || props.vehicle === "no" || props.motor_vehicle === "no";
-                const isPrivate = props.access === "private";
-                const roadCategoryLabel = isTrack
-                  ? "Track (non-priority)"
-                  : isExcluded
-                    ? "Pedestrian / non-motorized"
-                    : isNoAccess
-                      ? "Restricted access (no motor vehicles)"
-                      : isPrivate
-                        ? "Private / restricted access"
-                        : "Motorable-class mapped road";
-
-                return (
-                  <Polyline
-                    key={props.road_id ?? props.osm_id ?? i}
-                    positions={coords}
-                    pathOptions={{
-                      color: roadColor(highwayType),
-                      weight: roadWeight(highwayType),
-                      opacity: 0.8,
-                      dashArray:
-                        highwayType === "local_road" || highwayType === "service" || highwayType === "track" || isExcluded
-                          ? "4 4"
-                          : undefined,
-                    }}
-                  >
-                    <Popup>
-                      <div className="text-xs">
-                        <p className="font-semibold">{roadName}</p>
-                        <p className="text-slate-500 capitalize">
-                          {highwayType.replace(/_/g, " ")} · {roadCategoryLabel}
-                        </p>
-                        {isReal ? (
-                          <div className="mt-1 border-t border-slate-700/50 pt-1">
-                            <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-mono bg-emerald-950 text-emerald-300 border border-emerald-800">
-                              REAL_OSM · © OSM contributors
-                            </span>
-                            {props.surface && (
-                              <p className="text-slate-400 text-[10px]">Surface: {props.surface}</p>
-                            )}
-                            {props.access && (
-                              <p className="text-amber-400 text-[10px]">Access: {props.access}</p>
-                            )}
-                            <p className="text-slate-400 text-[10px] mt-1 font-mono">
-                              Status: EXPOSED_NOT_VERIFIED_BLOCKED
-                            </p>
-                            <p className="text-slate-500 text-[9px] italic">
-                              Intersecting hazard zone; blockage not verified
-                            </p>
-                          </div>
-                        ) : (
-                          <p className="text-amber-500 text-[10px] mt-1 font-mono">
-                            SAMPLE MOCK
-                          </p>
-                        )}
-                      </div>
-                    </Popup>
-                  </Polyline>
-                );
-              })}
-            </>
+            {roads && roads.features && roads.features.length > 0 && (
+              <GeoJSON
+                key={`roads-${geoData.isRealOsm ? "real" : "sample"}-${roads.features.length}`}
+                data={roads as GeoJsonObject}
+                style={roadStyle}
+                onEachFeature={onEachRoad}
+              />
+            )}
           </LayersControl.Overlay>
 
           {/* ── Critical Facilities ── */}

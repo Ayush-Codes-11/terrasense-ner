@@ -5,7 +5,7 @@
 // Falls back to local GeoJSON precomputed values if backend is offline.
 // ============================================================
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import type { Zone } from "../types";
 import { getAllZoneRisks } from "../services/api";
 
@@ -50,28 +50,24 @@ export function useAllZoneRisks(fallbackZones: Zone[]): AllZoneRisksResult {
     };
   }, []);
 
-  if (apiZones && apiZones.length > 0) {
-    const map = new Map<string, Zone>();
-    apiZones.forEach((z) => map.set(z.zone_id, z));
-    return {
-      zoneRisksMap: map,
-      zonesList: apiZones,
-      loading: false,
-      apiOnline: true,
-      isFallback: false,
-      error: null,
-    };
-  }
+  const isFallback = !apiZones || apiZones.length === 0;
 
-  // Fallback to local GeoJSON
-  const map = new Map<string, Zone>();
-  fallbackZones.forEach((z) => map.set(z.zone_id, z));
+  const zonesList = useMemo(() => {
+    return apiZones && apiZones.length > 0 ? apiZones : fallbackZones;
+  }, [apiZones, fallbackZones]);
+
+  const zoneRisksMap = useMemo(() => {
+    const map = new Map<string, Zone>();
+    zonesList.forEach((z) => map.set(z.zone_id, z));
+    return map;
+  }, [zonesList]);
+
   return {
-    zoneRisksMap: map,
-    zonesList: fallbackZones,
+    zoneRisksMap,
+    zonesList,
     loading,
     apiOnline,
-    isFallback: true,
+    isFallback,
     error,
   };
 }
