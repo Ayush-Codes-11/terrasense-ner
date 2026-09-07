@@ -51,7 +51,7 @@ try:
     from services.gpm_loader import get_zone_gpm_observed
 except ImportError:
     try:
-        from backend.services.gpm_loader import get_zone_gpm_observed
+        from services.gpm_loader import get_zone_gpm_observed
     except ImportError:
         def get_zone_gpm_observed(z: str):
             return None
@@ -129,7 +129,7 @@ def get_rainfall_series(zone_id: str) -> RainfallSeries:
 
     # Check for Real GPM IMERG observations
     try:
-        from backend.services.gpm_loader import get_gpm_provenance_status
+        from services.gpm_loader import get_gpm_provenance_status
         prov_status = get_gpm_provenance_status()
     except ImportError:
         prov_status = {"status": "SAMPLE_MOCK"}

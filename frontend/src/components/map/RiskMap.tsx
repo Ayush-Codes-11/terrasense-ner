@@ -167,8 +167,8 @@ export default function RiskMap({
       const isSelected = feature?.properties?.zone_id === selectedZoneId;
       return {
         fillColor: riskColor(cat),
-        fillOpacity: isSelected ? 0.5 : 0.35,
-        color: isSelected ? "#ffffff" : riskColor(cat),
+        fillOpacity: isSelected ? 0.45 : 0.35,
+        color: isSelected ? "#22D3EE" : riskColor(cat),
         weight: isSelected ? 2.5 : 0.5,
         opacity: isSelected ? 1 : 0.4,
       };
@@ -203,13 +203,14 @@ export default function RiskMap({
       layer.on({
         click: () => onZoneSelect(props),
         mouseover: (e) => {
-          (e.target as L.Path).setStyle({ fillOpacity: 0.6, weight: 2 });
+          (e.target as L.Path).setStyle({ fillOpacity: 0.55, weight: 2 });
         },
         mouseout: (e) => {
           const isSelected = props.zone_id === selectedZoneId;
           (e.target as L.Path).setStyle({
-            fillOpacity: isSelected ? 0.65 : 0.35,
+            fillOpacity: isSelected ? 0.45 : 0.35,
             weight: isSelected ? 2.5 : 0.5,
+            color: isSelected ? "#22D3EE" : riskColor(cat),
           });
         },
       });

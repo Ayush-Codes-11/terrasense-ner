@@ -136,9 +136,27 @@ export default function Dashboard() {
 
   const pendingReportsCount = localReports.filter(r => r.sync_status !== "SYNCED").length;
 
+  // Find latest retrieved_at from zonesList
+  const lastUpdated = useMemo(() => {
+    if (!zonesList || zonesList.length === 0) return null;
+    let maxTime = "";
+    for (const z of zonesList) {
+      if (z.data_meta?.freshness) {
+        if (z.data_meta.freshness > maxTime) {
+          maxTime = z.data_meta.freshness;
+        }
+      }
+    }
+    return maxTime || null;
+  }, [zonesList]);
+
   return (
     <div className="flex flex-col h-[100dvh] overflow-hidden bg-[#07111F]">
-      <TopBar districtMeta={null} />
+      <TopBar
+        districtMeta={null}
+        lastUpdated={lastUpdated}
+        isOffline={isRiskFallback}
+      />
 
       <main className="relative flex-1 min-h-0 overflow-hidden">
         <RiskMap

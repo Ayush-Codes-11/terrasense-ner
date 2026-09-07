@@ -7,13 +7,13 @@ Endpoints:
 from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException
-from backend.models.schemas import (
+from models.schemas import (
     DataMeta,
     HorizonPrioritySchema,
     PriorityContributorSchema,
     ZonePriorityResponse,
 )
-from backend.services.priority_engine import compute_zone_priority, HorizonPriorityResult
+from services.priority_engine import compute_zone_priority, HorizonPriorityResult
 
 router = APIRouter(prefix="/priority")
 

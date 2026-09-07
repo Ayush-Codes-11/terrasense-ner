@@ -34,7 +34,7 @@ from pyproj import Geod
 from shapely.geometry import Point, Polygon, MultiPolygon, LineString, MultiLineString, shape
 from shapely.ops import unary_union
 
-from backend.services.priority_config import (
+from services.priority_config import (
     MOTORABLE_HIGHWAY_CLASSES,
     TRACK_HIGHWAY_CLASSES,
     EXCLUDED_HIGHWAY_CLASSES,

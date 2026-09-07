@@ -10,8 +10,8 @@ Endpoints:
 from __future__ import annotations
 
 from fastapi import APIRouter
-from backend.models.schemas import DataMeta, OSMStatusResponse
-from backend.services.exposure_engine import (
+from models.schemas import DataMeta, OSMStatusResponse
+from services.exposure_engine import (
     get_critical_facilities_feature_collection,
     get_osm_provenance_status,
     load_exposure_layers,

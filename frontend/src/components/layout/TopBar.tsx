@@ -4,9 +4,11 @@ import { formatDateTime } from "../../utils/risk";
 
 interface TopBarProps {
   districtMeta?: DistrictMeta | null;
+  lastUpdated?: string | null;
+  isOffline?: boolean;
 }
 
-export default function TopBar({ districtMeta }: TopBarProps) {
+export default function TopBar({ districtMeta, lastUpdated, isOffline }: TopBarProps) {
   return (
     <header className="flex items-center justify-between px-4 py-2 bg-[#07111F] border-b border-slate-800 shrink-0 z-10">
       {/* Left: Logo + District */}
@@ -55,11 +57,15 @@ export default function TopBar({ districtMeta }: TopBarProps) {
       {/* Right: Timestamp */}
       <div className="flex items-center gap-3">
         <div className="hidden md:block text-right">
-          <div className="text-[9px] text-slate-500 uppercase tracking-widest">Last updated</div>
+          <div className="text-[9px] text-slate-500 uppercase tracking-widest">
+            {isOffline ? "Last valid update" : "Last updated"}
+          </div>
           <div className="text-[11px] text-slate-400 font-mono">
-            {districtMeta?.last_updated
-              ? formatDateTime(districtMeta.last_updated)
-              : "—"}
+            {lastUpdated
+              ? formatDateTime(lastUpdated)
+              : districtMeta?.last_updated
+                ? formatDateTime(districtMeta.last_updated)
+                : "—"}
           </div>
         </div>
       </div>

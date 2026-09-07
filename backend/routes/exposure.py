@@ -7,7 +7,7 @@ Endpoints:
 from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException
-from backend.models.schemas import (
+from models.schemas import (
     DataMeta,
     ExposedFacilitySchema,
     ExposedRoadSchema,
@@ -15,7 +15,7 @@ from backend.models.schemas import (
     ExposureSummarySchema,
     ZoneExposureResponse,
 )
-from backend.services.exposure_engine import compute_zone_exposure
+from services.exposure_engine import compute_zone_exposure
 
 router = APIRouter(prefix="/exposure")
 

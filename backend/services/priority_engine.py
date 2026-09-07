@@ -30,8 +30,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
-from backend.services.exposure_engine import compute_zone_exposure, ZoneExposureResult
-from backend.services.priority_config import (
+from services.exposure_engine import compute_zone_exposure, ZoneExposureResult
+from services.priority_config import (
     WEIGHT_LANDSLIDE_RISK,
     WEIGHT_ROAD_EXPOSURE,
     WEIGHT_SETTLEMENT_EXPOSURE,
@@ -41,8 +41,8 @@ from backend.services.priority_config import (
     REF_CRITICAL_FACILITIES_COUNT,
     get_priority_category,
 )
-from backend.services.risk_forecast import compute_zone_risk_outlook, RiskOutlookResult
-from backend.services.data_loader import get_zone_props
+from services.risk_forecast import compute_zone_risk_outlook, RiskOutlookResult
+from services.data_loader import get_zone_props
 
 
 @dataclass

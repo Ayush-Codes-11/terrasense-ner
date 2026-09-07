@@ -49,7 +49,7 @@ def compute_zone_risk(zone_props: Dict[str, Any]) -> RiskResult:
       - rain_7d        — SAMPLE_MOCK (optional)
     """
     if RISK_MODEL == "prototype":
-        from backend.services.terrain_loader import get_zone_terrain
+        from services.terrain_loader import get_zone_terrain
 
         zone_id = str(zone_props.get("zone_id", "")).upper()
         terrain = get_zone_terrain(zone_id) if zone_id else None

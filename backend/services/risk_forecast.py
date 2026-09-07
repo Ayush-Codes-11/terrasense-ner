@@ -38,13 +38,13 @@ for _p in (str(_REPO_ROOT), str(_BACKEND_DIR)):
 
 from ml.prototype_scorer import score_zone, RiskResult, Contributor
 try:
-    from backend.services.rainfall import get_rainfall_series, RainfallSeries
-    from backend.services.rainfall_accumulator import (
+    from services.rainfall import get_rainfall_series, RainfallSeries
+    from services.rainfall_accumulator import (
         compute_zone_rolling_rainfall,
         HorizonRainfall,
         RollingAccumulationResult,
     )
-    from backend.services.terrain_loader import get_zone_terrain
+    from services.terrain_loader import get_zone_terrain
 except ImportError:
     from services.rainfall import get_rainfall_series, RainfallSeries
     from services.rainfall_accumulator import (
