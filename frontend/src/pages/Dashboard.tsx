@@ -140,9 +140,9 @@ export default function Dashboard() {
     <div className="flex flex-col h-[100dvh] overflow-hidden bg-[#07111F]">
       <TopBar districtMeta={null} />
 
-      <main className="relative flex-1 overflow-hidden">
+      <main className="relative flex-1 min-h-0 overflow-hidden">
         <RiskMap
-          className="absolute inset-0 z-0"
+          className="absolute inset-0 h-full w-full z-0"
           geoData={geoData}
           selectedZoneId={selectedZoneId}
           onZoneSelect={setSelectedZoneProps}

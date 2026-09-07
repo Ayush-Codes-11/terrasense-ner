@@ -31,6 +31,20 @@ import type {
 } from "../../types/geojson";
 import { RISK_COLORS } from "../../utils/risk";
 
+function MapResizeFix() {
+  const map = useMap();
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      map.invalidateSize();
+    });
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [map]);
+  return null;
+}
+
 // ---- Aizawl pilot area constants ----
 const AIZAWL_CENTER: [number, number] = [23.7271, 92.7176];
 const DEFAULT_ZOOM = 13;
@@ -204,8 +218,7 @@ export default function RiskMap({
   );
 
   return (
-    <div className={`relative ${className || "w-full h-full"}`}>
-      {/* Risk Engine / Data banner */}
+    <div className={className || "relative w-full h-full"}>
       {isRiskFallback ? (
         <div className="absolute top-2 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-amber-500/40 text-[10px] text-amber-400 font-medium pointer-events-none">
           <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
@@ -262,6 +275,7 @@ export default function RiskMap({
         style={{ height: "100%", width: "100%", background: "#0f172a" }}
         zoomControl={true}
       >
+        <MapResizeFix />
         {/* Custom legend */}
         <MapLegend />
 
