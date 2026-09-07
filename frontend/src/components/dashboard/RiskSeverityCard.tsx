@@ -65,8 +65,6 @@ export default function RiskSeverityCard({
 
   const displayZone = selectedZone ?? null;
   const isPlaceholder = total === 0;
-  
-  const currentRisk = displayZone ? displayZone.risk : dominantRisk;
 
   return (
     <div className="card p-4 flex flex-col gap-3">
@@ -113,12 +111,12 @@ export default function RiskSeverityCard({
         </div>
       ) : (
         <>
-          {/* Current / Dominant risk */}
+          {/* Dominant risk */}
           <div className="flex items-center gap-3">
             <span
-              className={`risk-badge text-base px-3 py-1.5 ${RISK_BG_CLASSES[currentRisk]}`}
+              className={`risk-badge text-base px-3 py-1.5 ${RISK_BG_CLASSES[dominantRisk]}`}
             >
-              {RISK_LABEL[currentRisk]}
+              {RISK_LABEL[dominantRisk]}
             </span>
             {displayZone && (
               <div>
@@ -132,17 +130,15 @@ export default function RiskSeverityCard({
             )}
           </div>
 
-          <div className="border-t border-slate-700/60 mt-2 pt-3">
-            <div className="text-[9px] text-slate-400 font-semibold uppercase tracking-widest mb-2">
-              PILOT-WIDE RISK DISTRIBUTION · {total} ZONES
-            </div>
-            {/* Zone breakdown */}
-            <div className="flex flex-col gap-1.5">
-              {(["VERY_HIGH", "HIGH", "MODERATE", "LOW"] as const).map((r) => (
-                <RiskBar key={r} level={r} count={counts[r]} total={total} />
-              ))}
-            </div>
+          {/* Zone breakdown */}
+          <div className="flex flex-col gap-1.5">
+            {(["VERY_HIGH", "HIGH", "MODERATE", "LOW"] as const).map((r) => (
+              <RiskBar key={r} level={r} count={counts[r]} total={total} />
+            ))}
           </div>
+          <p className="text-[10px] text-slate-600 border-t border-slate-700 pt-2">
+            {total} zones analysed
+          </p>
         </>
       )}
     </div>

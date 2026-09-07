@@ -31,20 +31,6 @@ import type {
 } from "../../types/geojson";
 import { RISK_COLORS } from "../../utils/risk";
 
-function MapResizeFix() {
-  const map = useMap();
-  useEffect(() => {
-    requestAnimationFrame(() => {
-      map.invalidateSize();
-    });
-    const timer = setTimeout(() => {
-      map.invalidateSize();
-    }, 200);
-    return () => clearTimeout(timer);
-  }, [map]);
-  return null;
-}
-
 // ---- Aizawl pilot area constants ----
 const AIZAWL_CENTER: [number, number] = [23.7271, 92.7176];
 const DEFAULT_ZOOM = 13;
@@ -70,24 +56,28 @@ function MapLegend() {
     legend.onAdd = () => {
       const div = L.DomUtil.create("div");
       div.style.cssText =
-        "background:rgba(16,31,53,0.90);backdrop-filter:blur(8px);border:1px solid rgba(148,163,184,0.15);border-radius:8px;padding:10px 12px;font-size:11px;color:#cbd5e1;box-shadow:0 8px 24px rgba(0,0,0,0.4);";
+        "background:rgba(15,23,42,0.92);border:1px solid rgba(71,85,105,0.6);border-radius:6px;padding:8px 10px;font-size:11px;color:#cbd5e1;min-width:120px;";
       const items: [string, string][] = [
-        ["LOW", RISK_COLORS.LOW],
-        ["MODERATE", RISK_COLORS.MODERATE],
-        ["HIGH", RISK_COLORS.HIGH],
-        ["VERY HIGH", RISK_COLORS.VERY_HIGH],
+        ["LOW", "#22c55e"],
+        ["MODERATE", "#eab308"],
+        ["HIGH", "#f97316"],
+        ["VERY HIGH", "#ef4444"],
       ];
       div.innerHTML =
-        `<div style="font-weight:700;font-size:10px;letter-spacing:0.05em;color:#94a3b8;margin-bottom:8px;text-transform:uppercase;">Risk Level</div>` +
+        `<div style="font-weight:600;font-size:10px;letter-spacing:0.05em;color:#94a3b8;margin-bottom:6px;text-transform:uppercase;">Risk Level</div>` +
         items
           .map(
             ([label, color]) =>
-              `<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                <div style="width:10px;height:10px;border-radius:50%;background:${color};flex-shrink:0;box-shadow:0 0 4px ${color}80;"></div>
-                <span style="font-weight:500;">${label}</span>
+              `<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+                <div style="width:12px;height:12px;border-radius:2px;background:${color};opacity:0.85;flex-shrink:0;"></div>
+                <span>${label}</span>
               </div>`
           )
-          .join("");
+          .join("") +
+        `<div style="border-top:1px solid rgba(71,85,105,0.4);margin-top:6px;padding-top:5px;font-size:9px;color:#475569;">
+          <span style="background:rgba(251,191,36,0.2);border:1px solid rgba(251,191,36,0.4);color:#fbbf24;border-radius:3px;padding:1px 4px;">PROTOTYPE</span>
+          &nbsp;Georeferenced to real coordinates; prototype analysis boundaries, not official administrative/hazard boundaries.
+        </div>`;
       return div;
     };
     legend.addTo(map);
@@ -142,7 +132,6 @@ interface RiskMapProps {
   zoneRisks?: Map<string, Zone> | null;
   isRiskFallback?: boolean;
   reports?: any[];
-  className?: string;
 }
 
 // ---- Main component ----
@@ -154,7 +143,6 @@ export default function RiskMap({
   zoneRisks,
   isRiskFallback = false,
   reports = [],
-  className = "",
 }: RiskMapProps) {
   const { gridRisk, roads, villages, hospitals, loading, error } = geoData;
 
@@ -167,9 +155,9 @@ export default function RiskMap({
       const isSelected = feature?.properties?.zone_id === selectedZoneId;
       return {
         fillColor: riskColor(cat),
-        fillOpacity: isSelected ? 0.45 : 0.35,
-        color: isSelected ? "#22D3EE" : riskColor(cat),
-        weight: isSelected ? 2.5 : 0.5,
+        fillOpacity: isSelected ? 0.45 : 0.30,
+        color: isSelected ? "#ffffff" : riskColor(cat),
+        weight: isSelected ? 2.5 : 1.5,
         opacity: isSelected ? 1 : 0.4,
       };
     },
@@ -203,14 +191,13 @@ export default function RiskMap({
       layer.on({
         click: () => onZoneSelect(props),
         mouseover: (e) => {
-          (e.target as L.Path).setStyle({ fillOpacity: 0.55, weight: 2 });
+          (e.target as L.Path).setStyle({ fillOpacity: 0.6, weight: 2 });
         },
         mouseout: (e) => {
           const isSelected = props.zone_id === selectedZoneId;
           (e.target as L.Path).setStyle({
-            fillOpacity: isSelected ? 0.45 : 0.35,
-            weight: isSelected ? 2.5 : 0.5,
-            color: isSelected ? "#22D3EE" : riskColor(cat),
+            fillOpacity: isSelected ? 0.65 : 0.35,
+            weight: isSelected ? 2.5 : 1.2,
           });
         },
       });
@@ -219,7 +206,8 @@ export default function RiskMap({
   );
 
   return (
-    <div className={className || "relative w-full h-full"}>
+    <div className="relative w-full h-full rounded-lg overflow-hidden border border-slate-700">
+      {/* Risk Engine / Data banner */}
       {isRiskFallback ? (
         <div className="absolute top-2 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-amber-500/40 text-[10px] text-amber-400 font-medium pointer-events-none">
           <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
@@ -276,7 +264,6 @@ export default function RiskMap({
         style={{ height: "100%", width: "100%", background: "#0f172a" }}
         zoomControl={true}
       >
-        <MapResizeFix />
         {/* Custom legend */}
         <MapLegend />
 
