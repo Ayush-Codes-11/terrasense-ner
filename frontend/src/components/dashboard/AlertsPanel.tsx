@@ -83,17 +83,17 @@ export default function AlertsPanel() {
       </button>
 
       {alerts.length > 0 && (
-        <div className="flex flex-col gap-2 mt-1 max-h-48 overflow-y-auto pr-1">
+        <div className="flex flex-col gap-2 mt-2 pb-10">
           {alerts.map((a) => (
-            <div key={a.alert_id} className="p-2 rounded bg-slate-900 border border-slate-700/50 flex flex-col gap-1">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-red-400">Zone {a.zone_id} ALERT</span>
-                <span className="text-[9px] text-slate-500">{new Date(a.created_at).toLocaleTimeString()}</span>
+            <div key={a.alert_id} className="p-3 rounded bg-[#07111F]/80 border-l-[3px] border-l-red-500 border border-t-slate-700/30 border-r-slate-700/30 border-b-slate-700/30 flex flex-col gap-1.5 shadow-sm">
+              <div className="flex items-start justify-between gap-2">
+                <span className="text-xs font-bold text-slate-100 uppercase leading-tight">VERY HIGH<br/><span className="text-[#94A3B8] font-medium">Zone {a.zone_id}</span></span>
+                <span className="text-[10px] text-slate-500 font-mono whitespace-nowrap">{new Date(a.created_at).toLocaleTimeString()}</span>
               </div>
-              <p className="text-[10px] text-slate-300">{a.rationale}</p>
-              <div className="flex items-center justify-between mt-1 pt-1 border-t border-slate-800">
-                <span className="text-[9px] text-slate-500">Channels: {a.delivery_channels.join(", ")}</span>
-                <span className="text-[9px] font-medium text-amber-500">{a.delivery_status}</span>
+              <p className="text-[11px] text-slate-300 leading-snug">{a.rationale}</p>
+              <div className="flex items-center justify-between mt-1 pt-1.5 border-t border-slate-800/80">
+                <span className="text-[9px] text-slate-500 uppercase tracking-widest">Channels: {a.delivery_channels.join(", ")}</span>
+                <span className="text-[9px] font-bold text-amber-500 uppercase">{a.delivery_status}</span>
               </div>
             </div>
           ))}
