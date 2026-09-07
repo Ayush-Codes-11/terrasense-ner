@@ -30,7 +30,6 @@ import { useZoneDetails } from "../hooks/useZoneDetails";
 import { propsToZone } from "../utils/zoneTransformers";
 import type { ZoneGeoJSONProperties } from "../types/geojson";
 import type { Zone } from "../types";
-import { getWeatherStatus } from "../services/api";
 
 export default function Dashboard() {
   const geoData = useGeoJSONData();
@@ -137,38 +136,19 @@ export default function Dashboard() {
 
   const pendingReportsCount = localReports.filter(r => r.sync_status !== "SYNCED").length;
 
-  // Fetch weather provenance status once on mount.
-  // Used to: (a) derive isDataSample, (b) obtain real retrieved_at_utc for "Last Updated".
-  // /weather/status returns the GPM provenance and the actual data-ingestion timestamp.
-  // We do NOT use data_meta.timestamp (= server clock at request time) for "Last Updated".
-  const [weatherStatus, setWeatherStatus] = useState<Record<string, any> | null>(null);
-  useEffect(() => {
-    if (apiOnline === true) {
-      getWeatherStatus()
-        .then((ws) => setWeatherStatus(ws))
-        .catch(() => setWeatherStatus(null));
-    }
-  }, [apiOnline]);
-
-  // isDataSample: true when API is up but serving SAMPLE/fixture data
-  // derived from the actual /weather/status response field is_real.
-  // If is_real is true (NASA_GES_DISC confirmed), show live badge.
-  const isDataSample = useMemo(() => {
-    if (isRiskFallback) return true; // offline — irrelevant but default safe
-    if (!weatherStatus) return true; // still loading or unknown — conservative
-    return !weatherStatus.is_real;   // OFFLINE_TEST_FIXTURE → is_real=false → sample
-  }, [isRiskFallback, weatherStatus]);
-
-  // lastUpdated: use retrieved_at_utc from /weather/status (actual GPM ingestion timestamp).
-  // Do NOT use data_meta.timestamp (= server clock at request time).
-  // Do NOT use forecast horizon timestamps (reference_timestamp_utc is the last obs day-end).
-  // "Not available" is shown if no trustworthy ingestion timestamp exists.
+  // Find latest retrieved_at from zonesList
   const lastUpdated = useMemo(() => {
-    if (!weatherStatus) return null;
-    // retrieved_at_utc = when fetch_gpm_imerg.py ran and wrote the file
-    const ts = weatherStatus.retrieved_at_utc as string | undefined | null;
-    return ts || null;
-  }, [weatherStatus]);
+    if (!zonesList || zonesList.length === 0) return null;
+    let maxTime = "";
+    for (const z of zonesList) {
+      if (z.data_meta?.freshness) {
+        if (z.data_meta.freshness > maxTime) {
+          maxTime = z.data_meta.freshness;
+        }
+      }
+    }
+    return maxTime || null;
+  }, [zonesList]);
 
   return (
     <div className="flex flex-col h-[100dvh] overflow-hidden bg-[#07111F]">
@@ -186,7 +166,6 @@ export default function Dashboard() {
           onZoneSelect={setSelectedZoneProps}
           zoneRisks={zoneRisksMap}
           isRiskFallback={isRiskFallback}
-          isDataSample={isDataSample}
           reports={localReports}
         />
 
