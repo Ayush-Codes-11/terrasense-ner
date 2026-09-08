@@ -63,6 +63,42 @@ function riskColor(category: string): string {
   return map[category] ?? "#94a3b8";
 }
 
+/**
+ * Visual-only refinement: subtly varies fill lightness/intensity according to the exact risk score
+ * within each category while strictly preserving category hue:
+ * - LOW: green
+ * - MODERATE: yellow (lighter yellow at lower scores -> stronger/richer yellow at higher scores)
+ * - HIGH: orange
+ * - VERY HIGH: red
+ */
+function getScoreAdjustedColor(category: string, score: number): string {
+  const s = Math.max(0, Math.min(score, 1));
+  if (category === "MODERATE") {
+    // MODERATE band: [0.25, 0.50)
+    const t = Math.max(0, Math.min((s - 0.25) / 0.25, 1));
+    const lightness = Math.round(64 - t * 16);
+    return `hsl(45, 94%, ${lightness}%)`;
+  }
+  if (category === "HIGH") {
+    // HIGH band: [0.50, 0.75)
+    const t = Math.max(0, Math.min((s - 0.50) / 0.25, 1));
+    const lightness = Math.round(56 - t * 10);
+    return `hsl(24, 95%, ${lightness}%)`;
+  }
+  if (category === "LOW") {
+    // LOW band: [0.00, 0.25)
+    const t = Math.max(0, Math.min(s / 0.25, 1));
+    const lightness = Math.round(52 - t * 12);
+    return `hsl(142, 70%, ${lightness}%)`;
+  }
+  if (category === "VERY_HIGH") {
+    const t = Math.max(0, Math.min((s - 0.75) / 0.25, 1));
+    const lightness = Math.round(52 - t * 12);
+    return `hsl(0, 85%, ${lightness}%)`;
+  }
+  return riskColor(category);
+}
+
 // ---- Custom map legend control ----
 
 function MapLegend() {
@@ -170,19 +206,33 @@ export default function RiskMap({
     gridRisk.features.length > 0
   );
 
+  // Stable fingerprint of current zone risks to force Leaflet style refresh when risk data loads
+  const zoneRisksFingerprint = useMemo(() => {
+    if (!zoneRisks || zoneRisks.size === 0) return "empty";
+    const parts: string[] = [];
+    zoneRisks.forEach((z, id) => {
+      const scoreVal = z.score !== undefined ? z.score : z.risk_score;
+      parts.push(`${id}:${z.risk}:${scoreVal.toFixed(4)}`);
+    });
+    return parts.sort().join(";");
+  }, [zoneRisks]);
+
   // Style function for risk zones — uses API computed risk if available, else sample GeoJSON
   const riskStyle = useCallback(
     (feature?: Feature<Geometry, ZoneGeoJSONProperties>): PathOptions => {
-      const zoneId = feature?.properties?.zone_id;
+      const zoneId = feature?.properties?.zone_id ? String(feature.properties.zone_id).toUpperCase() : undefined;
       const computedZone = zoneId ? zoneRisks?.get(zoneId) : undefined;
       const cat = computedZone?.risk ?? feature?.properties?.risk_category ?? "LOW";
-      const isSelected = feature?.properties?.zone_id === selectedZoneId;
+      const score = computedZone?.score ?? computedZone?.risk_score ?? feature?.properties?.risk_score ?? 0.3;
+      const isSelected = zoneId === selectedZoneId?.toUpperCase();
+      const fillColor = getScoreAdjustedColor(cat, score);
+      const baseOpacity = 0.28 + Math.min(Math.max(score, 0), 1) * 0.22;
       return {
-        fillColor: riskColor(cat),
-        fillOpacity: isSelected ? 0.5 : 0.35,
-        color: isSelected ? "#ffffff" : riskColor(cat),
-        weight: isSelected ? 2.5 : 0.5,
-        opacity: isSelected ? 1 : 0.4,
+        fillColor,
+        fillOpacity: isSelected ? 0.65 : baseOpacity,
+        color: isSelected ? "#22d3ee" : fillColor,
+        weight: isSelected ? 3.0 : 0.6,
+        opacity: isSelected ? 1 : 0.45,
       };
     },
     [selectedZoneId, zoneRisks]
@@ -295,7 +345,8 @@ export default function RiskMap({
   const onEachZone = useCallback(
     (feature: Feature, layer: Layer) => {
       const props = feature.properties as ZoneGeoJSONProperties;
-      const computedZone = zoneRisks?.get(props.zone_id);
+      const zoneId = props.zone_id ? String(props.zone_id).toUpperCase() : "";
+      const computedZone = zoneId ? zoneRisks?.get(zoneId) : undefined;
       const scoreStr =
         computedZone?.score !== undefined
           ? computedZone.score.toFixed(4)
@@ -321,10 +372,16 @@ export default function RiskMap({
           (e.target as L.Path).setStyle({ fillOpacity: 0.6, weight: 2 });
         },
         mouseout: (e) => {
-          const isSelected = props.zone_id === selectedZoneId;
+          const isSelected = zoneId === selectedZoneId?.toUpperCase();
+          const score = computedZone?.score ?? computedZone?.risk_score ?? props.risk_score ?? 0.3;
+          const fillColor = getScoreAdjustedColor(cat, score);
+          const baseOpacity = 0.28 + Math.min(Math.max(score, 0), 1) * 0.22;
           (e.target as L.Path).setStyle({
-            fillOpacity: isSelected ? 0.65 : 0.35,
-            weight: isSelected ? 2.5 : 0.5,
+            fillColor,
+            fillOpacity: isSelected ? 0.65 : baseOpacity,
+            color: isSelected ? "#22d3ee" : fillColor,
+            weight: isSelected ? 3.0 : 0.6,
+            opacity: isSelected ? 1 : 0.45,
           });
         },
       });
@@ -431,7 +488,7 @@ export default function RiskMap({
           <LayersControl.Overlay checked name="Risk Grid">
             {gridRisk && (
               <GeoJSON
-                key={`risk-${selectedZoneId ?? "none"}-${isRiskFallback ? "fallback" : "live"}-${zoneRisks?.size ?? 0}`}
+                key={`risk-${selectedZoneId ?? "none"}-${isRiskFallback ? "fallback" : "live"}-${zoneRisksFingerprint}`}
                 data={gridRisk as GeoJsonObject}
                 style={
                   riskStyle as (
