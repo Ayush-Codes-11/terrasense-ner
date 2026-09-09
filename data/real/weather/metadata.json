@@ -4,6 +4,7 @@
   "algorithm_generation": "V07",
   "granule_processing_version": "V07C",
   "collection_concept_id": "C2723754859-GES_DISC",
+  "source_data_origin": "NASA_GES_DISC",
   "source": "NASA Global Precipitation Measurement (GPM) IMERG Late Run",
   "product": "NASA GPM IMERG Late Precipitation L3 1 day 0.1\u00b0 V07 (GPM_3IMERGDL)",
   "source_variable": "precipitation",
@@ -11,8 +12,8 @@
   "observation_duration": "1 complete UTC day per bucket",
   "native_spatial_resolution_deg": 0.1,
   "temporal_resolution": "1 day (daily accumulation)",
-  "reference_timestamp_utc": "2026-09-04T23:59:59Z",
-  "retrieved_at_utc": "2026-09-06T14:36:26.951549+00:00",
+  "reference_timestamp_utc": "2026-09-08T23:59:59Z",
+  "retrieved_at_utc": "2026-09-09T16:39:50.461666+00:00",
   "pilot_district": "Aizawl District, Mizoram, India",
   "total_zones": 25,
   "unique_native_cells_count": 4,
@@ -35,12 +36,11 @@
     }
   },
   "days": {
-    "d_minus_2": "2026-09-02",
-    "d_minus_1": "2026-09-03",
-    "d0": "2026-09-04"
+    "d_minus_2": "2026-09-06",
+    "d_minus_1": "2026-09-07",
+    "d0": "2026-09-08"
   },
   "is_live": false,
   "attribution": "NASA Global Precipitation Measurement (GPM) Integrated Multi-satellitE Retrievals for GPM (IMERG), archived and distributed by NASA GES DISC.",
-  "notes": "GPM IMERG estimates are satellite-derived precipitation measurements at ~0.1 deg (~10 km) native grid. Values represent recent observed precipitation triggers; future rainfall windows remain scenario-based.",
-  "source_data_origin": "OFFLINE_TEST_FIXTURE"
+  "notes": "GPM IMERG estimates are satellite-derived precipitation measurements at ~0.1 deg (~10 km) native grid. Values represent recent observed precipitation triggers; future rainfall windows remain scenario-based."
 }

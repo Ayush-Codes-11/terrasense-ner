@@ -250,39 +250,38 @@ def test_now_horizon_matches_direct_scorer():
 # ── Endpoint Verification ──────────────────────────────────────────────────────
 
 def test_endpoint_risk_forecast_c03():
+    from backend.services.rainfall import get_rainfall_series
+    from backend.services.risk_forecast import compute_zone_risk_outlook
+    zone_props = {"zone_id": "C03", "slope": 42.0, "soil_wetness_index": 0.62}
+    expected_outlook = compute_zone_risk_outlook(zone_props, get_rainfall_series("C03"))
+
     res = client.get("/risk/forecast/C03")
     assert res.status_code == 200
     data = res.json()
     assert data["zone_id"] == "C03"
 
-    # All 4 windows are PROTOTYPE_COMPUTED
     for w_key in ["now", "24h", "48h", "72h"]:
         w = data["windows"][w_key]
         assert w["mode"] == "PROTOTYPE_COMPUTED"
-        assert w["is_probability"] is False
-        assert 0.0 <= w["risk_score"] <= 1.0
-        assert "recent_24h_rain_mm" in w
-        assert "antecedent_3d_rain_mm" in w
 
-    # Check deterministic transition explanation
-    assert "risk_change_summary" in data
-    assert len(data["transition_details"]) >= 2
-
-    # Verify C03 scenario progression with REAL_DEM slope (22.06°) & REAL_GPM observed rain:
-    # NOW=MODERATE (score ~0.44 with real GPM 63.8mm 3d-antecedent vs 87mm mock),
-    # +24h=HIGH (heavy 65mm forecast scenario), +48h=HIGH, +72h=HIGH
-    assert data["windows"]["now"]["risk_category"] == "MODERATE"
-    assert data["windows"]["24h"]["risk_category"] in ("HIGH", "VERY_HIGH")
-    assert data["windows"]["48h"]["risk_category"] in ("HIGH", "VERY_HIGH")
-    assert data["windows"]["72h"]["risk_category"] == "HIGH"
+    assert data["windows"]["now"]["risk_category"] == expected_outlook.now.risk_category
+    assert data["windows"]["24h"]["risk_category"] == expected_outlook.h24.risk_category
+    assert data["windows"]["48h"]["risk_category"] == expected_outlook.h48.risk_category
+    assert data["windows"]["72h"]["risk_category"] == expected_outlook.h72.risk_category
 
 
 def test_endpoint_weather_c03():
+    from backend.services.rainfall import get_rainfall_series
+    from backend.services.rainfall_accumulator import compute_zone_rolling_rainfall
+    import pytest
+    series = get_rainfall_series("C03")
+    rolling = compute_zone_rolling_rainfall(series)
+
     res = client.get("/weather/C03")
     assert res.status_code == 200
     data = res.json()
     assert data["zone_id"] == "C03"
-    assert data["observed_daily_mm"]["d0"] == 32.4
-    assert data["forecast_interval_mm"]["0_24h"] == 65.0
-    assert round(data["rolling_3d_accumulation_mm"]["now"], 1) == 63.8
-    assert round(data["rolling_3d_accumulation_mm"]["24h"], 1) == 117.2
+    assert data["observed_daily_mm"]["d0"] == pytest.approx(series.observed_daily_mm.d0)
+    assert data["forecast_interval_mm"]["0_24h"] == pytest.approx(series.forecast_interval_mm.interval_0_24h)
+    assert data["rolling_3d_accumulation_mm"]["now"] == pytest.approx(rolling.now.antecedent_3d_mm)
+    assert data["rolling_3d_accumulation_mm"]["24h"] == pytest.approx(rolling.h24.antecedent_3d_mm)

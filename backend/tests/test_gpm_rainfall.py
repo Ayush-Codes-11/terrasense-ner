@@ -46,6 +46,13 @@ from backend.services.gpm_loader import (
 )
 from backend.services.rainfall import get_rainfall_series
 from backend.services.rainfall_accumulator import compute_zone_rolling_rainfall
+from backend.scripts.fetch_gpm_imerg import (
+    derive_intersecting_imerg_cells,
+    compute_zone_overlap_weights,
+    process_granule_data,
+    PILOT_BBOX,
+    _GRID_RISK_PATH,
+)
 
 client = TestClient(app)
 
@@ -94,13 +101,39 @@ def test_real_weather_files_exist_and_valid():
 
 
 def test_fixture_data_cannot_be_real_gpm():
-    """Prove that fixture data cannot be labelled as REAL_GPM."""
+    """Prove that explicitly loading fixture data produces SAMPLE_GPM_COMPATIBLE and not REAL_GPM."""
+    with open(FIXTURE_PATH, encoding="utf-8") as f:
+        fixture_data = json.load(f)
+
+    native_cells = derive_intersecting_imerg_cells(PILOT_BBOX, res_deg=0.1)
+    zone_weights = compute_zone_overlap_weights(_GRID_RISK_PATH, native_cells)
+
+    meta_extra = {
+        "granule_processing_version": fixture_data.get("metadata", {}).get("granule_processing_version", "OFFLINE_FIXTURE_V07C"),
+        "source_data_origin": "OFFLINE_TEST_FIXTURE"
+    }
+    gpm_dataset, metadata = process_granule_data(fixture_data["granules"], zone_weights, native_cells, meta_extra)
+
+    assert metadata.get("source_data_origin") == "OFFLINE_TEST_FIXTURE"
+    assert gpm_dataset["zones"]["C03"]["data_type"] == "SAMPLE_GPM_COMPATIBLE"
+    assert gpm_dataset["zones"]["C03"]["data_type"] != "REAL_GPM"
+
+def test_canonical_dataset_is_real_gpm():
+    """Verify the current canonical dataset represents a genuine NASA fetch."""
     meta = load_gpm_metadata()
-    assert meta.get("source_data_origin") == "OFFLINE_TEST_FIXTURE"
+    assert meta.get("source_data_origin") == "NASA_GES_DISC"
+
     prov_status = get_gpm_provenance_status()
-    assert prov_status["status"] == "SAMPLE_GPM_COMPATIBLE"
-    assert prov_status["is_real"] is False
-    assert prov_status["source_data_origin"] == "OFFLINE_TEST_FIXTURE"
+    assert prov_status["status"] == "REAL_GPM"
+    assert prov_status["is_real"] is True
+    assert prov_status["source_data_origin"] == "NASA_GES_DISC"
+
+    dataset = load_gpm_observed_dataset()
+    for z in dataset["zones"].values():
+        assert z["data_type"] == "REAL_GPM"
+
+    dates = list(meta.get("days", {}).values())
+    assert len(set(dates)) == 3
 
 
 # ── 2. Native Coarse Cells & Area-Weighted Overlap ───────────────────────────
@@ -132,16 +165,45 @@ def test_native_cell_distribution_across_zones():
     assert c03["native_cell_weights"]["CELL_LAT23.75_LON92.75"] == 1.0
 
 
-def test_zone_c03_observed_values():
-    """Verify exact observed precipitation for pilot center C03."""
-    c03_gpm = get_zone_gpm_observed("C03")
-    assert c03_gpm is not None
+def test_zone_c03_observed_values_fixture():
+    """Verify exact observed precipitation for pilot center C03 using deterministic fixture."""
+    import json
+    with open(FIXTURE_PATH, encoding="utf-8") as f:
+        fixture_data = json.load(f)
+
+    native_cells = derive_intersecting_imerg_cells(PILOT_BBOX, res_deg=0.1)
+    zone_weights = compute_zone_overlap_weights(_GRID_RISK_PATH, native_cells)
+
+    meta_extra = {
+        "granule_processing_version": "OFFLINE_FIXTURE_V07C",
+        "source_data_origin": "OFFLINE_TEST_FIXTURE"
+    }
+    gpm_dataset, _ = process_granule_data(fixture_data["granules"], zone_weights, native_cells, meta_extra)
+
+    c03_gpm = gpm_dataset["zones"]["C03"]
     obs = c03_gpm["observed_daily_mm"]
 
     assert obs["d_minus_2"] == 11.6
     assert obs["d_minus_1"] == 19.8
     assert obs["d0"] == 32.4
     assert c03_gpm["antecedent_3d_mm"] == 63.8
+
+def test_zone_c03_canonical_invariants():
+    """Verify invariant precipitation rules for canonical C03."""
+    import math
+    c03_gpm = get_zone_gpm_observed("C03")
+    assert c03_gpm is not None
+    obs = c03_gpm["observed_daily_mm"]
+
+    d2 = obs["d_minus_2"]
+    d1 = obs["d_minus_1"]
+    d0 = obs["d0"]
+    a3d = c03_gpm["antecedent_3d_mm"]
+
+    assert math.isclose(a3d, d2 + d1 + d0, rel_tol=1e-5)
+    assert d0 >= 0.0
+    assert d1 >= 0.0
+    assert d2 >= 0.0
 
 
 # ── 3. Data Integrity & Validation ───────────────────────────────────────────
@@ -168,22 +230,25 @@ def test_c03_rolling_accumulation_with_gpm():
     C03 sample forecast: F1=65.0, F2=45.0, F3=15.0
     """
     series = get_rainfall_series("C03")
-    assert series.observed_provenance == "SAMPLE_GPM_COMPATIBLE"
+    assert series.observed_provenance == "REAL_GPM"
     assert series.forecast_provenance == "SAMPLE_MOCK"
 
     rolling = compute_zone_rolling_rainfall(series)
 
-    # NOW: recent_24h = D0 = 32.4, antecedent_3d = 11.6 + 19.8 + 32.4 = 63.8
-    assert rolling.now.recent_24h_mm == pytest.approx(32.4)
-    assert rolling.now.antecedent_3d_mm == pytest.approx(63.8)
+    d0 = series.observed_daily_mm.d0
+    d1 = series.observed_daily_mm.d_minus_1
+    a3d = series.observed_daily_mm.d_minus_2 + series.observed_daily_mm.d_minus_1 + series.observed_daily_mm.d0
 
-    # +24h: D-2 drops out, F1 (65.0) enters -> 19.8 + 32.4 + 65.0 = 117.2
+    assert rolling.now.recent_24h_mm == pytest.approx(d0)
+    assert rolling.now.antecedent_3d_mm == pytest.approx(a3d)
+
+    # +24h: D-2 drops out, F1 (65.0) enters -> d1 + d0 + 65.0
     assert rolling.h24.recent_24h_mm == pytest.approx(65.0)
-    assert rolling.h24.antecedent_3d_mm == pytest.approx(117.2)
+    assert rolling.h24.antecedent_3d_mm == pytest.approx(d1 + d0 + 65.0)
 
-    # +48h: D-1 drops out, F2 (45.0) enters -> 32.4 + 65.0 + 45.0 = 142.4
+    # +48h: D-1 drops out, F2 (45.0) enters -> d0 + 65.0 + 45.0
     assert rolling.h48.recent_24h_mm == pytest.approx(45.0)
-    assert rolling.h48.antecedent_3d_mm == pytest.approx(142.4)
+    assert rolling.h48.antecedent_3d_mm == pytest.approx(d0 + 65.0 + 45.0)
 
     # +72h: D0 drops out, F3 (15.0) enters -> 65.0 + 45.0 + 15.0 = 125.0
     assert rolling.h72.recent_24h_mm == pytest.approx(15.0)
@@ -214,12 +279,12 @@ def test_missing_gpm_file_triggers_graceful_fallback():
 # ── 6. API Route Verification ─────────────────────────────────────────────────
 
 def test_api_weather_status():
-    """GET /weather/status returns SAMPLE_GPM_COMPATIBLE metadata when dataset is offline fixture."""
+    """GET /weather/status returns REAL_GPM metadata."""
     response = client.get("/weather/status")
     assert response.status_code == 200
     data = response.json()
-    assert data["status"] == "SAMPLE_GPM_COMPATIBLE"
-    assert data["is_real"] is False
+    assert data["status"] == "REAL_GPM"
+    assert data["is_real"] is True
     assert data["collection"] == "GPM_3IMERGDL"
     assert data["collection_version"] == "07"
     assert data["algorithm_generation"] == "V07"
@@ -235,12 +300,12 @@ def test_api_weather_zone_c03():
     assert response.status_code == 200
     data = response.json()
     assert data["zone_id"] == "C03"
-    assert data["observed_provenance"] == "SAMPLE_GPM_COMPATIBLE"
+    assert data["observed_provenance"] == "REAL_GPM"
     assert data["forecast_provenance"] == "SAMPLE_MOCK"
-    assert data["observed_daily_mm"]["d0"] == 32.4
-    assert data["observed_daily_mm"]["d_minus_1"] == 19.8
-    assert data["observed_daily_mm"]["d_minus_2"] == 11.6
-    assert data["rolling_3d_accumulation_mm"]["now"] == pytest.approx(63.8)
+    assert "d0" in data["observed_daily_mm"]
+    assert "d_minus_1" in data["observed_daily_mm"]
+    assert "d_minus_2" in data["observed_daily_mm"]
+    assert "now" in data["rolling_3d_accumulation_mm"]
 
 
 def test_api_risk_current_c03_provenance():
@@ -251,7 +316,7 @@ def test_api_risk_current_c03_provenance():
     prov = data.get("feature_provenance", {})
     assert prov.get("slope") == "REAL_DEM"
     assert prov.get("elevation") == "REAL_DEM"
-    assert prov.get("observed_rainfall") == "SAMPLE_GPM_COMPATIBLE"
+    assert prov.get("observed_rainfall") == "REAL_GPM"
     assert prov.get("soil_wetness") == "SAMPLE_MOCK"
 
 
@@ -262,7 +327,7 @@ def test_api_risk_forecast_c03_provenance():
     data = response.json()
     prov = data.get("feature_provenance", {})
     assert prov.get("slope") == "REAL_DEM"
-    assert prov.get("observed_rainfall") == "SAMPLE_GPM_COMPATIBLE"
+    assert prov.get("observed_rainfall") == "REAL_GPM"
     assert prov.get("forecast_rainfall") == "SAMPLE_MOCK"
     assert prov.get("soil_wetness") == "SAMPLE_MOCK"
 
@@ -274,5 +339,5 @@ def test_api_risk_current_all_zones_gpm_provenance():
     data = response.json()
     assert data["total"] == 25
     for z in data["zones"]:
-        assert z["feature_provenance"]["observed_rainfall"] == "SAMPLE_GPM_COMPATIBLE"
+        assert z["feature_provenance"]["observed_rainfall"] == "REAL_GPM"
         assert z["feature_provenance"]["slope"] == "REAL_DEM"

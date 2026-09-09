@@ -82,7 +82,7 @@ def test_get_zone_current_risk_c03():
     # Phase 8: feature_provenance must show REAL_DEM for slope, SAMPLE_GPM_COMPATIBLE for observed rainfall
     prov = data.get("feature_provenance", {})
     assert prov.get("slope") == "REAL_DEM"
-    assert prov.get("observed_rainfall") == "SAMPLE_GPM_COMPATIBLE"
+    assert prov.get("observed_rainfall") == "REAL_GPM"
 
     # Check contributors are sorted descending by contribution
     contribs = [c["contribution"] for c in data["contributors"]]
