@@ -66,11 +66,15 @@ def compute_zone_risk(zone_props: Dict[str, Any]) -> RiskResult:
             slope_provenance = "SAMPLE_MOCK"
             elev_provenance = "SAMPLE_MOCK"
 
-        # ── Rainfall / soil: always SAMPLE_MOCK in Phase 7 ──
+        #  Rainfall / soil: real soil, mock rainfall
         rain_24h = float(zone_props.get("rain_24h", 0.0))
         rain_3d = float(zone_props.get("rain_3d", 0.0))
-        sw_val = zone_props.get("soil_wetness_index") if "soil_wetness_index" in zone_props else zone_props.get("soil_moisture")
-        soil_wetness = float(sw_val) if sw_val is not None else 0.0
+
+        from services.soil_loader import get_zone_soil_wetness, get_soil_provenance_status
+        soil_status = get_soil_provenance_status()
+        soil_wetness = get_zone_soil_wetness(zone_id)
+        soil_provenance = soil_status.get("status", "SAMPLE_MOCK")
+
         rain_7d = float(zone_props.get("rain_7d", 0.0)) if "rain_7d" in zone_props else None
 
         result = _ml_score_zone(
@@ -91,7 +95,7 @@ def compute_zone_risk(zone_props: Dict[str, Any]) -> RiskResult:
             "elevation": elev_provenance,
             "observed_rainfall": obs_rain_prov,
             "forecast_rainfall": fcst_rain_prov,
-            "soil_wetness": "SAMPLE_MOCK",
+            "soil_wetness": soil_provenance,
             "rainfall": obs_rain_prov,
         }
         result.used_slope_deg = slope

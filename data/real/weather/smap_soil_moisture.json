@@ -1,0 +1,220 @@
+{
+  "metadata": {
+    "data_type": "REAL_SOIL_MOISTURE",
+    "source_data_origin": "NASA_NSIDC_SMAP",
+    "provider": "NASA",
+    "daac": "NSIDC_DAAC",
+    "dataset": "SPL4SMGP",
+    "version": "8",
+    "collection_concept_id": "C3480440870-NSIDC_CPRD",
+    "granule_concept_id": "G4304006843-NSIDC_CPRD",
+    "source_filename": "SMAP_L4_SM_gph_20260907T223000_Vv8011_001.h5",
+    "variable": "sm_rootzone_wetness",
+    "depth_cm": "0-100",
+    "units": "dimensionless",
+    "spatial_resolution": "~9 km",
+    "grid": "EASE_GRID_2_0",
+    "crs": "EPSG:6933",
+    "temporal_resolution": "3-hourly",
+    "temporal_semantics": "3-hour time average",
+    "product_nature": "DATA_ASSIMILATION",
+    "product_start_utc": "2026-09-07T21:00:00.000Z",
+    "product_end_utc": "2026-09-08T00:00:00.000Z",
+    "representative_time_utc": "2026-09-07T22:30:00Z",
+    "retrieved_at_utc": "2026-09-10T17:24:40Z",
+    "product_age_hours": 66.91113405527777,
+    "source_availability_status": "LATEST_AVAILABLE_AT_RETRIEVAL",
+    "is_real": true,
+    "is_live": false
+  },
+  "native_cells": {
+    "ROW_485_COL_2920": {
+      "cell_id": "ROW_485_COL_2920",
+      "row": 485,
+      "column": 2920,
+      "center_lat": 23.70861053466797,
+      "center_lon": 92.6607894897461,
+      "sm_rootzone_wetness": 0.9224612712860107,
+      "valid": true
+    },
+    "ROW_485_COL_2921": {
+      "cell_id": "ROW_485_COL_2921",
+      "row": 485,
+      "column": 2921,
+      "center_lat": 23.70861053466797,
+      "center_lon": 92.754150390625,
+      "sm_rootzone_wetness": 0.9275882244110107,
+      "valid": true
+    },
+    "ROW_484_COL_2920": {
+      "cell_id": "ROW_484_COL_2920",
+      "row": 484,
+      "column": 2920,
+      "center_lat": 23.785587310791016,
+      "center_lon": 92.6607894897461,
+      "sm_rootzone_wetness": 0.9192874431610107,
+      "valid": true
+    },
+    "ROW_484_COL_2921": {
+      "cell_id": "ROW_484_COL_2921",
+      "row": 484,
+      "column": 2921,
+      "center_lat": 23.785587310791016,
+      "center_lon": 92.754150390625,
+      "sm_rootzone_wetness": 0.9234378337860107,
+      "valid": true
+    }
+  },
+  "zones": {
+    "A01": {
+      "zone_id": "A01",
+      "native_cell_id": "ROW_485_COL_2920",
+      "soil_wetness": 0.9224612712860107,
+      "provenance": "REAL_SOIL_MOISTURE"
+    },
+    "A02": {
+      "zone_id": "A02",
+      "native_cell_id": "ROW_485_COL_2920",
+      "soil_wetness": 0.9224612712860107,
+      "provenance": "REAL_SOIL_MOISTURE"
+    },
+    "A03": {
+      "zone_id": "A03",
+      "native_cell_id": "ROW_485_COL_2921",
+      "soil_wetness": 0.9275882244110107,
+      "provenance": "REAL_SOIL_MOISTURE"
+    },
+    "A04": {
+      "zone_id": "A04",
+      "native_cell_id": "ROW_485_COL_2921",
+      "soil_wetness": 0.9275882244110107,
+      "provenance": "REAL_SOIL_MOISTURE"
+    },
+    "A05": {
+      "zone_id": "A05",
+      "native_cell_id": "ROW_485_COL_2921",
+      "soil_wetness": 0.9275882244110107,
+      "provenance": "REAL_SOIL_MOISTURE"
+    },
+    "B01": {
+      "zone_id": "B01",
+      "native_cell_id": "ROW_485_COL_2920",
+      "soil_wetness": 0.9224612712860107,
+      "provenance": "REAL_SOIL_MOISTURE"
+    },
+    "B02": {
+      "zone_id": "B02",
+      "native_cell_id": "ROW_485_COL_2920",
+      "soil_wetness": 0.9224612712860107,
+      "provenance": "REAL_SOIL_MOISTURE"
+    },
+    "B03": {
+      "zone_id": "B03",
+      "native_cell_id": "ROW_485_COL_2921",
+      "soil_wetness": 0.9275882244110107,
+      "provenance": "REAL_SOIL_MOISTURE"
+    },
+    "B04": {
+      "zone_id": "B04",
+      "native_cell_id": "ROW_485_COL_2921",
+      "soil_wetness": 0.9275882244110107,
+      "provenance": "REAL_SOIL_MOISTURE"
+    },
+    "B05": {
+      "zone_id": "B05",
+      "native_cell_id": "ROW_485_COL_2921",
+      "soil_wetness": 0.9275882244110107,
+      "provenance": "REAL_SOIL_MOISTURE"
+    },
+    "C01": {
+      "zone_id": "C01",
+      "native_cell_id": "ROW_485_COL_2920",
+      "soil_wetness": 0.9224612712860107,
+      "provenance": "REAL_SOIL_MOISTURE"
+    },
+    "C02": {
+      "zone_id": "C02",
+      "native_cell_id": "ROW_485_COL_2920",
+      "soil_wetness": 0.9224612712860107,
+      "provenance": "REAL_SOIL_MOISTURE"
+    },
+    "C03": {
+      "zone_id": "C03",
+      "native_cell_id": "ROW_485_COL_2921",
+      "soil_wetness": 0.9275882244110107,
+      "provenance": "REAL_SOIL_MOISTURE"
+    },
+    "C04": {
+      "zone_id": "C04",
+      "native_cell_id": "ROW_485_COL_2921",
+      "soil_wetness": 0.9275882244110107,
+      "provenance": "REAL_SOIL_MOISTURE"
+    },
+    "C05": {
+      "zone_id": "C05",
+      "native_cell_id": "ROW_485_COL_2921",
+      "soil_wetness": 0.9275882244110107,
+      "provenance": "REAL_SOIL_MOISTURE"
+    },
+    "D01": {
+      "zone_id": "D01",
+      "native_cell_id": "ROW_485_COL_2920",
+      "soil_wetness": 0.9224612712860107,
+      "provenance": "REAL_SOIL_MOISTURE"
+    },
+    "D02": {
+      "zone_id": "D02",
+      "native_cell_id": "ROW_485_COL_2920",
+      "soil_wetness": 0.9224612712860107,
+      "provenance": "REAL_SOIL_MOISTURE"
+    },
+    "D03": {
+      "zone_id": "D03",
+      "native_cell_id": "ROW_485_COL_2921",
+      "soil_wetness": 0.9275882244110107,
+      "provenance": "REAL_SOIL_MOISTURE"
+    },
+    "D04": {
+      "zone_id": "D04",
+      "native_cell_id": "ROW_485_COL_2921",
+      "soil_wetness": 0.9275882244110107,
+      "provenance": "REAL_SOIL_MOISTURE"
+    },
+    "D05": {
+      "zone_id": "D05",
+      "native_cell_id": "ROW_485_COL_2921",
+      "soil_wetness": 0.9275882244110107,
+      "provenance": "REAL_SOIL_MOISTURE"
+    },
+    "E01": {
+      "zone_id": "E01",
+      "native_cell_id": "ROW_484_COL_2920",
+      "soil_wetness": 0.9192874431610107,
+      "provenance": "REAL_SOIL_MOISTURE"
+    },
+    "E02": {
+      "zone_id": "E02",
+      "native_cell_id": "ROW_484_COL_2920",
+      "soil_wetness": 0.9192874431610107,
+      "provenance": "REAL_SOIL_MOISTURE"
+    },
+    "E03": {
+      "zone_id": "E03",
+      "native_cell_id": "ROW_484_COL_2921",
+      "soil_wetness": 0.9234378337860107,
+      "provenance": "REAL_SOIL_MOISTURE"
+    },
+    "E04": {
+      "zone_id": "E04",
+      "native_cell_id": "ROW_484_COL_2921",
+      "soil_wetness": 0.9234378337860107,
+      "provenance": "REAL_SOIL_MOISTURE"
+    },
+    "E05": {
+      "zone_id": "E05",
+      "native_cell_id": "ROW_484_COL_2921",
+      "soil_wetness": 0.9234378337860107,
+      "provenance": "REAL_SOIL_MOISTURE"
+    }
+  }
+}

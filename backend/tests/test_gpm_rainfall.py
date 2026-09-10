@@ -325,7 +325,7 @@ def test_api_risk_current_c03_provenance():
     assert prov.get("slope") == "REAL_DEM"
     assert prov.get("elevation") == "REAL_DEM"
     assert prov.get("observed_rainfall") == "REAL_GPM"
-    assert prov.get("soil_wetness") == "SAMPLE_MOCK"
+    assert prov.get("soil_wetness") == "REAL_SOIL_MOISTURE"
 
 
 @patch("services.forecast_loader.get_forecast_provenance_status", return_value={"status": "SAMPLE_MOCK", "freshness_status": "MOCK"})

@@ -172,7 +172,7 @@ def test_risk_engine_uses_real_slope():
     assert prov.get("slope") == "REAL_DEM", f"Expected slope=REAL_DEM, got: {prov}"
     assert prov.get("elevation") == "REAL_DEM", f"Expected elevation=REAL_DEM, got: {prov}"
     assert prov.get("rainfall") == "SAMPLE_MOCK"
-    assert prov.get("soil_wetness") == "SAMPLE_MOCK"
+    assert prov.get("soil_wetness") == "REAL_SOIL_MOISTURE"
 
     # REAL_DEM slope for C03 is ~22.06°, not 42°
     if used_slope is not None:
@@ -237,7 +237,7 @@ def test_risk_current_c03_has_provenance(test_client):
     assert prov.get("slope") == "REAL_DEM"
     assert prov.get("elevation") == "REAL_DEM"
     assert prov.get("observed_rainfall") == "REAL_GPM"
-    assert prov.get("soil_wetness") == "SAMPLE_MOCK"
+    assert prov.get("soil_wetness") == "REAL_SOIL_MOISTURE"
     # Slope reported should be ~22°, not 42°
     assert data.get("slope", 100) < 40, f"Expected real slope ~22°, got {data.get('slope')}"
 
