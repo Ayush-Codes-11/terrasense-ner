@@ -223,7 +223,9 @@ def test_no_negative_or_nan_rainfall():
 
 # ── 4. Rolling Accumulation with Real GPM Values ──────────────────────────────
 
-def test_c03_rolling_accumulation_with_gpm():
+@patch("services.forecast_loader.get_forecast_provenance_status", return_value={"status": "SAMPLE_MOCK", "freshness_status": "MOCK"})
+@patch("services.forecast_loader.get_zone_forecast", return_value=None)
+def test_c03_rolling_accumulation_with_gpm(mock_forecast, mock_prov):
     """
     Test rolling accumulation on C03 where observed is SAMPLE_GPM_COMPATIBLE and forecast is SAMPLE_MOCK.
     C03 GPM observed: D-2=11.6, D-1=19.8, D0=32.4
@@ -257,7 +259,9 @@ def test_c03_rolling_accumulation_with_gpm():
 
 # ── 5. Provenance Invariants & Fallback Behavior ──────────────────────────────
 
-def test_forecast_never_labelled_as_gpm():
+@patch("services.forecast_loader.get_forecast_provenance_status", return_value={"status": "SAMPLE_MOCK", "freshness_status": "MOCK"})
+@patch("services.forecast_loader.get_zone_forecast", return_value=None)
+def test_forecast_never_labelled_as_gpm(mock_forecast, mock_prov):
     """INVARIANT: Forecast intervals must NEVER have REAL_GPM provenance."""
     for zid in ["A01", "C03", "E05"]:
         series = get_rainfall_series(zid)
@@ -266,7 +270,9 @@ def test_forecast_never_labelled_as_gpm():
         assert series.forecast_provenance != "SAMPLE_GPM_COMPATIBLE"
 
 
-def test_missing_gpm_file_triggers_graceful_fallback():
+@patch("services.forecast_loader.get_forecast_provenance_status", return_value={"status": "SAMPLE_MOCK", "freshness_status": "MOCK"})
+@patch("services.forecast_loader.get_zone_forecast", return_value=None)
+def test_missing_gpm_file_triggers_graceful_fallback(mock_forecast, mock_prov):
     """When GPM observed file is absent or cannot be loaded, fallback to SAMPLE_MOCK."""
     with patch.object(rainfall_mod, "get_zone_gpm_observed", return_value=None):
         series = get_rainfall_series("C03")
@@ -294,7 +300,9 @@ def test_api_weather_status():
     assert data["unique_native_cells_count"] == 4
 
 
-def test_api_weather_zone_c03():
+@patch("services.forecast_loader.get_forecast_provenance_status", return_value={"status": "SAMPLE_MOCK", "freshness_status": "MOCK"})
+@patch("services.forecast_loader.get_zone_forecast", return_value=None)
+def test_api_weather_zone_c03(mock_forecast, mock_prov):
     """GET /weather/C03 returns observed GPM rainfall and sample forecast intervals."""
     response = client.get("/weather/C03")
     assert response.status_code == 200
@@ -320,7 +328,9 @@ def test_api_risk_current_c03_provenance():
     assert prov.get("soil_wetness") == "SAMPLE_MOCK"
 
 
-def test_api_risk_forecast_c03_provenance():
+@patch("services.forecast_loader.get_forecast_provenance_status", return_value={"status": "SAMPLE_MOCK", "freshness_status": "MOCK"})
+@patch("services.forecast_loader.get_zone_forecast", return_value=None)
+def test_api_risk_forecast_c03_provenance(mock_forecast, mock_prov):
     """GET /risk/forecast/C03 distinguishes SAMPLE_GPM_COMPATIBLE observed from SAMPLE_MOCK forecast."""
     response = client.get("/risk/forecast/C03")
     assert response.status_code == 200

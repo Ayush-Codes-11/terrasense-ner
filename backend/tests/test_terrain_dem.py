@@ -244,7 +244,11 @@ def test_risk_current_c03_has_provenance(test_client):
 
 # ─── 15. /risk/forecast/C03 has feature_provenance ───────────────────────────
 
-def test_risk_forecast_c03_has_provenance(test_client):
+from unittest.mock import patch
+
+@patch("services.forecast_loader.get_forecast_provenance_status", return_value={"status": "SAMPLE_MOCK", "freshness_status": "MOCK"})
+@patch("services.forecast_loader.get_zone_forecast", return_value=None)
+def test_risk_forecast_c03_has_provenance(mock_forecast, mock_prov, test_client):
     """GET /risk/forecast/C03 exposes feature_provenance with REAL_DEM slope."""
     resp = test_client.get("/risk/forecast/C03")
     assert resp.status_code == 200

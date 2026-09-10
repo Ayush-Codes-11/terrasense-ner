@@ -26,7 +26,7 @@ REAL-DATA GUARDRAILS FOR FUTURE WEATHER ADAPTERS (PHASE 5+ DOCUMENTATION):
    - Multiple fine cells share the same SMAP value. Do not integrate SMAP until Phase 6+.
 
 4. MULTI-SCALE RESOLUTION DISCIPLINE:
-   - Terrain features (slope, aspect) are fine (~30m from SRTM/Copernicus DEM).
+   - Terrain features (slope, aspect) are fine (~30m from Copernicus DEM GLO-30).
    - Meteorological & soil features (IMD/GPM/SMAP) are coarse (10-25 km).
    - NEVER upsample coarse atmospheric data and present it as independently measured
      fine-scale hyper-local weather.
@@ -114,18 +114,49 @@ def get_rainfall_series(zone_id: str) -> RainfallSeries:
     obs_raw = raw.get("observed_daily_mm", {})
     fcst_raw = raw.get("forecast_interval_mm", {})
 
-    # Validation of forecast intervals (always present)
-    for key in ["0_24h", "24_48h", "48_72h"]:
-        if key not in fcst_raw or fcst_raw[key] is None:
-            raise ValueError(f"Missing required forecast rainfall interval '{key}' for zone {zid}")
-        if float(fcst_raw[key]) < 0:
-            raise ValueError(f"Negative forecast rainfall for interval '{key}' in zone {zid}: {fcst_raw[key]}")
+    # Check for Real Forecast observations
+    try:
+        from services.forecast_loader import get_forecast_provenance_status, get_zone_forecast
+        fcst_prov_status = get_forecast_provenance_status()
+        fcst_data = get_zone_forecast(zid)
+    except ImportError:
+        fcst_prov_status = {"status": "SAMPLE_MOCK", "freshness_status": "MOCK"}
+        fcst_data = None
 
-    forecast = ForecastIntervalRainfall(
-        interval_0_24h=float(fcst_raw["0_24h"]),
-        interval_24_48h=float(fcst_raw["24_48h"]),
-        interval_48_72h=float(fcst_raw["48_72h"]),
-    )
+    if fcst_data and "forecast_interval_mm" in fcst_data:
+        f_mm = fcst_data["forecast_interval_mm"]
+        f1 = float(f_mm["0_24h"])
+        f2 = float(f_mm["24_48h"])
+        f3 = float(f_mm["48_72h"])
+
+        for k, v in [("0_24h", f1), ("24_48h", f2), ("48_72h", f3)]:
+            if v < 0 or not math.isfinite(v):
+                raise ValueError(f"Invalid real forecast rainfall for '{k}' in zone {zid}: {v}")
+
+        forecast = ForecastIntervalRainfall(
+            interval_0_24h=f1,
+            interval_24_48h=f2,
+            interval_48_72h=f3,
+        )
+        forecast_prov = fcst_prov_status.get("status", "SAMPLE_MOCK")
+        forecast_freshness = fcst_prov_status.get("freshness_status", "CURRENT")
+        fcst_source = fcst_prov_status.get("source", "ECMWF_OPEN_METEO")
+    else:
+        # Fallback to sample
+        for key in ["0_24h", "24_48h", "48_72h"]:
+            if key not in fcst_raw or fcst_raw[key] is None:
+                raise ValueError(f"Missing required forecast rainfall interval '{key}' for zone {zid}")
+            if float(fcst_raw[key]) < 0:
+                raise ValueError(f"Negative forecast rainfall for interval '{key}' in zone {zid}: {fcst_raw[key]}")
+
+        forecast = ForecastIntervalRainfall(
+            interval_0_24h=float(fcst_raw["0_24h"]),
+            interval_24_48h=float(fcst_raw["24_48h"]),
+            interval_48_72h=float(fcst_raw["48_72h"]),
+        )
+        forecast_prov = "SAMPLE_MOCK"
+        forecast_freshness = "MOCK"
+        fcst_source = "TerraSense Synthetic Scenario"
 
     # Check for Real GPM IMERG observations
     try:
@@ -151,10 +182,10 @@ def get_rainfall_series(zone_id: str) -> RainfallSeries:
         data_type = observed_prov
         obs_buckets_meta = gpm_data.get("observed_buckets")
         obs_timestamp = gpm_data.get("observed_buckets", {}).get("d0", {}).get("window_end_utc")
-        source = prov_status.get("source", "NASA GPM IMERG")
+        source = f"Obs: {prov_status.get('source', 'NASA GPM')} | Fcst: {fcst_source}"
         note = (
-            f"Observed rainfall from {source}. "
-            "Future forecast intervals are SAMPLE_MOCK scenario."
+            f"Observed rainfall from {prov_status.get('source')}. "
+            f"Forecast from {fcst_source} (Freshness: {forecast_freshness})."
         )
     else:
         # Fallback to sample weather
@@ -173,8 +204,14 @@ def get_rainfall_series(zone_id: str) -> RainfallSeries:
         data_type = raw.get("data_type", "SAMPLE_MOCK")
         obs_buckets_meta = None
         obs_timestamp = None
-        source = raw.get("data_meta", {}).get("source", "TerraSense Synthetic Scenario Weather Generator")
+        source = raw.get("data_meta", {}).get("source", "TerraSense Synthetic")
         note = "SAMPLE_FALLBACK: Real GPM data not loaded. Using sample mock rainfall."
+
+    # If forecast is stale, maybe expose it in RainfallSeries, or let it be.
+    # The prompt says "freshness_status = CURRENT | STALE", let's attach to forecast_provenance or note.
+    # We can add `forecast_freshness` to RainfallSeries but it requires altering the dataclass.
+    # Let's just append freshness to `forecast_provenance` or `note`.
+    # I will modify RainfallSeries dataclass to include `forecast_freshness`.
 
     return RainfallSeries(
         zone_id=zid,
@@ -185,7 +222,7 @@ def get_rainfall_series(zone_id: str) -> RainfallSeries:
         source=source,
         note=note,
         observed_provenance=observed_prov,
-        forecast_provenance="SAMPLE_MOCK",
+        forecast_provenance=forecast_prov,
         observation_timestamp=obs_timestamp,
         observed_buckets_meta=obs_buckets_meta,
     )
