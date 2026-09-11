@@ -58,3 +58,15 @@ class AnalysisZoneMetadata(BaseModel):
     zone_type: ZoneType
 
     model_config = ConfigDict(use_enum_values=True)
+
+class RegionListResponse(BaseModel):
+    count: int
+    items: list[Region]
+
+class StateListResponse(BaseModel):
+    count: int
+    items: list[State]
+
+class DistrictListResponse(BaseModel):
+    count: int
+    items: list[District]
