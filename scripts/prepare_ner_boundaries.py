@@ -63,6 +63,14 @@ def read_geojson(path: Path) -> dict[str, Any]:
     return document
 
 
+def read_json(path: Path) -> dict[str, Any]:
+    with path.open(encoding="utf-8") as handle:
+        document = json.load(handle)
+    if not isinstance(document, dict):
+        raise ValueError(f"{path} must contain a JSON object")
+    return document
+
+
 def feature_properties(feature: dict[str, Any]) -> dict[str, Any]:
     properties = feature.get("properties")
     if not isinstance(properties, dict):
@@ -134,7 +142,7 @@ def main() -> None:
                 "admin_level": "state",
                 "source_feature_id": source["shapeID"],
                 "source": "geoBoundaries gbOpen India ADM1",
-                "source_version": "2021 boundary vintage; build 2023-12-12",
+                "source_version": "2011 boundary vintage; build 2023-12-12",
             },
         }
         state_features.append(feature)
@@ -212,23 +220,63 @@ def main() -> None:
         )
         for state_id in STATES
     }
-    aizawl = next(
-        feature for feature in district_features
+    aizawl_matches = [
+        feature
+        for feature in district_features
         if feature["properties"]["district_name"] == "Aizawl"
-    )
+        and feature["properties"]["state_id"] == "IN-MZ"
+    ]
+    if len(aizawl_matches) != 1:
+        raise ValueError(
+            "Expected exactly one Aizawl district under IN-MZ, "
+            f"found {len(aizawl_matches)}"
+        )
+    aizawl = aizawl_matches[0]
+    metadata_path = OUTPUT_DIR / "metadata.json"
+    existing_metadata: dict[str, Any] = {}
+    if metadata_path.exists():
+        existing_metadata = read_json(metadata_path)
     metadata = {
         "regions": [{"region_id": "NER", "region_name": "Northeast Region"}],
         "pilot_district_id": aizawl["properties"]["district_id"],
-        "dataset_source": "geoBoundaries gbOpen India ADM1/ADM2, release 9469f09",
+        "dataset_source": {
+            "adm1_states": {
+                "name": "geoBoundaries gbOpen India ADM1",
+                "release": "9469f09",
+                "boundary_vintage": "2011",
+                "upstream_sources": [
+                    "DataMeet India community",
+                    "Election Commission of India",
+                ],
+                "license": "CC BY 2.5 India",
+            },
+            "adm2_districts": {
+                "name": "geoBoundaries gbOpen India ADM2",
+                "release": "9469f09",
+                "boundary_vintage": "2021",
+                "upstream_sources": [
+                    "Pathways Data Pvt. Ltd.",
+                    "lgdirectory.gov.in",
+                ],
+                "license": "ODbL 1.0",
+            },
+        },
         "dataset_version": "ADM1 2011 / ADM2 2021 boundary vintages; built 2023-12-12",
         "crs": "EPSG:4326",
         "state_count": len(state_features),
         "district_count": len(district_features),
         "district_count_by_state": counts,
         "lgd_mapping_status": "Not provided by geometry features; no LGD codes guessed",
+        "administrative_list_comparison_date": existing_metadata.get(
+            "administrative_list_comparison_date"
+        ),
+        "administrative_list_comparison_status": existing_metadata.get(
+            "administrative_list_comparison_status",
+            "Not recorded; current LGD comparison has not been attempted",
+        ),
         "generated_on": date.today().isoformat(),
     }
-    with (OUTPUT_DIR / "metadata.json").open("w", encoding="utf-8", newline="\n") as handle:
+    with metadata_path.open("w", encoding="utf-8", newline="\n") as handle:
         json.dump(metadata, handle, indent=2, ensure_ascii=False)
         handle.write("\n")
 
