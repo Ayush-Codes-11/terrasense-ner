@@ -1,0 +1,55 @@
+{
+  "dataset_type": "OFFICIAL_REFERENCE_CONTACTS",
+  "operational_status": "REFERENCE_ONLY",
+  "last_verified": "2026-09-11",
+  "disclaimer": "Verify numbers with the responsible authority before operational dispatch. TerraSense does not automatically call these contacts.",
+  "contacts": [
+    {
+      "contact_id": "IN-EMERGENCY-112",
+      "name": "India Emergency Response Support System",
+      "scope": "India",
+      "phone": "112",
+      "source_url": "https://112.gov.in/",
+      "source_organisation": "Government of India ERSS",
+      "use": "Emergency assistance routing",
+      "verified_from_source": true
+    },
+    {
+      "contact_id": "IN-NDRF-HQ-CONTROL-01123438091",
+      "name": "NDRF Headquarters Control Room",
+      "scope": "India",
+      "phone": "011-23438091",
+      "source_url": "https://ndrf.gov.in/contact-us",
+      "source_organisation": "National Disaster Response Force",
+      "use": "Reference and coordination contact",
+      "verified_from_source": true
+    },
+    {
+      "contact_id": "IN-NDRF-HQ-CONTROL-01123438136",
+      "name": "NDRF Headquarters Control Room",
+      "scope": "India",
+      "phone": "011-23438136",
+      "source_url": "https://ndrf.gov.in/contact-us",
+      "source_organisation": "National Disaster Response Force",
+      "use": "Reference and coordination contact",
+      "verified_from_source": true
+    }
+  ],
+  "official_directory_links": [
+    {
+      "scope": "India",
+      "name": "National Disaster Management Authority",
+      "url": "https://ndma.gov.in/"
+    },
+    {
+      "scope": "Mizoram / Aizawl",
+      "name": "Aizawl District Administration",
+      "url": "https://aizawl.nic.in/"
+    },
+    {
+      "scope": "Mizoram",
+      "name": "Mizoram Government Portal",
+      "url": "https://mizoram.gov.in/"
+    }
+  ]
+}

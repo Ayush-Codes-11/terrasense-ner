@@ -162,7 +162,7 @@ export default function Dashboard() {
         />
 
         {/* Floating Top Actions */}
-        <div className="absolute top-0 left-0 right-0 z-[1000] px-3 py-2 bg-[#07111F]/95 border-b border-slate-700/40 shadow-xl flex flex-wrap gap-2 justify-end pointer-events-none">
+        <div className="absolute top-0 left-0 right-0 z-[2000] px-3 py-2 bg-[#07111F]/95 border-b border-slate-700/40 shadow-xl flex flex-wrap gap-2 justify-end pointer-events-none">
           <button 
             className="pointer-events-auto px-3 py-1.5 rounded-md bg-[#101F35]/90 border border-slate-400/20 shadow-lg text-xs font-medium text-slate-200 hover:bg-[#152845] transition-all backdrop-blur-md flex items-center gap-2"
             onClick={() => setIsDataStatusOpen(!isDataStatusOpen)}

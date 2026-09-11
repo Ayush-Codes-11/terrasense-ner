@@ -51,6 +51,12 @@ body {
   border-top-color: rgba(148, 163, 184, 0.2) !important;
 }
 
+/* The dashboard action strip owns the top edge; keep the map-style picker below it. */
+.leaflet-top.leaflet-right {
+  top: 62px !important;
+  z-index: 900 !important;
+}
+
 /* Risk badge */
 .risk-badge {
   @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border;
