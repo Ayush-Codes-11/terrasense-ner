@@ -6,6 +6,8 @@ never turn an unavailable Kafka broker, IoT feed, or live API into a fake
 """
 from __future__ import annotations
 
+import os
+import socket
 import hashlib
 from pathlib import Path
 from typing import Any
@@ -19,6 +21,16 @@ from services.soil_loader import get_soil_provenance_status
 from services.terrain_loader import get_terrain_provenance_status
 
 router = APIRouter(prefix="/operations", tags=["operations"])
+
+
+def _tcp_status(host: str, port: int, configured: bool) -> str:
+    if not configured:
+        return "NOT_CONFIGURED"
+    try:
+        with socket.create_connection((host, port), timeout=0.5):
+            return "ONLINE"
+    except OSError:
+        return "UNAVAILABLE"
 
 
 def _parity_check() -> dict[str, Any]:
@@ -54,11 +66,20 @@ def _parity_check() -> dict[str, Any]:
 @router.get("/status")
 def operations_status() -> dict[str, Any]:
     fusion = get_real_fusion_status()
+    kafka_url = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "")
+    kafka_host, _, kafka_port_text = kafka_url.partition(":")
+    kafka_port = int(kafka_port_text or "9092")
+    database_url = os.getenv("DATABASE_URL", "")
     return {
         "connectivity": {
             "backend_api": "ONLINE",
-            "kafka": "NOT_CONFIGURED",
-            "iot_sensor_gateway": "NOT_CONFIGURED",
+            "kafka": _tcp_status(kafka_host, kafka_port, bool(kafka_host)),
+            "iot_sensor_gateway": (
+                "SIMULATOR_READY"
+                if os.getenv("SENSOR_MODE") == "SIMULATED"
+                else "NOT_CONFIGURED"
+            ),
+            "postgis": _tcp_status("localhost", 5432, bool(database_url)),
             "live_remote_sensing": "NOT_CONFIGURED",
             "offline_field_reports": "AVAILABLE",
         },
