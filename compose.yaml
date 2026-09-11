@@ -1,0 +1,19 @@
+# Local development only; defaults are not production credentials.
+services:
+  postgis:
+    image: postgis/postgis:16-3.5
+    environment:
+      POSTGRES_DB: terrasense
+      POSTGRES_USER: terrasense
+      POSTGRES_PASSWORD: terrasense
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - terrasense_postgis:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U terrasense -d terrasense"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+volumes:
+  terrasense_postgis:
