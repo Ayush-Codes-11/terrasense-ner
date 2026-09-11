@@ -139,6 +139,7 @@ def main() -> None:
             "properties": {
                 "state_id": state_id,
                 "state_name": state_name,
+                "region_id": "NER",
                 "admin_level": "state",
                 "source_feature_id": source["shapeID"],
                 "source": "geoBoundaries gbOpen India ADM1",
