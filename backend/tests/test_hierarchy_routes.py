@@ -89,6 +89,16 @@ def test_hierarchy_unavailable(tmp_path):
     assert response.status_code == 503
     assert response.json()["detail"]["status"] == "BOUNDARY_DATA_UNAVAILABLE"
 
+    assert client.get("/districts/TEST-AIZAWL/zones").status_code == 503
+    assert client.get("/zones/C03").status_code == 503
+
+    app.dependency_overrides[get_hierarchy_loader] = override_missing
+    client = TestClient(app)
+
+    response = client.get("/regions")
+    assert response.status_code == 503
+    assert response.json()["detail"]["status"] == "BOUNDARY_DATA_UNAVAILABLE"
+
     app.dependency_overrides.clear()
 
 def test_hierarchy_invalid(tmp_path):
@@ -142,3 +152,73 @@ def test_legacy_routes_work_when_hierarchy_unavailable():
     prov = response.json().get("feature_provenance", {})
     assert prov.get("slope") == "REAL_DEM"
     assert prov.get("observed_rainfall") == "REAL_GPM"
+
+
+def test_get_district_zones_pilot(client_with_fixture):
+    response = client_with_fixture.get('/districts/TEST-AIZAWL/zones')
+    assert response.status_code == 200
+    data = response.json()
+    assert data['district_id'] == 'TEST-AIZAWL'
+    assert data['detailed_zone_model_available'] is True
+    assert data['count'] == 25
+    assert len(data['items']) == 25
+    z_c03 = next((z for z in data['items'] if z['zone_id'] == 'C03'), None)
+    assert z_c03 is not None
+    assert z_c03['zone_type'] == 'PROTOTYPE_ANALYSIS_GRID'
+    assert z_c03['district_id'] == 'TEST-AIZAWL'
+
+    zone_ids = [z['zone_id'] for z in data['items']]
+    assert len(zone_ids) == len(set(zone_ids))
+    assert 'SYNTHETIC' not in zone_ids
+
+def test_get_district_zones_non_pilot(client_with_fixture):
+    response = client_with_fixture.get('/districts/TEST-LUNGLEI/zones')
+    assert response.status_code == 200
+    data = response.json()
+    assert data['count'] == 0
+    assert len(data['items']) == 0
+    assert data['detailed_zone_model_available'] is False
+
+def test_get_district_zones_unknown(client_with_fixture):
+    assert client_with_fixture.get('/districts/UNKNOWN/zones').status_code == 404
+
+def test_get_zone(client_with_fixture):
+    response = client_with_fixture.get('/zones/C03')
+    assert response.status_code == 200
+    data = response.json()
+    assert data['zone_id'] == 'C03'
+    assert data['district_id'] == 'TEST-AIZAWL'
+    assert data['zone_type'] == 'PROTOTYPE_ANALYSIS_GRID'
+
+def test_get_zone_unknown(client_with_fixture):
+    assert client_with_fixture.get('/zones/UNKNOWN').status_code == 404
+
+def test_legacy_get_zones_preserved():
+    from fastapi.testclient import TestClient
+    from main import app
+    client = TestClient(app)
+    response = client.get('/zones')
+    assert response.status_code == 200
+    data = response.json()
+    assert data['type'] == 'FeatureCollection'
+    features = data['features']
+    assert len(features) == 25
+    z_c03 = next((f for f in features if f['properties']['zone_id'] == 'C03'), None)
+    assert z_c03 is not None
+    assert z_c03['geometry']['type'] == 'Polygon'
+
+def test_analysis_zone_service_discovers_zones_from_canonical_loader(monkeypatch):
+    from services.analysis_zone_service import AnalysisZoneService
+
+    # Mock the canonical loader to return a synthetic set of zones
+    def mock_get_all_zone_props():
+        return [{"zone_id": "X01"}, {"zone_id": "X02"}, {"zone_id": "X03"}]
+
+    monkeypatch.setattr('services.analysis_zone_service.get_all_zone_props', mock_get_all_zone_props)
+
+    service = AnalysisZoneService(override_hierarchy_loader())
+    zones = service.get_district_zones("TEST-AIZAWL")
+
+    zone_ids = [z.zone_id for z in zones]
+    assert zone_ids == ["X01", "X02", "X03"]
+    assert all(z.district_id == "TEST-AIZAWL" for z in zones)

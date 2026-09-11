@@ -7,7 +7,8 @@ from functools import lru_cache
 from models.hierarchy import (
     HierarchyStatus,
     Region, State, District,
-    RegionListResponse, StateListResponse, DistrictListResponse
+    RegionListResponse, StateListResponse, DistrictListResponse,
+    DistrictZonesResponse, AnalysisZoneMetadata, CoverageLevel
 )
 from services.hierarchy_loader import HierarchyLoader, HierarchyDataError
 
@@ -83,3 +84,31 @@ def get_district(district_id: str, loader: HierarchyLoader = Depends(ensure_hier
     if district_id not in loader.districts:
         raise HTTPException(status_code=404, detail="District not found")
     return loader.districts[district_id]
+
+
+@router.get('/districts/{district_id}/zones', response_model=DistrictZonesResponse)
+def get_district_zones(district_id: str, loader: HierarchyLoader = Depends(ensure_hierarchy_ready)):
+    if district_id not in loader.districts:
+        raise HTTPException(status_code=404, detail='District not found')
+    from services.analysis_zone_service import AnalysisZoneService
+    service = AnalysisZoneService(loader)
+    zones = service.get_district_zones(district_id)
+    district = loader.districts[district_id]
+    return DistrictZonesResponse(
+        district_id=district.district_id,
+        district_name=district.district_name,
+        coverage_level=district.coverage_level,
+        risk_model_status=district.risk_model_status,
+        detailed_zone_model_available=(district.coverage_level == CoverageLevel.DETAILED_PILOT),
+        count=len(zones),
+        items=zones
+    )
+
+@router.get('/zones/{zone_id}', response_model=AnalysisZoneMetadata)
+def get_zone(zone_id: str, loader: HierarchyLoader = Depends(ensure_hierarchy_ready)):
+    from services.analysis_zone_service import AnalysisZoneService
+    service = AnalysisZoneService(loader)
+    zone = service.get_zone(zone_id)
+    if not zone:
+        raise HTTPException(status_code=404, detail='Zone not found')
+    return zone

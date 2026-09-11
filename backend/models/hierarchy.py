@@ -70,3 +70,12 @@ class StateListResponse(BaseModel):
 class DistrictListResponse(BaseModel):
     count: int
     items: list[District]
+
+class DistrictZonesResponse(BaseModel):
+    district_id: str
+    district_name: str
+    coverage_level: CoverageLevel
+    risk_model_status: RiskModelStatus
+    detailed_zone_model_available: bool
+    count: int
+    items: list[AnalysisZoneMetadata]
