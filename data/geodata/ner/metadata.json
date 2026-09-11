@@ -1,0 +1,26 @@
+{
+  "regions": [
+    {
+      "region_id": "NER",
+      "region_name": "Northeast Region"
+    }
+  ],
+  "pilot_district_id": "IND-ADM2-76128533B34203923268864",
+  "dataset_source": "geoBoundaries gbOpen India ADM1/ADM2, release 9469f09",
+  "dataset_version": "ADM1 2011 / ADM2 2021 boundary vintages; built 2023-12-12",
+  "crs": "EPSG:4326",
+  "state_count": 8,
+  "district_count": 119,
+  "district_count_by_state": {
+    "IN-AR": 25,
+    "IN-AS": 33,
+    "IN-MN": 16,
+    "IN-ML": 11,
+    "IN-MZ": 11,
+    "IN-NL": 11,
+    "IN-SK": 4,
+    "IN-TR": 8
+  },
+  "lgd_mapping_status": "Not provided by geometry features; no LGD codes guessed",
+  "generated_on": "2026-09-11"
+}
