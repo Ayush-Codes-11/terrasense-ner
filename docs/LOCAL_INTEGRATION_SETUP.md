@@ -56,4 +56,12 @@ requires human verification. It does not claim a trained landslide classifier.
 - Real sensor hardware, gateway protocol, calibration, and deployment network.
 - Production Kafka/PostgreSQL secrets, backups, monitoring, and alert provider.
 
+## SMS for a judge demo
+
+The default provider is `demo`, which records a preview and does not send
+telecom traffic. To send a real SMS, use a verified Twilio account, configure
+`SMS_PROVIDER=twilio`, the three `TWILIO_*` variables, and recipient numbers.
+Indian sender registration, destination verification, billing, and provider
+rate limits still apply. Never put these credentials in GitHub.
+
 Never commit `.env.local`, tokens, passwords, or production credentials.
