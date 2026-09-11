@@ -92,13 +92,6 @@ def test_hierarchy_unavailable(tmp_path):
     assert client.get("/districts/TEST-AIZAWL/zones").status_code == 503
     assert client.get("/zones/C03").status_code == 503
 
-    app.dependency_overrides[get_hierarchy_loader] = override_missing
-    client = TestClient(app)
-
-    response = client.get("/regions")
-    assert response.status_code == 503
-    assert response.json()["detail"]["status"] == "BOUNDARY_DATA_UNAVAILABLE"
-
     app.dependency_overrides.clear()
 
 def test_hierarchy_invalid(tmp_path):
@@ -134,24 +127,27 @@ def test_hierarchy_invalid(tmp_path):
 
     app.dependency_overrides.clear()
 
-def test_legacy_routes_work_when_hierarchy_unavailable():
-    # By default, without overrides, it uses the production path which is missing,
-    # so it should be UNAVAILABLE (unless the teammate's data suddenly arrived).
-    client = TestClient(app)
+def test_legacy_routes_work_when_hierarchy_unavailable(tmp_path):
+    def override_missing():
+        return HierarchyLoader(data_dir=tmp_path)
 
-    # Hierarchy fails
-    assert client.get("/regions").status_code == 503
+    app.dependency_overrides[get_hierarchy_loader] = override_missing
+    try:
+        with TestClient(app) as client:
+            response = client.get("/regions")
+            assert response.status_code == 503
+            assert response.json()["detail"]["status"] == "BOUNDARY_DATA_UNAVAILABLE"
 
-    # But legacy routes still work!
-    assert client.get("/health").status_code == 200
-    assert client.get("/zones").status_code == 200
+            assert client.get("/health").status_code == 200
+            assert client.get("/zones").status_code == 200
 
-    response = client.get("/risk/current/C03")
-    assert response.status_code == 200
-    # verify provenance
-    prov = response.json().get("feature_provenance", {})
-    assert prov.get("slope") == "REAL_DEM"
-    assert prov.get("observed_rainfall") == "REAL_GPM"
+            response = client.get("/risk/current/C03")
+            assert response.status_code == 200
+            prov = response.json().get("feature_provenance", {})
+            assert prov.get("slope") == "REAL_DEM"
+            assert prov.get("observed_rainfall") == "REAL_GPM"
+    finally:
+        app.dependency_overrides.clear()
 
 
 def test_get_district_zones_pilot(client_with_fixture):
