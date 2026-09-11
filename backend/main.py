@@ -76,6 +76,7 @@ app.add_middleware(
 from routes.field_reports import router as field_reports_router
 from routes.alerts import router as alerts_router
 from routes.hierarchy import router as hierarchy_router
+from routes.real_risk import router as real_risk_router
 
 app.include_router(zones_router)         # /health, /zones
 app.include_router(risk_router)          # /risk/current, /risk/forecast/{id}
@@ -87,6 +88,7 @@ app.include_router(terrain_router)       # /terrain/status, /terrain/{zone_id}
 app.include_router(field_reports_router) # /field-reports
 app.include_router(alerts_router)        # /alerts
 app.include_router(hierarchy_router)     # /regions, /states, /districts
+app.include_router(real_risk_router)     # /risk/real/status, /risk/real/{zone_id}
 
 
 
