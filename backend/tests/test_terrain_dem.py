@@ -171,7 +171,6 @@ def test_risk_engine_uses_real_slope():
 
     assert prov.get("slope") == "REAL_DEM", f"Expected slope=REAL_DEM, got: {prov}"
     assert prov.get("elevation") == "REAL_DEM", f"Expected elevation=REAL_DEM, got: {prov}"
-    assert prov.get("rainfall") == "SAMPLE_MOCK"
     assert prov.get("soil_wetness") == "REAL_SOIL_MOISTURE"
 
     # REAL_DEM slope for C03 is ~22.06°, not 42°

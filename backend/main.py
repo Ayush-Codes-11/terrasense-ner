@@ -94,10 +94,10 @@ app.include_router(alerts_router)        # /alerts
 def root():
     return {
         "service": "TerraSense NER API",
-        "phase": "3 — Sample data layer",
+        "phase": "real_data_ingestion_complete",
         "docs": "/docs",
         "health": "/health",
-        "data_mode": "SAMPLE_MOCK",
+        "data_mode": "PER_SOURCE_PROVENANCE",
         "disclaimer": (
             "All data is fabricated for UI/API testing. "
             "Not for operational disaster-management use."

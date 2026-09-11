@@ -13,15 +13,31 @@ router = APIRouter()
 
 @router.get("/health", response_model=HealthResponse)
 def health():
+    from services.terrain_loader import get_terrain_provenance_status
+    from services.gpm_loader import get_gpm_provenance_status
+    from services.forecast_loader import get_forecast_provenance_status
+    from services.soil_loader import get_soil_provenance_status
+
+    terrain_prov = get_terrain_provenance_status().get("status", "SAMPLE_MOCK")
+    gpm_prov = get_gpm_provenance_status().get("status", "SAMPLE_MOCK")
+    fcst_prov = get_forecast_provenance_status().get("status", "SAMPLE_MOCK")
+    soil_prov = get_soil_provenance_status().get("status", "SAMPLE_MOCK")
+
     return HealthResponse(
         status="ok",
-        data_mode="SAMPLE_MOCK",
-        version="0.1.0-phase3",
+        risk_engine="prototype_scorer_active",
+        data_mode="PER_SOURCE_PROVENANCE",
+        phase="real_data_ingestion_complete",
         disclaimer=(
-            "All risk data is SAMPLE_MOCK for UI/API testing. "
-            "Not for operational disaster-management use. "
-            "Phase 4+ connects the prototype risk engine."
+            "Prototype relative-risk scorer. Data provenance is reported per feature; "
+            "not for operational disaster-management use."
         ),
+        data_sources={
+            "terrain": terrain_prov,
+            "observed_rainfall": gpm_prov,
+            "forecast_rainfall": fcst_prov,
+            "soil_wetness": soil_prov
+        },
         endpoints=[
             "GET /health",
             "GET /zones",

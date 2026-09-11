@@ -39,10 +39,11 @@ SAMPLE_META = DataMeta(
 
 class HealthResponse(BaseModel):
     status: str
-    data_mode: str
     risk_engine: str = "prototype_scorer_active"
-    version: str
+    data_mode: str
+    phase: str
     disclaimer: str
+    data_sources: Optional[Dict[str, str]] = None
     endpoints: List[str]
 
 

@@ -30,7 +30,9 @@ def test_health():
     data = res.json()
     assert data["status"] == "ok"
     assert data["risk_engine"] == "prototype_scorer_active"
-    assert data["data_mode"] == "SAMPLE_MOCK"
+    assert data["data_mode"] == "PER_SOURCE_PROVENANCE"
+    assert "data_sources" in data
+    assert data["data_sources"]["soil_wetness"] in ("REAL_SOIL_MOISTURE", "SAMPLE_MOCK")
 
 
 def test_get_all_current_risk():

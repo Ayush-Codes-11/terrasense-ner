@@ -86,8 +86,11 @@ def compute_zone_risk(zone_props: Dict[str, Any]) -> RiskResult:
             elevation_m=elevation,
         )
 
-        obs_rain_prov = zone_props.get("observed_rainfall_provenance", "SAMPLE_MOCK")
-        fcst_rain_prov = zone_props.get("forecast_rainfall_provenance", "SAMPLE_MOCK")
+        from services.gpm_loader import get_gpm_provenance_status
+        from services.forecast_loader import get_forecast_provenance_status
+
+        obs_rain_prov = get_gpm_provenance_status().get("status", "SAMPLE_MOCK")
+        fcst_rain_prov = get_forecast_provenance_status().get("status", "SAMPLE_MOCK")
 
         # Attach feature provenance so routes can expose it
         result.feature_provenance = {

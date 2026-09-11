@@ -120,3 +120,12 @@ def test_deployment_bundle_parity():
                 f"File {rel_path} content diverged between canonical ml/ and backend/ml/. "
                 "Run `python backend/scripts/sync_deployment_bundle.py`."
             )
+
+
+def test_critical_files_not_empty():
+    from pathlib import Path
+    repo_root = Path(__file__).resolve().parent.parent.parent
+    for rel_path in ['backend/services/soil_loader.py', 'backend/scripts/fetch_smap_soil.py']:
+        p = repo_root / rel_path
+        assert p.exists()
+        assert p.stat().st_size > 0, f'{rel_path} is unexpectedly empty!'
