@@ -1,0 +1,52 @@
+name: PostGIS Foundation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'backend/db/**'
+      - 'backend/tests/test_*db*'
+      - 'backend/tests/test_postgis*'
+      - 'backend/requirements*.txt'
+      - 'migrations/**'
+      - 'alembic.ini'
+      - 'scripts/import_hierarchy_to_postgis.py'
+      - 'data/geodata/ner/**'
+      - 'data/sample/grid-risk.geojson'
+      - '.github/workflows/postgis.yml'
+  workflow_dispatch:
+
+jobs:
+  postgis:
+    runs-on: ubuntu-latest
+    services:
+      postgis:
+        image: postgis/postgis:16-3.5
+        env:
+          POSTGRES_DB: terrasense
+          POSTGRES_USER: terrasense
+          POSTGRES_PASSWORD: terrasense
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U terrasense -d terrasense"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PYTHONPATH: backend
+      DATABASE_URL: postgresql+psycopg://terrasense:terrasense@localhost:5432/terrasense
+      POSTGIS_TEST_DATABASE_URL: postgresql+psycopg://terrasense:terrasense@localhost:5432/terrasense
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install database tooling
+        run: python -m pip install -r backend/requirements.txt -r backend/requirements-db.txt pytest
+      - name: Migrate, import twice, and validate canonical parity
+        run: |
+          python -m alembic upgrade head
+          python scripts/import_hierarchy_to_postgis.py
+          python scripts/import_hierarchy_to_postgis.py
+          python scripts/import_hierarchy_to_postgis.py --validate-only
+      - name: Test isolated migration roundtrip and database constraints
+        run: python -m pytest backend/tests/test_postgis_integration.py -v --tb=short
