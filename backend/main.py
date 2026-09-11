@@ -78,6 +78,7 @@ from routes.alerts import router as alerts_router
 from routes.hierarchy import router as hierarchy_router
 from routes.real_risk import router as real_risk_router
 from routes.operations import router as operations_router
+from routes.contacts import router as contacts_router
 
 app.include_router(zones_router)         # /health, /zones
 app.include_router(risk_router)          # /risk/current, /risk/forecast/{id}
@@ -91,6 +92,7 @@ app.include_router(alerts_router)        # /alerts
 app.include_router(hierarchy_router)     # /regions, /states, /districts
 app.include_router(real_risk_router)     # /risk/real/status, /risk/real/{zone_id}
 app.include_router(operations_router)   # /operations/status
+app.include_router(contacts_router)     # /contacts/official
 
 
 
