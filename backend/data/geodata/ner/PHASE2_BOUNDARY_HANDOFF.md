@@ -2,14 +2,15 @@
 
 ## Selected source
 
-The generated files use geoBoundaries `gbOpen` India releases at commit
-`9469f09`:
+The generated files use separate geoBoundaries `gbOpen` India releases at
+commit `9469f09`:
 
-- State source: `geoBoundaries-IND-ADM1.geojson`, boundary vintage 2011,
-  source organisations DataMeet India community and Election Commission of
-  India.
-- District source: `geoBoundaries-IND-ADM2.geojson`, boundary vintage 2021,
-  source organisations Pathways Data Pvt. Ltd. and LGD Directory.
+- **ADM1 / state source:** `geoBoundaries-IND-ADM1.geojson`, boundary vintage
+  **2011**, source organisations DataMeet India community and Election
+  Commission of India, licence **CC BY 2.5 India**.
+- **ADM2 / district source:** `geoBoundaries-IND-ADM2.geojson`, boundary vintage
+  **2021**, source organisations Pathways Data Pvt. Ltd. and LGD Directory,
+  licence **ODbL 1.0**.
 - Build date in source metadata: 2023-12-12.
 - Source references and licence notes: [source_notes.md](./source_notes.md).
 - Output CRS: `EPSG:4326`.
@@ -46,18 +47,34 @@ numeric codes, so `lgd_code` is null throughout rather than guessed.
   `lgd_code` is null for all districts. No numeric LGD code was guessed.**
 - CRS: **EPSG:4326**
 
-## Administrative-version comparison
+## Boundary and administrative dates
 
-The 119 districts are internally consistent with the selected geoBoundaries
-ADM2/LGD-derived 2021 district list: no source-list omissions, additions, or
-renames were found in the filtered NER set. The state source is a 2011
-boundary vintage, while the district source is 2021; this mixed vintage is
-documented and must not be interpreted as a single-date official snapshot.
+- Boundary geometry vintage: **ADM1 = 2011; ADM2 = 2021**
+- Administrative-list comparison date: **2026-09-11**
 
-The LGD portal remains the authoritative source for checking changes after
-2021. A machine-readable current LGD export was not accessible during this
-preparation, so post-2021 new/split/renamed districts are an unresolved
-limitation and should be reconciled before production use.
+## Current LGD reconciliation results
+
+The public [LGD district directory](https://lgdirectory.gov.in/globalviewdistrictforcitizen.do)
+was checked on **2026-09-11**. The page exposed the current state selector and
+all eight NER states, but the current district report required an interactive
+CAPTCHA and session submission. No machine-readable current district export or
+API response could be retrieved during this run.
+
+Therefore:
+
+| Requested comparison | Result |
+|---|---|
+| 2021 boundary districts still current | Not determinable from accessible current LGD response; 119-name 2021 baseline retained |
+| Current LGD districts missing from 2021 geometry | Not determinable |
+| 2021 district names changed | Not determinable |
+| Districts split/created after 2021 | Not determinable |
+| Unresolved mapping issues | Current-list comparison blocked by LGD CAPTCHA/session; geometry has no LGD numeric codes |
+
+This is deliberately reported as unresolved. It must not be presented as proof
+that the 2021 district list is current in 2026. The internal 2021 comparison
+is complete: all 119 selected NER features have unique source IDs and valid
+state relationships. A maintainer should obtain an authenticated LGD export and
+complete the name/code crosswalk before production use.
 
 ## Files generated
 
@@ -85,7 +102,8 @@ use the exact Aizawl ID above and retain the requested status values:
 ## Git handoff
 
 - Branch: `phase2/ner-boundary-data`
-- Dataset commit hash: `fa1f17c`
+- Dataset commit hash: superseded by the reconciliation update; final branch
+  tip is supplied in the delivery message.
 - The final branch tip is supplied in the delivery message. Embedding a
   branch-tip hash in this file would itself create another commit and change
   that hash.
