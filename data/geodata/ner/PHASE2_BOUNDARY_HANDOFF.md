@@ -85,5 +85,7 @@ use the exact Aizawl ID above and retain the requested status values:
 ## Git handoff
 
 - Branch: `phase2/ner-boundary-data`
-- Final commit hash: to be filled after commit
-
+- Dataset commit hash: `fa1f17c`
+- The final branch tip is supplied in the delivery message. Embedding a
+  branch-tip hash in this file would itself create another commit and change
+  that hash.
