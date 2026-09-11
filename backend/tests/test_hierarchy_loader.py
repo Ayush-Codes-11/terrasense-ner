@@ -235,12 +235,15 @@ def test_loader_never_fabricates_state_or_district(tmp_path):
     assert len(loader.districts) == 0
 
 def test_production_default_path_is_relative_to_backend():
-    from services.hierarchy_loader import _DEFAULT_HIERARCHY_DIR, _REPO_ROOT
+    from services.hierarchy_loader import (
+        _BACKEND_DIR,
+        _DEFAULT_HIERARCHY_DIR,
+        _REPO_ROOT,
+    )
 
-    # Assert _REPO_ROOT is actually resolving correctly
-    assert _REPO_ROOT.name == "TerraSense"
-    assert _DEFAULT_HIERARCHY_DIR.name == "ner"
-    assert _DEFAULT_HIERARCHY_DIR.parent.name == "geodata"
+    assert _BACKEND_DIR == Path(__file__).resolve().parents[1]
+    assert _REPO_ROOT == _BACKEND_DIR.parent
+    assert _DEFAULT_HIERARCHY_DIR == _REPO_ROOT / "data" / "geodata" / "ner"
 
 
 def test_partial_dataset_is_invalid(tmp_path):
