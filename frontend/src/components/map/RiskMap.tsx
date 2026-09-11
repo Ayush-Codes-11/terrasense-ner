@@ -50,6 +50,7 @@ function MapResizeFix() {
 // ---- Aizawl pilot area constants ----
 const AIZAWL_CENTER: [number, number] = [23.7271, 92.7176];
 const DEFAULT_ZOOM = 13;
+const WEATHER_TILE_URL = import.meta.env.VITE_WEATHER_TILE_URL as string | undefined;
 
 // ---- Risk colour helpers ----
 
@@ -483,6 +484,16 @@ export default function RiskMap({
               maxZoom={19}
             />
           </LayersControl.BaseLayer>
+          {WEATHER_TILE_URL && (
+            <LayersControl.Overlay name="Cloud / weather overlay">
+              <TileLayer
+                url={WEATHER_TILE_URL}
+                opacity={0.45}
+                attribution="Weather tiles configured by deployment"
+                maxZoom={12}
+              />
+            </LayersControl.Overlay>
+          )}
 
           {/* ── Risk Zones ── */}
           <LayersControl.Overlay checked name="Risk Grid">

@@ -135,16 +135,37 @@ export default function Dashboard() {
   const [isReportsOpen, setIsReportsOpen] = useState(false);
   const [isDataStatusOpen, setIsDataStatusOpen] = useState(false);
   const [operationsStatus, setOperationsStatus] = useState<Record<string, any> | null>(null);
+  const [installPrompt, setInstallPrompt] = useState<Event | null>(null);
 
   const pendingReportsCount = localReports.filter(r => r.sync_status !== "SYNCED").length;
 
   useEffect(() => {
     let active = true;
-    getOperationsStatus()
-      .then((status) => { if (active) setOperationsStatus(status); })
-      .catch(() => { if (active) setOperationsStatus(null); });
-    return () => { active = false; };
+    const refresh = () => {
+      getOperationsStatus()
+        .then((status) => { if (active) setOperationsStatus(status); })
+        .catch(() => { if (active) setOperationsStatus(null); });
+    };
+    refresh();
+    const timer = window.setInterval(refresh, 30_000);
+    const onInstall = (event: Event) => {
+      event.preventDefault();
+      setInstallPrompt(event);
+    };
+    window.addEventListener("beforeinstallprompt", onInstall);
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+      window.removeEventListener("beforeinstallprompt", onInstall);
+    };
   }, []);
+
+  const installApp = async () => {
+    const prompt = installPrompt as (Event & { prompt?: () => Promise<void> }) | null;
+    if (!prompt?.prompt) return;
+    await prompt.prompt();
+    setInstallPrompt(null);
+  };
 
   return (
     <div className="flex flex-col h-[100dvh] overflow-hidden bg-[#07111F]">
@@ -196,6 +217,14 @@ export default function Dashboard() {
           >
             + Field Report
           </Link>
+          {installPrompt && (
+            <button
+              className="pointer-events-auto px-3 py-1.5 rounded-md bg-[#22D3EE]/90 border border-[#22D3EE]/50 shadow-lg text-xs font-medium text-slate-950 hover:bg-[#67e8f9] transition-all"
+              onClick={installApp}
+            >
+              Install app
+            </button>
+          )}
         </div>
 
         {/* Data Status Popover */}
@@ -235,6 +264,12 @@ export default function Dashboard() {
               </div>
               {operationsStatus && (
                 <>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-500">Monitoring</span>
+                    <span className={operationsStatus.connectivity.backend_api === "ONLINE" ? "text-green-400" : "text-amber-400"}>
+                      {operationsStatus.connectivity.backend_api === "ONLINE" ? "Polling · 30s" : "Offline"}
+                    </span>
+                  </div>
                   <div className="flex justify-between items-center">
                     <span className="text-slate-500">Kafka / IoT</span>
                     <span className="text-amber-400">
