@@ -30,6 +30,7 @@ import { useZoneDetails } from "../hooks/useZoneDetails";
 import { propsToZone } from "../utils/zoneTransformers";
 import type { ZoneGeoJSONProperties } from "../types/geojson";
 import type { Zone } from "../types";
+import { getOperationsStatus } from "../services/api";
 
 export default function Dashboard() {
   const geoData = useGeoJSONData();
@@ -133,8 +134,17 @@ export default function Dashboard() {
   const [isAlertsOpen, setIsAlertsOpen] = useState(false);
   const [isReportsOpen, setIsReportsOpen] = useState(false);
   const [isDataStatusOpen, setIsDataStatusOpen] = useState(false);
+  const [operationsStatus, setOperationsStatus] = useState<Record<string, any> | null>(null);
 
   const pendingReportsCount = localReports.filter(r => r.sync_status !== "SYNCED").length;
+
+  useEffect(() => {
+    let active = true;
+    getOperationsStatus()
+      .then((status) => { if (active) setOperationsStatus(status); })
+      .catch(() => { if (active) setOperationsStatus(null); });
+    return () => { active = false; };
+  }, []);
 
   return (
     <div className="flex flex-col h-[100dvh] overflow-hidden bg-[#07111F]">
@@ -201,8 +211,9 @@ export default function Dashboard() {
                 { label: "Roads", source: "OpenStreetMap", prov: "REAL" },
                 { label: "Facilities", source: "OpenStreetMap", prov: "REAL" },
                 { label: "Inventory", source: "GSI", prov: "REAL" },
-                { label: "Rainfall", source: "GPM-compatible", prov: "SAMPLE" },
-                { label: "Soil", source: "Prototype input", prov: "SAMPLE" },
+                { label: "Rainfall", source: "NASA GPM IMERG snapshot", prov: "REAL" },
+                { label: "Forecast", source: "ECMWF/Open-Meteo snapshot", prov: "REAL" },
+                { label: "Soil", source: "NASA SMAP snapshot", prov: "REAL" },
               ].map(({ label, source, prov }) => (
                 <div key={label} className="flex items-center justify-between text-[10px]">
                   <span className="text-slate-500 w-16">{label}</span>
@@ -222,6 +233,26 @@ export default function Dashboard() {
                 <span className="text-slate-500">Backend API</span>
                 <span className={apiOk ? "text-green-400" : "text-amber-400"}>{apiStatus}</span>
               </div>
+              {operationsStatus && (
+                <>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-500">Kafka / IoT</span>
+                    <span className="text-amber-400">
+                      {operationsStatus.connectivity.kafka === "NOT_CONFIGURED" ? "Not configured" : "Ready"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-500">Offline queue</span>
+                    <span className="text-green-400">Available</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-500">Parity</span>
+                    <span className={operationsStatus.verification.status === "PASS" ? "text-green-400" : "text-red-400"}>
+                      {operationsStatus.verification.status}
+                    </span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}
