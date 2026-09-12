@@ -14,6 +14,8 @@ interface FieldReportDB extends DBSchema {
       severity: string;
       description: string;
       reporter?: string;
+      photo_base64?: string;
+      photo_status?: "QUEUED" | "SYNCED";
       sync_status: "LOCAL_ONLY" | "SYNC_PENDING" | "SYNCING" | "SYNCED" | "SYNC_FAILED";
     };
   };

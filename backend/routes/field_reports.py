@@ -16,11 +16,13 @@ class FieldReport(BaseModel):
     severity: str
     description: str
     reporter: Optional[str] = ""
+    photo_base64: Optional[str] = Field(default=None, max_length=2_000_000)
+    photo_status: Optional[str] = None
     sync_status: str
 
     @validator("category")
     def validate_category(cls, v):
-        allowed = ["landslide", "road_blockage", "cracks_slope_movement", "flooding", "other"]
+        allowed = ["landslide", "road_blockage", "cracks_slope_movement", "slope_crack", "debris", "flooding", "other"]
         if v not in allowed:
             raise ValueError(f"Category must be one of {allowed}")
         return v

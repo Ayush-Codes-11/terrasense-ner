@@ -1,0 +1,295 @@
+{
+  "dataset_type": "STATIC_SUSCEPTIBILITY_FEATURE_TABLE",
+  "label_semantics": "spatial_inventory_presence_only",
+  "model_status": "NOT_TRAINED",
+  "is_probability": false,
+  "sources": {
+    "grid": "TerraSense Aizawl pilot analysis grid (existing A01-E05)",
+    "terrain": "Copernicus DEM GLO-30 derived zonal statistics",
+    "inventory": "GSI BhooSanket Landslide_Public"
+  },
+  "limitations": [
+    "GSI public records contain no usable event dates.",
+    "Inventory presence is not a temporal event label.",
+    "Rows are pilot-grid cells and are not a national training sample.",
+    "A future model requires spatial holdout validation and additional static covariates."
+  ],
+  "row_count": 25,
+  "rows": [
+    {
+      "zone_id": "A01",
+      "state_id": "IN-MZ",
+      "district_id": "IND-ADM2-76128533B34203923268864",
+      "mean_slope_deg": 24.75,
+      "p90_slope_deg": 37.87,
+      "mean_elevation_m": 609.6,
+      "elevation_range_m": 540.5,
+      "gsi_inventory_count": 0,
+      "inventory_presence_label": 0
+    },
+    {
+      "zone_id": "A02",
+      "state_id": "IN-MZ",
+      "district_id": "IND-ADM2-76128533B34203923268864",
+      "mean_slope_deg": 26.89,
+      "p90_slope_deg": 35.96,
+      "mean_elevation_m": 793.4,
+      "elevation_range_m": 462.8,
+      "gsi_inventory_count": 0,
+      "inventory_presence_label": 0
+    },
+    {
+      "zone_id": "A03",
+      "state_id": "IN-MZ",
+      "district_id": "IND-ADM2-76128533B34203923268864",
+      "mean_slope_deg": 27.74,
+      "p90_slope_deg": 39.07,
+      "mean_elevation_m": 890.5,
+      "elevation_range_m": 443.8,
+      "gsi_inventory_count": 7,
+      "inventory_presence_label": 1
+    },
+    {
+      "zone_id": "A04",
+      "state_id": "IN-MZ",
+      "district_id": "IND-ADM2-76128533B34203923268864",
+      "mean_slope_deg": 27.2,
+      "p90_slope_deg": 36.27,
+      "mean_elevation_m": 598.5,
+      "elevation_range_m": 437.9,
+      "gsi_inventory_count": 0,
+      "inventory_presence_label": 0
+    },
+    {
+      "zone_id": "A05",
+      "state_id": "IN-MZ",
+      "district_id": "IND-ADM2-76128533B34203923268864",
+      "mean_slope_deg": 27.96,
+      "p90_slope_deg": 39.24,
+      "mean_elevation_m": 502.9,
+      "elevation_range_m": 479.7,
+      "gsi_inventory_count": 0,
+      "inventory_presence_label": 0
+    },
+    {
+      "zone_id": "B01",
+      "state_id": "IN-MZ",
+      "district_id": "IND-ADM2-76128533B34203923268864",
+      "mean_slope_deg": 20.71,
+      "p90_slope_deg": 33.02,
+      "mean_elevation_m": 570.2,
+      "elevation_range_m": 675.2,
+      "gsi_inventory_count": 4,
+      "inventory_presence_label": 1
+    },
+    {
+      "zone_id": "B02",
+      "state_id": "IN-MZ",
+      "district_id": "IND-ADM2-76128533B34203923268864",
+      "mean_slope_deg": 26.2,
+      "p90_slope_deg": 34.8,
+      "mean_elevation_m": 828.4,
+      "elevation_range_m": 430.8,
+      "gsi_inventory_count": 2,
+      "inventory_presence_label": 1
+    },
+    {
+      "zone_id": "B03",
+      "state_id": "IN-MZ",
+      "district_id": "IND-ADM2-76128533B34203923268864",
+      "mean_slope_deg": 26.25,
+      "p90_slope_deg": 37.1,
+      "mean_elevation_m": 973.7,
+      "elevation_range_m": 452.3,
+      "gsi_inventory_count": 3,
+      "inventory_presence_label": 1
+    },
+    {
+      "zone_id": "B04",
+      "state_id": "IN-MZ",
+      "district_id": "IND-ADM2-76128533B34203923268864",
+      "mean_slope_deg": 22.31,
+      "p90_slope_deg": 32.93,
+      "mean_elevation_m": 779.3,
+      "elevation_range_m": 346.7,
+      "gsi_inventory_count": 2,
+      "inventory_presence_label": 1
+    },
+    {
+      "zone_id": "B05",
+      "state_id": "IN-MZ",
+      "district_id": "IND-ADM2-76128533B34203923268864",
+      "mean_slope_deg": 27.5,
+      "p90_slope_deg": 37.57,
+      "mean_elevation_m": 631.5,
+      "elevation_range_m": 477.1,
+      "gsi_inventory_count": 1,
+      "inventory_presence_label": 1
+    },
+    {
+      "zone_id": "C01",
+      "state_id": "IN-MZ",
+      "district_id": "IND-ADM2-76128533B34203923268864",
+      "mean_slope_deg": 21.56,
+      "p90_slope_deg": 34.09,
+      "mean_elevation_m": 780.8,
+      "elevation_range_m": 390.3,
+      "gsi_inventory_count": 3,
+      "inventory_presence_label": 1
+    },
+    {
+      "zone_id": "C02",
+      "state_id": "IN-MZ",
+      "district_id": "IND-ADM2-76128533B34203923268864",
+      "mean_slope_deg": 23.46,
+      "p90_slope_deg": 33.71,
+      "mean_elevation_m": 903.0,
+      "elevation_range_m": 289.2,
+      "gsi_inventory_count": 3,
+      "inventory_presence_label": 1
+    },
+    {
+      "zone_id": "C03",
+      "state_id": "IN-MZ",
+      "district_id": "IND-ADM2-76128533B34203923268864",
+      "mean_slope_deg": 22.01,
+      "p90_slope_deg": 32.43,
+      "mean_elevation_m": 980.8,
+      "elevation_range_m": 332.2,
+      "gsi_inventory_count": 1,
+      "inventory_presence_label": 1
+    },
+    {
+      "zone_id": "C04",
+      "state_id": "IN-MZ",
+      "district_id": "IND-ADM2-76128533B34203923268864",
+      "mean_slope_deg": 21.73,
+      "p90_slope_deg": 32.79,
+      "mean_elevation_m": 778.6,
+      "elevation_range_m": 377.0,
+      "gsi_inventory_count": 1,
+      "inventory_presence_label": 1
+    },
+    {
+      "zone_id": "C05",
+      "state_id": "IN-MZ",
+      "district_id": "IND-ADM2-76128533B34203923268864",
+      "mean_slope_deg": 24.46,
+      "p90_slope_deg": 35.76,
+      "mean_elevation_m": 787.2,
+      "elevation_range_m": 479.6,
+      "gsi_inventory_count": 2,
+      "inventory_presence_label": 1
+    },
+    {
+      "zone_id": "D01",
+      "state_id": "IN-MZ",
+      "district_id": "IND-ADM2-76128533B34203923268864",
+      "mean_slope_deg": 20.59,
+      "p90_slope_deg": 32.52,
+      "mean_elevation_m": 888.2,
+      "elevation_range_m": 321.8,
+      "gsi_inventory_count": 2,
+      "inventory_presence_label": 1
+    },
+    {
+      "zone_id": "D02",
+      "state_id": "IN-MZ",
+      "district_id": "IND-ADM2-76128533B34203923268864",
+      "mean_slope_deg": 24.91,
+      "p90_slope_deg": 36.92,
+      "mean_elevation_m": 875.4,
+      "elevation_range_m": 508.1,
+      "gsi_inventory_count": 11,
+      "inventory_presence_label": 1
+    },
+    {
+      "zone_id": "D03",
+      "state_id": "IN-MZ",
+      "district_id": "IND-ADM2-76128533B34203923268864",
+      "mean_slope_deg": 25.51,
+      "p90_slope_deg": 35.4,
+      "mean_elevation_m": 964.4,
+      "elevation_range_m": 550.4,
+      "gsi_inventory_count": 2,
+      "inventory_presence_label": 1
+    },
+    {
+      "zone_id": "D04",
+      "state_id": "IN-MZ",
+      "district_id": "IND-ADM2-76128533B34203923268864",
+      "mean_slope_deg": 24.25,
+      "p90_slope_deg": 34.58,
+      "mean_elevation_m": 859.1,
+      "elevation_range_m": 355.4,
+      "gsi_inventory_count": 4,
+      "inventory_presence_label": 1
+    },
+    {
+      "zone_id": "D05",
+      "state_id": "IN-MZ",
+      "district_id": "IND-ADM2-76128533B34203923268864",
+      "mean_slope_deg": 23.32,
+      "p90_slope_deg": 32.79,
+      "mean_elevation_m": 808.8,
+      "elevation_range_m": 434.5,
+      "gsi_inventory_count": 3,
+      "inventory_presence_label": 1
+    },
+    {
+      "zone_id": "E01",
+      "state_id": "IN-MZ",
+      "district_id": "IND-ADM2-76128533B34203923268864",
+      "mean_slope_deg": 25.76,
+      "p90_slope_deg": 34.81,
+      "mean_elevation_m": 607.1,
+      "elevation_range_m": 553.7,
+      "gsi_inventory_count": 4,
+      "inventory_presence_label": 1
+    },
+    {
+      "zone_id": "E02",
+      "state_id": "IN-MZ",
+      "district_id": "IND-ADM2-76128533B34203923268864",
+      "mean_slope_deg": 22.94,
+      "p90_slope_deg": 32.38,
+      "mean_elevation_m": 581.0,
+      "elevation_range_m": 390.0,
+      "gsi_inventory_count": 1,
+      "inventory_presence_label": 1
+    },
+    {
+      "zone_id": "E03",
+      "state_id": "IN-MZ",
+      "district_id": "IND-ADM2-76128533B34203923268864",
+      "mean_slope_deg": 26.07,
+      "p90_slope_deg": 38.65,
+      "mean_elevation_m": 773.0,
+      "elevation_range_m": 686.0,
+      "gsi_inventory_count": 1,
+      "inventory_presence_label": 1
+    },
+    {
+      "zone_id": "E04",
+      "state_id": "IN-MZ",
+      "district_id": "IND-ADM2-76128533B34203923268864",
+      "mean_slope_deg": 28.38,
+      "p90_slope_deg": 41.55,
+      "mean_elevation_m": 1069.1,
+      "elevation_range_m": 564.9,
+      "gsi_inventory_count": 1,
+      "inventory_presence_label": 1
+    },
+    {
+      "zone_id": "E05",
+      "state_id": "IN-MZ",
+      "district_id": "IND-ADM2-76128533B34203923268864",
+      "mean_slope_deg": 26.94,
+      "p90_slope_deg": 36.84,
+      "mean_elevation_m": 833.9,
+      "elevation_range_m": 639.5,
+      "gsi_inventory_count": 2,
+      "inventory_presence_label": 1
+    }
+  ]
+}

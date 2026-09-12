@@ -5,6 +5,7 @@ const API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "h
 export default function AlertsPanel() {
   const [alerts, setAlerts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [backendAvailable, setBackendAvailable] = useState<boolean | null>(null);
   const [permission, setPermission] = useState<NotificationPermission>(
     typeof Notification !== "undefined" ? Notification.permission : "default"
   );
@@ -18,9 +19,12 @@ export default function AlertsPanel() {
       const res = await fetch(`${API_BASE}/alerts`);
       if (res.ok) {
         setAlerts(await res.json());
+        setBackendAvailable(true);
+      } else {
+        setBackendAvailable(false);
       }
-    } catch (e) {
-      console.error(e);
+    } catch {
+      setBackendAvailable(false);
     }
   };
 
@@ -38,6 +42,7 @@ export default function AlertsPanel() {
       if (res.ok) {
         const newAlert = await res.json();
         setAlerts((prev) => [newAlert, ...prev]);
+        setBackendAvailable(true);
         
         // Show browser notification if allowed
         if (permission === "granted") {
@@ -47,8 +52,8 @@ export default function AlertsPanel() {
           });
         }
       }
-    } catch (e) {
-      console.error(e);
+    } catch {
+      setBackendAvailable(false);
     } finally {
       setLoading(false);
     }
@@ -73,6 +78,11 @@ export default function AlertsPanel() {
           </span>
         )}
       </div>
+      {backendAvailable === false && (
+        <p className="text-[10px] text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded px-2 py-1.5">
+          Backend offline. Browser notifications remain local; no alert was sent.
+        </p>
+      )}
 
       <button
         onClick={sendTestAlert}

@@ -33,6 +33,30 @@ body {
   @apply bg-[rgba(7,17,31,0.88)] border border-slate-400/15 rounded-xl shadow-[0_12px_40px_rgba(0,0,0,0.3)] backdrop-blur-[12px];
 }
 
+/* Keep Leaflet's layer picker legible over bright basemaps. */
+.leaflet-control-layers {
+  background: rgba(7, 17, 31, 0.94) !important;
+  color: #cbd5e1;
+  border: 1px solid rgba(148, 163, 184, 0.22) !important;
+  border-radius: 8px !important;
+}
+.leaflet-control-layers-expanded {
+  padding: 8px 10px !important;
+}
+.leaflet-control-layers label {
+  color: #cbd5e1;
+  font-size: 11px;
+}
+.leaflet-control-layers-separator {
+  border-top-color: rgba(148, 163, 184, 0.2) !important;
+}
+
+/* The dashboard action strip owns the top edge; keep the map-style picker below it. */
+.leaflet-top.leaflet-right {
+  top: 62px !important;
+  z-index: 900 !important;
+}
+
 /* Risk badge */
 .risk-badge {
   @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border;

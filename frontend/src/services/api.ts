@@ -182,6 +182,11 @@ export async function getWeatherStatus(): Promise<Record<string, any>> {
   return apiFetch<Record<string, any>>("/weather/status");
 }
 
+/** Returns the truthful Phase 7-10 connectivity, source, and verification state. */
+export async function getOperationsStatus(): Promise<Record<string, any>> {
+  return apiFetch<Record<string, any>>("/operations/status");
+}
+
 // ── District meta (Phase 5+) ──────────────────────────────────────────────────
 
 export async function getDistrictMeta(): Promise<DistrictMeta | null> {

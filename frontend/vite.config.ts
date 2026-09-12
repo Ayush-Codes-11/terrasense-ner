@@ -20,14 +20,17 @@ export default defineConfig({
         display: "standalone",
         icons: [
           {
-            src: "icon-192.png",
-            sizes: "192x192",
-            type: "image/png"
-          },
+            src: "favicon.svg",
+            sizes: "any",
+            type: "image/svg+xml",
+            purpose: "any maskable"
+          }
+        ],
+        shortcuts: [
           {
-            src: "icon-512.png",
-            sizes: "512x512",
-            type: "image/png"
+            name: "Submit field report",
+            short_name: "Report",
+            url: "/field-report"
           }
         ]
       }

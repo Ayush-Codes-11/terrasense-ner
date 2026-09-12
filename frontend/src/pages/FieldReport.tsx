@@ -50,6 +50,8 @@ export default function FieldReport() {
   const [lon, setLon] = useState<number | null>(null);
   
   const [submitting, setSubmitting] = useState(false);
+  const [photoBase64, setPhotoBase64] = useState<string | undefined>();
+  const [photoName, setPhotoName] = useState("");
 
   const isPhase8 = true; // Enabled in Phase 8
 
@@ -65,6 +67,22 @@ export default function FieldReport() {
     } else {
       alert("Geolocation is not supported by your browser");
     }
+  };
+
+  const handlePhoto = (file: File | undefined) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      alert("Please choose an image file.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        setPhotoBase64(reader.result);
+        setPhotoName(file.name);
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSubmit = async () => {
@@ -84,6 +102,8 @@ export default function FieldReport() {
       severity,
       description: description + (selectedType === "road_blockage" && blockedRoad ? " [ROAD CONFIRMED BLOCKED]" : ""),
       reporter: reporter || undefined,
+      photo_base64: photoBase64,
+      photo_status: photoBase64 ? "QUEUED" : undefined,
       sync_status: navigator.onLine ? "SYNC_PENDING" : "LOCAL_ONLY",
     };
 
@@ -285,14 +305,22 @@ export default function FieldReport() {
             <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">
               📷 Photo (optional)
             </h2>
-            <div
+            <label
               className={`flex flex-col items-center justify-center gap-2 p-6 rounded-lg border-2 border-dashed border-slate-600 cursor-pointer hover:border-slate-500 transition-colors`}
             >
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="sr-only"
+                onChange={(e) => handlePhoto(e.target.files?.[0])}
+              />
               <span className="text-2xl opacity-40">📷</span>
-              <p className="text-xs text-slate-500">
-                Tap to capture or upload photo
+              <p className="text-xs text-slate-500 text-center">
+                {photoName ? `${photoName} queued for sync` : "Tap to capture or upload photo"}
               </p>
-            </div>
+              {photoBase64 && <span className="text-[10px] text-green-400">Saved on this device until sync</span>}
+            </label>
           </div>
 
           {/* Description */}

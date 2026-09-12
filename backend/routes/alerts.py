@@ -1,4 +1,5 @@
 from typing import List, Dict, Any, Optional
+import os
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from datetime import datetime
@@ -29,7 +30,7 @@ def list_alerts():
     return demo_alerts
 
 @router.post("/test", response_model=Alert)
-def test_alert(zone_id: str = "C03"):
+def test_alert(zone_id: str = "C03", to_number: Optional[str] = None):
     alert = Alert(
         alert_id=str(uuid.uuid4()),
         zone_id=zone_id,
@@ -48,7 +49,16 @@ def test_alert(zone_id: str = "C03"):
     # Send SMS preview
     sms_provider = get_sms_provider()
     message = f"TerraSense NER Alert\nZone {zone_id}\nPriority: VERY HIGH\nOutlook: +24h\n{alert.rationale}"
-    status = sms_provider.send_sms("+919876543210", message)
+    recipient = to_number or os.getenv("ALERT_TEST_TO")
+    if not recipient:
+        if os.getenv("SMS_PROVIDER", "demo").lower() == "demo":
+            recipient = "demo-recipient"
+        else:
+            raise HTTPException(
+                status_code=503,
+                detail="No alert recipient configured. Set ALERT_TEST_TO or pass to_number.",
+            )
+    status = sms_provider.send_sms(recipient, message)
     alert.delivery_status = status
     
     return alert
