@@ -30,3 +30,17 @@ If you are developing a production application, we recommend enabling type-aware
 ```
 
 See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+# 2D GIS command centre
+
+The dashboard uses Leaflet with the canonical NER boundary APIs. It requests
+only the current hierarchy level and switches to the 25-zone prototype grid
+after Aizawl is selected. The map uses the standard OpenStreetMap raster tile
+endpoint with visible attribution. OSM tiles are community-funded,
+best-effort infrastructure with usage limits and no operational SLA; this
+prototype does not claim them as a production disaster-operations basemap.
+Use a contracted or self-hosted tile service before production deployment.
+
+Risk labels are relative prototype scores. State and boundary-only districts
+do not receive fabricated risk values. The committed ADM1 2011 / ADM2 2021
+boundaries remain a prototype dataset and are not presented as a definitive
+2026 administrative list.

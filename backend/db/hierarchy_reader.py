@@ -30,7 +30,7 @@ class PostGISHierarchyReader:
         self.states = {}
         self.districts = {}
         self.zones = {}
-        # Only the opt-in parity utility loads geometry; HTTP schemas stay unchanged.
+        # Geometry is loaded only for explicit GeoJSON requests or parity checks.
         self.geometries = {}
         self.geometry_srids = {}
         try:
@@ -89,3 +89,6 @@ class PostGISHierarchyReader:
 
     def get_zone(self, zone_id):
         return self.zones.get(zone_id.upper())
+
+    def get_geometry(self, collection, feature_id):
+        return self.geometries[collection][feature_id]

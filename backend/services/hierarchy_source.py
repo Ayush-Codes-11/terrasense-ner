@@ -18,7 +18,7 @@ def get_file_hierarchy_loader():
         return loader
 
 
-def select_hierarchy_reader():
+def select_hierarchy_reader(*, include_geometry=False):
     source = os.getenv("HIERARCHY_DATA_SOURCE", "file")
     if source == "file":
         return get_file_hierarchy_loader()
@@ -29,4 +29,4 @@ def select_hierarchy_reader():
         engine = get_postgis_engine(os.getenv("DATABASE_URL", ""))
     except (ImportError, ValueError):
         raise HierarchyUnavailableError("PostGIS hierarchy is unavailable.") from None
-    return PostGISHierarchyReader(engine)
+    return PostGISHierarchyReader(engine, include_geometry=include_geometry)
