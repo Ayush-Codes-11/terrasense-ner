@@ -1,8 +1,78 @@
-# Phase 3A: PostgreSQL + PostGIS foundation
+# Phase 3: PostGIS foundation and opt-in hierarchy reads
 
-Phase 3A introduces the PostGIS persistence layer. Runtime hierarchy APIs still
-use the validated file-backed Phase 2 loader. The FastAPI app does not import
-`db`, connect at startup, or require `DATABASE_URL`. Database cutover is deferred.
+Phase 3A introduces the PostGIS persistence layer. Phase 3B1 adds an opt-in
+PostGIS hierarchy read path. The production/default hierarchy source remains
+file-backed until a later cutover checkpoint. In default/file mode the app does
+not import database packages or require `DATABASE_URL`.
+
+## Runtime selection (Phase 3B1)
+
+`HIERARCHY_DATA_SOURCE` accepts exactly `file` or `postgis`; unset means `file`.
+Set it in the process environment (the app does not automatically load `.env`).
+
+```powershell
+# Default behavior; no database or database dependencies needed.
+$env:HIERARCHY_DATA_SOURCE = "file"
+
+# Explicit opt-in, only after migration and import have completed:
+python -m pip install -r backend/requirements-db.txt
+$env:DATABASE_URL = "postgresql+psycopg://terrasense:terrasense@localhost:5432/terrasense"
+python -m alembic upgrade head
+python scripts/import_hierarchy_to_postgis.py
+$env:HIERARCHY_DATA_SOURCE = "postgis"
+```
+
+PostGIS deployments must install the optional DB requirements as well as the
+runtime requirements. Neither migrations nor imports run during app startup or
+requests. Missing configuration/dependencies, connection failures, or missing
+tables return the existing hierarchy `503 / BOUNDARY_DATA_UNAVAILABLE` response.
+Invalid source values return a clear configuration message with 503. Invalid
+domain data returns `503 / BOUNDARY_DATA_INVALID`. Responses never expose a
+database URL, credentials, SQL, or stack trace. **There is no silent fallback.**
+
+The thin file adapter preserves `HierarchyLoader` and `AnalysisZoneService`.
+The PostGIS reader uses existing domain response models and reads all four
+tables into a request-local snapshot. Each snapshot uses a short-lived SQLAlchemy
+session in a read-only, repeatable-read transaction, closed before route execution.
+Only engines/pools are cached; no live session or database snapshot is cached.
+Connection timeout defaults to five seconds unless provided in the URL. Restart
+workers after deployment configuration changes. The existing file loader remains
+cached as before.
+
+Routes, schemas, 404/503 semantics, and counts are unchanged. Collections keep
+the existing name-based route ordering; underlying DB rows and zones use ID order.
+`/zones` still returns the canonical file-backed risk grid even in PostGIS mode.
+Risk, weather, terrain, and other non-hierarchy paths are independent of this choice.
+
+## Read parity
+
+`db.hierarchy_parity.compare_file_and_postgis_hierarchy(engine)` is a read-only
+developer/CI utility; it is never called on production requests. It compares all
+region/state/district fields and zone bindings and reports mismatches by ID.
+Geometry is loaded only for parity via `ST_AsGeoJSON(geometry, 17, 0)` and
+`ST_SRID`, avoiding the serializer's default nine-decimal precision reduction.
+The API does not gain geometry response fields.
+
+Phase 3A stores MultiPolygons, while canonical files contain both Polygons and
+MultiPolygons. Parity applies **only the approved Polygon-to-MultiPolygon wrapper
+to the file representation**, then requires identical types, valid/nonempty
+geometry, matching topology, SRID 4326, and exact coordinates (zero tolerance).
+No coordinates, rings, or source files are repaired, rounded, or rewritten.
+
+```powershell
+$env:POSTGIS_TEST_DATABASE_URL = $env:DATABASE_URL
+python -m pytest backend/tests/test_postgis_read_parity.py -v --tb=short
+```
+
+These live tests import a dedicated random schema, commit so actual API request
+sessions can see it, select PostGIS via environment variables, and compare real
+FastAPI responses to file mode, including unknown IDs and Anjaw's zero-zone result.
+They check connection release after requests and forbid file fallback. The second
+test checks all domain fields and geometries. Teardown removes only that temporary
+schema. A missing test URL skips these tests locally; a configured but unreachable
+database fails them. The PostGIS CI workflow runs them after migration, import,
+idempotency, and the existing migration/constraint tests. Normal TerraSense CI
+continues to exercise default file mode and retains the parity guard unchanged.
 
 ## Architecture and data contract
 

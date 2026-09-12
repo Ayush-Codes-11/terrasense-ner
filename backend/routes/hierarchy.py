@@ -2,7 +2,6 @@
 Read-only hierarchy API for regions, states, and districts.
 """
 from fastapi import APIRouter, Depends, HTTPException
-from functools import lru_cache
 
 from models.hierarchy import (
     HierarchyStatus,
@@ -11,24 +10,31 @@ from models.hierarchy import (
     DistrictZonesResponse, AnalysisZoneMetadata, CoverageLevel
 )
 from services.hierarchy_loader import HierarchyLoader, HierarchyDataError
+from services.hierarchy_repository import (
+    FileHierarchyRepository, HierarchyReadRepository,
+    HierarchyConfigurationError, HierarchyUnavailableError,
+)
+from services.hierarchy_source import select_hierarchy_reader
 
 router = APIRouter(tags=["Hierarchy"])
 
-@lru_cache()
-def get_hierarchy_loader() -> HierarchyLoader:
-    # Production instantiation; tests will override this dependency.
-    # The loader is cached once per backend process. If administrative
-    # files are added/replaced, the backend requires a restart.
+def get_hierarchy_loader():
+    # Keep this dependency name so existing fixture overrides remain compatible.
     try:
-        return HierarchyLoader()
+        return select_hierarchy_reader()
+    except HierarchyConfigurationError as error:
+        raise HTTPException(status_code=503, detail={
+            "status": "BOUNDARY_DATA_UNAVAILABLE", "message": str(error)}) from None
+    except HierarchyUnavailableError:
+        raise HTTPException(status_code=503, detail={
+            "status": "BOUNDARY_DATA_UNAVAILABLE",
+            "message": "NER administrative boundary dataset is not available."}) from None
     except HierarchyDataError:
-        # Create an empty dummy loader that reports INVALID, so FastAPI doesn't crash
-        loader = HierarchyLoader.__new__(HierarchyLoader)
-        loader.available = False
-        loader.status = HierarchyStatus.BOUNDARY_DATA_INVALID
-        return loader
+        raise HTTPException(status_code=503, detail={
+            "status": "BOUNDARY_DATA_INVALID",
+            "message": "NER administrative boundary dataset failed validation."}) from None
 
-def ensure_hierarchy_ready(loader: HierarchyLoader = Depends(get_hierarchy_loader)) -> HierarchyLoader:
+def ensure_hierarchy_ready(loader = Depends(get_hierarchy_loader)) -> HierarchyReadRepository:
     if loader.status == HierarchyStatus.BOUNDARY_DATA_UNAVAILABLE:
         raise HTTPException(
             status_code=503,
@@ -45,15 +51,15 @@ def ensure_hierarchy_ready(loader: HierarchyLoader = Depends(get_hierarchy_loade
                 "message": "NER administrative boundary dataset failed validation."
             }
         )
-    return loader
+    return FileHierarchyRepository(loader) if isinstance(loader, HierarchyLoader) else loader
 
 @router.get("/regions", response_model=RegionListResponse)
-def get_regions(loader: HierarchyLoader = Depends(ensure_hierarchy_ready)):
+def get_regions(loader: HierarchyReadRepository = Depends(ensure_hierarchy_ready)):
     regions = sorted(loader.regions.values(), key=lambda r: r.region_name)
     return RegionListResponse(count=len(regions), items=regions)
 
 @router.get("/regions/{region_id}/states", response_model=StateListResponse)
-def get_region_states(region_id: str, loader: HierarchyLoader = Depends(ensure_hierarchy_ready)):
+def get_region_states(region_id: str, loader: HierarchyReadRepository = Depends(ensure_hierarchy_ready)):
     if region_id not in loader.regions:
         raise HTTPException(status_code=404, detail="Region not found")
     states = [s for s in loader.states.values() if s.region_id == region_id]
@@ -61,18 +67,18 @@ def get_region_states(region_id: str, loader: HierarchyLoader = Depends(ensure_h
     return StateListResponse(count=len(states), items=states)
 
 @router.get("/states", response_model=StateListResponse)
-def get_states(loader: HierarchyLoader = Depends(ensure_hierarchy_ready)):
+def get_states(loader: HierarchyReadRepository = Depends(ensure_hierarchy_ready)):
     states = sorted(loader.states.values(), key=lambda s: s.state_name)
     return StateListResponse(count=len(states), items=states)
 
 @router.get("/states/{state_id}", response_model=State)
-def get_state(state_id: str, loader: HierarchyLoader = Depends(ensure_hierarchy_ready)):
+def get_state(state_id: str, loader: HierarchyReadRepository = Depends(ensure_hierarchy_ready)):
     if state_id not in loader.states:
         raise HTTPException(status_code=404, detail="State not found")
     return loader.states[state_id]
 
 @router.get("/states/{state_id}/districts", response_model=DistrictListResponse)
-def get_state_districts(state_id: str, loader: HierarchyLoader = Depends(ensure_hierarchy_ready)):
+def get_state_districts(state_id: str, loader: HierarchyReadRepository = Depends(ensure_hierarchy_ready)):
     if state_id not in loader.states:
         raise HTTPException(status_code=404, detail="State not found")
     districts = [d for d in loader.districts.values() if d.state_id == state_id]
@@ -80,19 +86,17 @@ def get_state_districts(state_id: str, loader: HierarchyLoader = Depends(ensure_
     return DistrictListResponse(count=len(districts), items=districts)
 
 @router.get("/districts/{district_id}", response_model=District)
-def get_district(district_id: str, loader: HierarchyLoader = Depends(ensure_hierarchy_ready)):
+def get_district(district_id: str, loader: HierarchyReadRepository = Depends(ensure_hierarchy_ready)):
     if district_id not in loader.districts:
         raise HTTPException(status_code=404, detail="District not found")
     return loader.districts[district_id]
 
 
 @router.get('/districts/{district_id}/zones', response_model=DistrictZonesResponse)
-def get_district_zones(district_id: str, loader: HierarchyLoader = Depends(ensure_hierarchy_ready)):
+def get_district_zones(district_id: str, loader: HierarchyReadRepository = Depends(ensure_hierarchy_ready)):
     if district_id not in loader.districts:
         raise HTTPException(status_code=404, detail='District not found')
-    from services.analysis_zone_service import AnalysisZoneService
-    service = AnalysisZoneService(loader)
-    zones = service.get_district_zones(district_id)
+    zones = loader.get_district_zones(district_id)
     district = loader.districts[district_id]
     return DistrictZonesResponse(
         district_id=district.district_id,
@@ -105,10 +109,8 @@ def get_district_zones(district_id: str, loader: HierarchyLoader = Depends(ensur
     )
 
 @router.get('/zones/{zone_id}', response_model=AnalysisZoneMetadata)
-def get_zone(zone_id: str, loader: HierarchyLoader = Depends(ensure_hierarchy_ready)):
-    from services.analysis_zone_service import AnalysisZoneService
-    service = AnalysisZoneService(loader)
-    zone = service.get_zone(zone_id)
+def get_zone(zone_id: str, loader: HierarchyReadRepository = Depends(ensure_hierarchy_ready)):
+    zone = loader.get_zone(zone_id)
     if not zone:
         raise HTTPException(status_code=404, detail='Zone not found')
     return zone

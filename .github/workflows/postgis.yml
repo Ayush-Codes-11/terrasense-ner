@@ -5,6 +5,11 @@ on:
     branches: [main]
     paths:
       - 'backend/db/**'
+      - 'backend/routes/hierarchy.py'
+      - 'backend/services/hierarchy*'
+      - 'backend/services/analysis_zone_service.py'
+      - 'backend/models/hierarchy.py'
+      - 'backend/tests/test_hierarchy*'
       - 'backend/tests/test_*db*'
       - 'backend/tests/test_postgis*'
       - 'backend/requirements*.txt'
@@ -50,3 +55,5 @@ jobs:
           python scripts/import_hierarchy_to_postgis.py --validate-only
       - name: Test isolated migration roundtrip and database constraints
         run: python -m pytest backend/tests/test_postgis_integration.py -v --tb=short
+      - name: Test opt-in PostGIS API and file/PostGIS read parity
+        run: python -m pytest backend/tests/test_postgis_read_parity.py -v --tb=short
