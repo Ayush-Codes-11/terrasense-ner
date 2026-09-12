@@ -15,6 +15,8 @@ from db.import_hierarchy import (
 )
 from db.models import AnalysisZone, District, Region, State
 from db.session import create_db_engine
+from db.readiness import check_readiness
+from db.import_hierarchy import DatasetValidationError
 
 pytestmark = pytest.mark.postgis
 
@@ -53,7 +55,10 @@ def test_live_migration_import_spatial_parity_and_idempotency(migrated_database)
                    and i["dialect_options"]["postgresql_using"] == "gist" for i in indexes)
         assert len(inspector.get_foreign_keys(table.name, schema=schema)) == 1
     records = load_records()
+    with pytest.raises(DatasetValidationError):
+        check_readiness(connection)  # Migrated but empty is not deployable.
     report = import_records(connection, records)
+    assert check_readiness(connection)["ready"] is True
     assert report["counts"] == {"regions": 1, "states": 8, "districts": 119, "analysis_zones": 25}
     assert report["district_counts"] == DISTRICT_COUNTS
     pilot = connection.execute(select(District.__table__).where(
@@ -74,6 +79,28 @@ def test_live_migration_import_spatial_parity_and_idempotency(migrated_database)
     assert before == after
     assert validate_database(connection, records)["source_parity"] is True
 
+    # Readiness must reject real DB drift, even where constraints permit it.
+    # Each case rolls back inside the disposable test schema.
+    non_pilot = connection.scalar(select(District.district_id).where(
+        District.district_id != PILOT_ID).order_by(District.district_id).limit(1))
+    cases = [
+        ([AnalysisZone.__table__.delete().where(AnalysisZone.zone_id == "C03")],
+         "analysis_zones: IDs differ"),
+        ([AnalysisZone.__table__.delete(),
+          District.__table__.delete().where(District.district_id == PILOT_ID)],
+         "districts: IDs differ"),
+        ([AnalysisZone.__table__.update().where(AnalysisZone.zone_id == "C03")
+          .values(district_id=non_pilot)], "district_id differs"),
+        ([text("UPDATE analysis_zones SET geometry = ST_Translate(geometry, 0.000001, 0) "
+               "WHERE zone_id = 'C03'")], "geometry differs"),
+    ]
+    for statements, reason in cases:
+        with pytest.raises(DatasetValidationError, match=reason), connection.begin_nested():
+            for statement in statements:
+                connection.execute(statement)
+            check_readiness(connection)
+    assert check_readiness(connection)["ready"] is True
+
     # Prove database enforcement, not merely source validation.
     with pytest.raises(IntegrityError), connection.begin_nested():
         connection.execute(Region.__table__.insert(), records["regions"][0])
@@ -85,5 +112,7 @@ def test_live_migration_import_spatial_parity_and_idempotency(migrated_database)
 
     # A downgrade/re-upgrade is reproducible within this disposable schema.
     command.downgrade(config, "base")
+    with pytest.raises(DatasetValidationError, match="revision"):
+        check_readiness(connection)
     command.upgrade(config, "head")
     assert import_records(connection, records) == report
