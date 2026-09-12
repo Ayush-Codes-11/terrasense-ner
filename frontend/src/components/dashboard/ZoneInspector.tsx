@@ -1,9 +1,10 @@
 import type { RiskRecord, WeatherContext } from "../../services/spatial";
 import { riskColors, riskLabel } from "../../utils/navigation";
 const value = (v?: number, unit = "") => typeof v === "number" && Number.isFinite(v) ? `${v.toFixed(2)}${unit}` : "Unavailable";
-export default function ZoneInspector({ zone, risk, weather, loading, retrieved }: { zone: string; risk?: RiskRecord; weather?: WeatherContext; loading: boolean; retrieved?: string }) {
+export default function ZoneInspector({ zone, risk, weather, loading, retrieved, onClose }: { zone: string; risk?: RiskRecord; weather?: WeatherContext; loading: boolean; retrieved?: string; onClose?: () => void }) {
   return <section className="gis-inspector" aria-label={`Zone ${zone} details`}>
-    <p className="gis-eyebrow">SELECTED ANALYSIS ZONE</p><h2>{zone}</h2>
+    <div className="gis-inspector-sticky"><div><p className="gis-eyebrow">SELECTED ANALYSIS ZONE</p><h2>{zone}</h2></div>{onClose && <button className="gis-close" aria-label="Close zone details" onClick={onClose}>Close <span aria-hidden="true">×</span></button>}</div>
+    <div className="gis-inspector-body">
     <span className="gis-risk-pill" style={{ borderColor: riskColors[risk?.risk_category ?? ""] }}>{riskLabel(risk?.risk_category)}</span>
     <div className="gis-score">{risk ? risk.risk_score.toFixed(4) : "—"}<small>Relative prototype risk score</small></div>
     {loading && <p role="status">Refreshing risk…</p>}
@@ -28,5 +29,6 @@ export default function ZoneInspector({ zone, risk, weather, loading, retrieved 
     {risk?.feature_provenance ? <dl className="gis-provenance">{Object.entries(risk.feature_provenance).map(([name, source]) => <div key={name}><dt>{name.replaceAll("_", " ")}</dt><dd>{source}</dd></div>)}</dl> : <p>Source information unavailable</p>}
     <p className="gis-muted">Model: prototype weighted scorer. Static ML validation pending.</p>
     {retrieved && <p className="gis-muted">API retrieved at {new Date(retrieved).toLocaleTimeString()}. Retrieval time is not observation freshness.</p>}
+    </div>
   </section>;
 }
