@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { readFileSync } from "node:fs";
@@ -8,7 +8,10 @@ import ZoneInspector from "../src/components/dashboard/ZoneInspector";
 import { AIZAWL, pilotZones, riskLabel, selectLevel } from "../src/utils/navigation";
 import { clearSpatialCache, spatialFetch } from "../src/services/spatial";
 
-vi.mock("../src/components/map/HierarchyMap", () => ({ default: ({ data, level }: any) => <div data-testid="map">{level}: {data.features.length} features</div> }));
+vi.mock("../src/components/map/HierarchyMap", () => ({ default: ({ data, focus, level, onSelect }: any) => <div data-testid="map" data-focus-count={focus.features.length}>{level}: {data.features.length} features{data.features.map((feature: any) => {
+  const id = feature.properties[`${level}_id`];
+  return <button key={id} onClick={() => onSelect(id)}>{feature.properties[`${level}_name`] ?? id}</button>;
+})}</div> }));
 const read = (path: string) => JSON.parse(readFileSync(new URL(path, import.meta.url), "utf8"));
 const states = read("../../data/geodata/ner/states.geojson");
 const districts = read("../../data/geodata/ner/districts.geojson");
@@ -42,15 +45,19 @@ describe("GIS command centre", () => {
   it("starts at eight states and navigates to 11 Mizoram districts", async () => {
     mount();
     expect(await screen.findByText("state: 8 features")).toBeTruthy();
-    await userEvent.click(screen.getByRole("button", { name: /Mizoram/ }));
+    await userEvent.click(screen.getByRole("button", { name: /State.*Select state/ }));
+    await userEvent.click(screen.getByRole("option", { name: /Mizoram/ }));
     expect(await screen.findByText("district: 11 features")).toBeTruthy();
-    expect(screen.getByText(/Detailed risk model not yet available at state/)).toBeTruthy();
+    expect(screen.getByText(/detailed state risk not available/)).toBeTruthy();
   });
   it("shows 25 pilot zones, C03 risk details, and reversible breadcrumbs", async () => {
     mount(`?state=IN-MZ&district=${AIZAWL}`);
     expect(await screen.findByText("zone: 25 features")).toBeTruthy();
-    await userEvent.click(screen.getByRole("button", { name: /C03/ }));
+    expect(screen.getByTestId("map").getAttribute("data-focus-count")).toBe("25");
+    await userEvent.click(screen.getByRole("button", { name: "C03" }));
     expect(await screen.findByText("0.7103")).toBeTruthy();
+    expect(within(document.querySelector(".gis-context-hud")!).getByRole("heading", { name: "Aizawl" })).toBeTruthy();
+    expect(within(document.querySelector(".gis-context-hud")!).queryByRole("heading", { name: "C03" })).toBeNull();
     expect(screen.getByText("0.9276")).toBeTruthy();
     expect(screen.queryByText("0.6200")).toBeNull();
     expect(screen.getByText("REAL_SOIL_MOISTURE")).toBeTruthy();
@@ -64,7 +71,7 @@ describe("GIS command centre", () => {
   it("shows boundary-only status for exact Anjaw and no risk", async () => {
     mount("?state=IN-AR&district=IND-ADM2-76128533B55878637000592");
     expect(await screen.findByText("district: 1 features")).toBeTruthy();
-    expect(screen.getAllByText("Detailed model not implemented").length).toBeGreaterThan(0);
+    expect(screen.getByText(/detailed model not implemented/)).toBeTruthy();
     expect(screen.queryByText("Relative Risk")).toBeNull();
     expect(vi.mocked(fetch).mock.calls.some(([url]) => String(url).includes("/risk/"))).toBe(false);
   });
@@ -105,5 +112,15 @@ describe("GIS command centre", () => {
     await spatialFetch("/regions/NER/states?include_geometry=true");
     await spatialFetch("/regions/NER/states?include_geometry=true");
     expect(fetch).toHaveBeenCalledTimes(1);
+  });
+  it("offers the recovered basemaps and keeps 3D deferred", async () => {
+    mount();
+    await screen.findByText("state: 8 features");
+    await userEvent.click(screen.getByRole("button", { name: /Map View/ }));
+    const menu = screen.getByRole("dialog", { name: "Map view settings" });
+    expect(within(menu).getByRole("button", { name: /Street/ })).toBeTruthy();
+    expect(within(menu).getByRole("button", { name: /Terrain/ })).toBeTruthy();
+    expect(within(menu).getByRole("button", { name: /Satellite/ })).toBeTruthy();
+    expect((within(menu).getByRole("button", { name: /3D.*Coming in Phase 4B/ }) as HTMLButtonElement).disabled).toBe(true);
   });
 });
