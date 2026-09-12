@@ -16,6 +16,7 @@ on:
       - 'migrations/**'
       - 'alembic.ini'
       - 'scripts/import_hierarchy_to_postgis.py'
+      - 'scripts/check_postgis_readiness.py'
       - 'data/geodata/ner/**'
       - 'data/sample/grid-risk.geojson'
       - '.github/workflows/postgis.yml'
@@ -53,6 +54,8 @@ jobs:
           python scripts/import_hierarchy_to_postgis.py
           python scripts/import_hierarchy_to_postgis.py
           python scripts/import_hierarchy_to_postgis.py --validate-only
+      - name: Check read-only deployment readiness
+        run: python scripts/check_postgis_readiness.py
       - name: Test isolated migration roundtrip and database constraints
         run: python -m pytest backend/tests/test_postgis_integration.py -v --tb=short
       - name: Test opt-in PostGIS API and file/PostGIS read parity

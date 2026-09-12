@@ -175,3 +175,59 @@ References: [SQLAlchemy PostgreSQL upserts](https://docs.sqlalchemy.org/en/20/di
 [GeoAlchemy geometry types](https://geoalchemy-2.readthedocs.io/en/latest/types.html),
 [Alembic offline migrations](https://alembic.sqlalchemy.org/en/latest/offline.html),
 [PostGIS Docker images](https://github.com/postgis/docker-postgis).
+
+## Phase 3B2a production-readiness tooling and deployment runbook
+
+CUTOVER BLOCKED — production PostGIS prerequisites are not yet confirmed.
+The default remains `file`; this checkpoint does not activate production PostGIS.
+
+Repository evidence: `backend/vercel.json` uses `@vercel/python` with
+`backend/index.py` exposing `main.app`. README describes Vercel Git auto-deployment.
+`backend/requirements.txt` contains the runtime dependencies; DB dependencies
+remain separate in `backend/requirements-db.txt`. There is no repository-defined
+production DB provisioning or migration/import release hook. The actual Vercel
+project's install settings, secret configuration, database connectivity, and
+persistent PostGIS service have not been verified. The local Compose database
+and temporary GitHub CI database are not production infrastructure.
+
+Before enabling production PostGIS, the deployment owner must:
+
+1. Provision a persistent PostgreSQL 16 database with PostGIS, backups, and
+   network access from the backend. Confirm these in the actual deployment.
+2. Configure `DATABASE_URL` through the deployment's secret/environment settings.
+   Use the `postgresql+psycopg` scheme and provider-required TLS configuration;
+   never commit credentials or print the URL in logs.
+3. Configure the backend build/install step to run, from the repository root:
+   `python -m pip install -r backend/requirements.txt -r backend/requirements-db.txt`.
+   For a backend-root build use `-r requirements.txt -r requirements-db.txt`.
+   Confirm this in build logs before enabling PostGIS. This reuses version
+   constraints without making DB packages mandatory for file-only development.
+4. In an explicit trusted release job with the full repository and DB access,
+   run `python -m alembic upgrade head`.
+5. Run `python scripts/import_hierarchy_to_postgis.py`. Re-running is idempotent.
+6. Run `python scripts/check_postgis_readiness.py`, then the read-only
+   `compare_file_and_postgis_hierarchy(engine)` parity utility documented above.
+   Require all parity fields true and no mismatches. Readiness runs a read-only,
+   repeatable-read transaction and checks extension, current Alembic revision,
+   tables, 1/8/119/25 counts, Aizawl, canonical fields, exact geometry and orphans.
+   It exits nonzero with a sanitized diagnostic on failure; it never repairs data.
+   Stop the release if any command fails. Do not run migrations/import at app
+   startup. The existing explicit commands are the preparation sequence; no
+   additional mutating wrapper is required.
+7. Only after these gates pass, set `HIERARCHY_DATA_SOURCE=postgis` and redeploy.
+   Unset source continues to mean file in this checkpoint.
+8. Verify `/health`, `/regions`, `/states`, Mizoram's 11 districts, Aizawl's
+   25 zones, Anjaw's zero zones, `/zones/C03`, legacy `/zones` and C03 risk.
+   `/health` remains liveness; the readiness command is a separate deployment
+   gate and is not a new HTTP endpoint.
+9. To roll back hierarchy reads, set `HIERARCHY_DATA_SOURCE=file` and redeploy.
+   No DB is required for this mode. PostGIS failures never trigger hidden fallback.
+
+The CI PostGIS service runs readiness after migration and import. Live tests
+also reject empty databases, wrong counts, missing Aizawl, incorrect zone bindings,
+changed geometry, and downgraded migration state. Existing explicit
+PostGIS API, file parity, idempotency, spatial and session-release checks remain.
+CI success alone does not establish production provisioning or authorize cutover.
+The committed 2021 ADM2 prototype district dataset is not claimed as a fully
+current 2026 administrative list. Canonical files remain import, rollback,
+reproducibility and parity sources.
