@@ -79,3 +79,16 @@ class DistrictZonesResponse(BaseModel):
     detailed_zone_model_available: bool
     count: int
     items: list[AnalysisZoneMetadata]
+
+
+class HierarchyFeature(BaseModel):
+    type: str = "Feature"
+    geometry: dict
+    properties: dict
+
+
+class HierarchyFeatureCollection(BaseModel):
+    type: str = "FeatureCollection"
+    count: int
+    boundary_vintage: str
+    features: list[HierarchyFeature]

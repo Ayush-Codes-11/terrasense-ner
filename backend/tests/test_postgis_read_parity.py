@@ -7,6 +7,7 @@ import pytest
 from alembic import command
 from alembic.config import Config
 from fastapi.testclient import TestClient
+from shapely.geometry import shape, MultiPolygon
 from sqlalchemy import event
 from sqlalchemy.schema import CreateSchema, DropSchema
 
@@ -63,10 +64,12 @@ def test_live_postgis_api_matches_file_contract_and_releases_sessions(imported_r
     paths += [f"/states/{state_id}/districts" for state_id in sorted(loader.states)]
     paths += ["/regions/UNKNOWN/states", "/states/UNKNOWN", "/states/UNKNOWN/districts",
               "/districts/UNKNOWN", "/districts/UNKNOWN/zones", "/zones/UNKNOWN"]
+    geometry_paths = ["/regions/NER/states?include_geometry=true", "/states?include_geometry=true",
+                      "/states/IN-MZ/districts?include_geometry=true"]
     monkeypatch.setenv("HIERARCHY_DATA_SOURCE", "file")
     monkeypatch.delenv("DATABASE_URL", raising=False)
     with TestClient(app) as client:
-        expected = {path: client.get(path) for path in paths}
+        expected = {path: client.get(path) for path in paths + geometry_paths}
     assert expected["/regions"].json()["count"] == 1
     assert expected["/states"].json()["count"] == 8
     assert expected["/states/IN-MZ/districts"].json()["count"] == 11
@@ -91,6 +94,20 @@ def test_live_postgis_api_matches_file_contract_and_releases_sessions(imported_r
                 assert (actual.status_code, actual.json()) == (
                     expected[path].status_code, expected[path].json()), path
                 assert engine.pool.checkedout() == 0
+            for path in geometry_paths:
+                response = client.get(path)
+                assert response.status_code == 200
+                actual = response.json()
+                source = expected[path].json()
+                assert actual["count"] == source["count"]
+                assert actual["boundary_vintage"] == source["boundary_vintage"]
+                for left, right in zip(source["features"], actual["features"], strict=True):
+                    assert left["properties"] == right["properties"]
+                    geometry = shape(left["geometry"])
+                    if geometry.geom_type == "Polygon":
+                        geometry = MultiPolygon([geometry])
+                    assert geometry.equals_exact(shape(right["geometry"]), 0)
+                assert engine.pool.checkedout() == 0
             assert client.get("/health").status_code == 200
             assert len(client.get("/zones").json()["features"]) == 25
             risk = client.get("/risk/current/C03").json()
@@ -98,7 +115,7 @@ def test_live_postgis_api_matches_file_contract_and_releases_sessions(imported_r
             assert risk["risk_category"] == "HIGH"
     finally:
         event.remove(engine, "before_cursor_execute", record_sql)
-    assert sum("REPEATABLE READ, READ ONLY" in statement for statement in statements) == len(paths)
+    assert sum("REPEATABLE READ, READ ONLY" in statement for statement in statements) == len(paths) + len(geometry_paths)
     assert not any(statement.lstrip().split()[0].upper() in
                    {"INSERT", "UPDATE", "DELETE", "CREATE", "ALTER", "DROP"}
                    for statement in statements)

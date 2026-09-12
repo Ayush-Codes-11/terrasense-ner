@@ -4,7 +4,7 @@ Read-only hierarchy API for regions, states, and districts.
 from fastapi import APIRouter, Depends, HTTPException
 
 from models.hierarchy import (
-    HierarchyStatus,
+    HierarchyStatus, HierarchyFeatureCollection,
     Region, State, District,
     RegionListResponse, StateListResponse, DistrictListResponse,
     DistrictZonesResponse, AnalysisZoneMetadata, CoverageLevel
@@ -18,10 +18,10 @@ from services.hierarchy_source import select_hierarchy_reader
 
 router = APIRouter(tags=["Hierarchy"])
 
-def get_hierarchy_loader():
+def get_hierarchy_loader(include_geometry: bool = False):
     # Keep this dependency name so existing fixture overrides remain compatible.
     try:
-        return select_hierarchy_reader()
+        return select_hierarchy_reader(include_geometry=include_geometry)
     except HierarchyConfigurationError as error:
         raise HTTPException(status_code=503, detail={
             "status": "BOUNDARY_DATA_UNAVAILABLE", "message": str(error)}) from None
@@ -58,17 +58,21 @@ def get_regions(loader: HierarchyReadRepository = Depends(ensure_hierarchy_ready
     regions = sorted(loader.regions.values(), key=lambda r: r.region_name)
     return RegionListResponse(count=len(regions), items=regions)
 
-@router.get("/regions/{region_id}/states", response_model=StateListResponse)
-def get_region_states(region_id: str, loader: HierarchyReadRepository = Depends(ensure_hierarchy_ready)):
+@router.get("/regions/{region_id}/states", response_model=StateListResponse | HierarchyFeatureCollection)
+def get_region_states(region_id: str, include_geometry: bool = False, loader: HierarchyReadRepository = Depends(ensure_hierarchy_ready)):
     if region_id not in loader.regions:
         raise HTTPException(status_code=404, detail="Region not found")
     states = [s for s in loader.states.values() if s.region_id == region_id]
     states.sort(key=lambda s: s.state_name)
+    if include_geometry:
+        return feature_collection(loader, "states", states, "state_id", "2011")
     return StateListResponse(count=len(states), items=states)
 
-@router.get("/states", response_model=StateListResponse)
-def get_states(loader: HierarchyReadRepository = Depends(ensure_hierarchy_ready)):
+@router.get("/states", response_model=StateListResponse | HierarchyFeatureCollection)
+def get_states(include_geometry: bool = False, loader: HierarchyReadRepository = Depends(ensure_hierarchy_ready)):
     states = sorted(loader.states.values(), key=lambda s: s.state_name)
+    if include_geometry:
+        return feature_collection(loader, "states", states, "state_id", "2011")
     return StateListResponse(count=len(states), items=states)
 
 @router.get("/states/{state_id}", response_model=State)
@@ -77,12 +81,14 @@ def get_state(state_id: str, loader: HierarchyReadRepository = Depends(ensure_hi
         raise HTTPException(status_code=404, detail="State not found")
     return loader.states[state_id]
 
-@router.get("/states/{state_id}/districts", response_model=DistrictListResponse)
-def get_state_districts(state_id: str, loader: HierarchyReadRepository = Depends(ensure_hierarchy_ready)):
+@router.get("/states/{state_id}/districts", response_model=DistrictListResponse | HierarchyFeatureCollection)
+def get_state_districts(state_id: str, include_geometry: bool = False, loader: HierarchyReadRepository = Depends(ensure_hierarchy_ready)):
     if state_id not in loader.states:
         raise HTTPException(status_code=404, detail="State not found")
     districts = [d for d in loader.districts.values() if d.state_id == state_id]
     districts.sort(key=lambda d: d.district_name)
+    if include_geometry:
+        return feature_collection(loader, "districts", districts, "district_id", "2021")
     return DistrictListResponse(count=len(districts), items=districts)
 
 @router.get("/districts/{district_id}", response_model=District)
@@ -114,3 +120,11 @@ def get_zone(zone_id: str, loader: HierarchyReadRepository = Depends(ensure_hier
     if not zone:
         raise HTTPException(status_code=404, detail='Zone not found')
     return zone
+
+
+def feature_collection(loader, collection, items, key, vintage):
+    return HierarchyFeatureCollection(
+        count=len(items), boundary_vintage=vintage,
+        features=[{"type": "Feature", "properties": item.model_dump(mode="json"),
+                   "geometry": loader.get_geometry(collection, getattr(item, key))}
+                  for item in items])
