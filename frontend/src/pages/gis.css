@@ -78,6 +78,35 @@
   .gis-data-status.with-inspector{bottom:calc(min(59dvh,530px) + 8px)}
 }
 
+/* Phase 4B adds a separate lazy WebGL surface without changing the Leaflet shell. */
+.gis-maplibre{width:100%;height:100%;background:#172534}
+.gis-map-3d .maplibregl-canvas{outline:0}
+.gis-map-3d .maplibregl-ctrl-bottom-left{bottom:70px;left:4px}
+.gis-map-3d .maplibregl-ctrl-bottom-right{bottom:18px}
+.gis-map-3d .maplibregl-ctrl-group{overflow:hidden;border:1px solid #405269;border-radius:7px;background:#0b1b2ddd;box-shadow:0 5px 18px #0008}
+.gis-map-3d .maplibregl-ctrl-group button{background-color:transparent;filter:invert(1) brightness(1.7)}
+.gis-map-3d .maplibregl-ctrl-scale{border-color:#d8e4ee;background:#07111fbb;color:#d8e4ee}
+.gis-map-3d .maplibregl-ctrl-attrib{color:#303c43;background:#fffffff0;font-size:9px}
+.gis-map-3d .maplibregl-ctrl-attrib a{color:#165567}
+.gis-terrain-disclosure{position:absolute;z-index:650;left:14px;bottom:82px;margin:0;padding:5px 8px;border:1px solid #52617655;border-radius:5px;background:#091523df;color:#c8d4df;font-size:8px;pointer-events:none}
+.gis-mode-notice{position:absolute;z-index:1000;top:82px;left:50%;display:flex;align-items:center;gap:10px;max-width:min(520px,calc(100% - 28px));transform:translateX(-50%);padding:8px 10px;border:1px solid #b18145;border-radius:7px;background:#392a1ef2;color:#f5d7ad;box-shadow:0 8px 24px #0009;font-size:9px}
+.gis-mode-notice button{border:0;background:transparent;color:inherit;font-size:17px;line-height:1}
+.gis-display-options button{height:auto;min-height:36px;padding:5px 7px}
+.gis-display-options button small{margin-top:2px;line-height:1.2}
+
+@media(max-width:900px){
+  .gis-map-3d .maplibregl-ctrl-bottom-left{bottom:95px}
+  .gis-map-3d .maplibregl-ctrl-bottom-right{bottom:18px;max-width:72%}
+  .gis-terrain-disclosure{left:8px;bottom:101px;max-width:72%}
+  .gis-mode-notice{top:58px}
+}
+
+@media(max-width:760px){
+  .gis-map-3d .maplibregl-ctrl-bottom-left{display:none}
+  .gis-map-3d .maplibregl-ctrl-attrib{max-width:78%;font-size:7px}
+  .gis-terrain-disclosure{bottom:92px;font-size:7px}
+}
+
 /* Compact desktop inspector: the identity stays fixed while only the evidence body scrolls. */
 .gis-detail{top:14px;right:14px;bottom:auto;width:clamp(290px,22vw,330px);height:min(70vh,610px);max-height:min(70vh,610px);padding:0;overflow:hidden}
 .gis-inspector{display:flex;min-height:0;height:100%;flex-direction:column}

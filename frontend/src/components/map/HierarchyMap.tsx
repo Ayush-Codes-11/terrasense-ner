@@ -4,7 +4,11 @@ import L from "leaflet";
 import type { Feature } from "geojson";
 import type { Boundaries, RiskRecord } from "../../services/spatial";
 import { riskColors, riskLabel } from "../../utils/navigation";
+import { BASEMAPS } from "./mapConfig";
+import type { BasemapId } from "./mapConfig";
 import "leaflet/dist/leaflet.css";
+
+export type { BasemapId } from "./mapConfig";
 
 function Viewport({ focus }: { focus: Boundaries }) {
   const map = useMap();
@@ -19,26 +23,8 @@ function Viewport({ focus }: { focus: Boundaries }) {
   }, [map]);
   return null;
 }
-export type BasemapId = "street" | "terrain" | "satellite";
-const BASEMAPS = {
-  terrain: {
-    url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
-    attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
-    maxZoom: 17,
-  },
-  street: {
-    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
-    maxZoom: 19,
-  },
-  satellite: {
-    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EAP, and the GIS User Community',
-    maxZoom: 19,
-  },
-} as const;
-interface Props { data: Boundaries; focus: Boundaries; context?: Boundaries; level: "state" | "district" | "zone"; selected?: string; risks: RiskRecord[]; basemap: BasemapId; onSelect: (id: string) => void }
-export default function HierarchyMap({ data, focus, context, level, selected, risks, basemap, onSelect }: Props) {
+export interface HierarchyMapProps { data: Boundaries; focus: Boundaries; context?: Boundaries; level: "state" | "district" | "zone"; selected?: string; risks: RiskRecord[]; basemap: BasemapId; onSelect: (id: string) => void }
+export default function HierarchyMap({ data, focus, context, level, selected, risks, basemap, onSelect }: HierarchyMapProps) {
   const [tileErrorFor, setTileErrorFor] = useState<BasemapId>();
   const tileError = tileErrorFor === basemap;
   const riskMap = useMemo(() => new Map(risks.map(r => [r.zone_id, r])), [risks]);
@@ -48,7 +34,7 @@ export default function HierarchyMap({ data, focus, context, level, selected, ri
   const layerKey = JSON.stringify([level, data.features.map(f => idOf(f)), selected, risks.map(r => [r.zone_id, r.risk_category])]);
   return <div className="gis-map" aria-label="Interactive geographic map">
     <MapContainer center={[26, 93]} zoom={6} minZoom={4} maxZoom={18} scrollWheelZoom className="gis-leaflet">
-      <TileLayer key={basemap} className={`gis-basemap gis-basemap-${basemap}`} url={BASEMAPS[basemap].url}
+      <TileLayer key={basemap} className={`gis-basemap gis-basemap-${basemap}`} url={BASEMAPS[basemap].leafletUrl}
         attribution={BASEMAPS[basemap].attribution} maxZoom={BASEMAPS[basemap].maxZoom}
         eventHandlers={{ tileerror: () => setTileErrorFor(basemap) }} />
       <ScaleControl position="bottomleft" imperial={false} />

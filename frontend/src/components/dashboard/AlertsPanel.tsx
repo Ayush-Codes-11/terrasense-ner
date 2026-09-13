@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "http://localhost:8000";
+const API_BASE = ((import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "").replace(/\/$/, "");
 
 export default function AlertsPanel() {
   const [alerts, setAlerts] = useState<any[]>([]);
@@ -15,6 +15,7 @@ export default function AlertsPanel() {
 
   const fetchAlerts = async () => {
     try {
+      if (!API_BASE) return;
       const res = await fetch(`${API_BASE}/alerts`);
       if (res.ok) {
         setAlerts(await res.json());
@@ -34,6 +35,7 @@ export default function AlertsPanel() {
   const sendTestAlert = async () => {
     setLoading(true);
     try {
+      if (!API_BASE) return;
       const res = await fetch(`${API_BASE}/alerts/test`, { method: "POST" });
       if (res.ok) {
         const newAlert = await res.json();

@@ -3,8 +3,9 @@ import { useSearchParams } from "react-router-dom";
 import AlertsPanel from "../components/dashboard/AlertsPanel";
 import ZoneInspector from "../components/dashboard/ZoneInspector";
 import HierarchyCommandBar from "../components/map/HierarchyCommandBar";
-import HierarchyMap from "../components/map/HierarchyMap";
-import type { BasemapId } from "../components/map/HierarchyMap";
+import MapSurface from "../components/map/MapSurface";
+import type { BasemapId, DisplayMode } from "../components/map/mapConfig";
+import { supportsWebGL2 } from "../components/map/webgl";
 import ReportList from "../components/reports/ReportList";
 import SideDrawer from "../components/ui/SideDrawer";
 import { useHierarchyMap } from "../hooks/useHierarchyMap";
@@ -22,6 +23,9 @@ export default function Dashboard() {
   const [retry, setRetry] = useState(0);
   const [gridFocus, setGridFocus] = useState(false);
   const [basemap, setBasemap] = useState<BasemapId>("terrain");
+  const [displayMode, setDisplayMode] = useState<DisplayMode>("2d");
+  const [webglSupported] = useState(() => supportsWebGL2());
+  const [modeNotice, setModeNotice] = useState<string>();
   const [isAlertsOpen, setIsAlertsOpen] = useState(false);
   const [isReportsOpen, setIsReportsOpen] = useState(false);
   const [isDataStatusOpen, setIsDataStatusOpen] = useState(false);
@@ -49,6 +53,10 @@ export default function Dashboard() {
   }, []);
 
   const navigate = (level: "region" | "state" | "district" | "zone", id?: string) => {
+    if (displayMode === "3d" && (level === "region" || level === "state" || (level === "district" && id !== data?.district?.district_id))) {
+      setDisplayMode("2d");
+      setModeNotice("3D terrain is available for the Aizawl detailed pilot. The map is using 2D.");
+    }
     const next = selectLevel(selection, level, id);
     setParams(Object.fromEntries(Object.entries(next).filter((entry): entry is [string, string] => Boolean(entry[1]))));
     setGridFocus(false);
@@ -77,18 +85,40 @@ export default function Dashboard() {
   const districts = data?.districts?.features.map(feature => feature.properties) ?? [];
   const count = pilot ? data?.zones?.features.length : data?.district ? 1 : data?.districts?.features.length ?? data?.states.features.length;
   const selectedRisk = risk.risks.find(item => item.zone_id === selection.zone);
+  const threeDAvailable = pilot && webglSupported === true;
+  const activeDisplayMode: DisplayMode = displayMode === "3d" && pilot ? "3d" : "2d";
+  const threeDUnavailableReason = !pilot
+    ? "3D terrain available for the Aizawl detailed pilot"
+      : !webglSupported
+        ? "3D terrain unavailable on this device"
+      : "3D terrain unavailable";
+  const selectDisplayMode = (mode: DisplayMode) => {
+    if (mode === "3d" && !threeDAvailable) {
+      setModeNotice(`${threeDUnavailableReason}. The map remains in 2D.`);
+      return;
+    }
+    setModeNotice(undefined);
+    setDisplayMode(mode);
+  };
+  const handleModeFailure = (message: string) => {
+    setDisplayMode("2d");
+    setModeNotice(message);
+  };
 
   return <div className="gis-shell">
     <header className="gis-header">
       <a href="/" className="gis-brand" aria-label="TerraSense command centre home"><span aria-hidden="true">◈</span><div>TerraSense NER<small>LANDSLIDE DECISION SUPPORT · RESEARCH PROTOTYPE</small></div></a>
-      <HierarchyCommandBar states={states} districts={districts} stateId={selection.state} districtId={selection.district} basemap={basemap} pendingReports={pendingReports}
+      <HierarchyCommandBar states={states} districts={districts} stateId={selection.state} districtId={selection.district} basemap={basemap} displayMode={activeDisplayMode} threeDAvailable={threeDAvailable} threeDUnavailableReason={threeDUnavailableReason} pendingReports={pendingReports}
         onRegionChange={() => navigate("region")} onStateChange={id => navigate("state", id)} onDistrictChange={id => navigate("district", id)} onBasemapChange={setBasemap}
+        onDisplayModeChange={selectDisplayMode}
         onReportsOpen={() => setIsReportsOpen(true)} onAlertsOpen={() => setIsAlertsOpen(true)} />
     </header>
     <main className="gis-workspace">
       <section className="gis-map-stage" aria-label="Spatial view">
-        {data ? <HierarchyMap data={features} focus={focus} context={pilot ? context : undefined} level={level} selected={selection.zone ?? selection.district} risks={risk.risks} basemap={basemap} onSelect={id => navigate(level, id)} />
+        {data ? <MapSurface data={features} focus={focus} context={pilot ? context : undefined} level={level} selected={selection.zone ?? selection.district} risks={risk.risks} basemap={basemap} displayMode={activeDisplayMode} onModeFailure={handleModeFailure} onSelect={id => navigate(level, id)} />
           : <div className="gis-map-empty">{hierarchy.loading ? "Preparing North-East India…" : "Spatial data unavailable"}</div>}
+
+        {modeNotice && <div className="gis-mode-notice" role="status"><span>{modeNotice}</span><button aria-label="Dismiss map mode message" onClick={() => setModeNotice(undefined)}>×</button></div>}
 
         <div className="gis-context-hud">
           <nav className="gis-breadcrumb" aria-label="Geographic breadcrumb">
@@ -113,7 +143,7 @@ export default function Dashboard() {
           <button aria-expanded={isDataStatusOpen} onClick={() => setIsDataStatusOpen(open => !open)}><i className={data ? "available" : "unavailable"} />Data Status</button>
           {isDataStatusOpen && <div className="gis-data-status-popover">
             <strong>Data sources & availability</strong>
-            <dl><div><dt>Hierarchy</dt><dd>{data ? "Available" : "Unavailable"}</dd></div><div><dt>Basemap</dt><dd>{basemap === "terrain" ? "OpenTopoMap" : basemap === "street" ? "OpenStreetMap" : "Esri imagery"}</dd></div><div><dt>Detailed model</dt><dd>{pilot ? "Aizawl pilot" : "Not available at this level"}</dd></div>{selectedRisk?.feature_provenance && Object.entries(selectedRisk.feature_provenance).map(([name, source]) => <div key={name}><dt>{name.replaceAll("_", " ")}</dt><dd>{source}</dd></div>)}</dl>
+            <dl><div><dt>Hierarchy</dt><dd>{data ? "Available" : "Unavailable"}</dd></div><div><dt>Basemap</dt><dd>{basemap === "terrain" ? "OpenTopoMap" : basemap === "street" ? "OpenStreetMap" : "Esri imagery"}</dd></div><div><dt>Display</dt><dd>{activeDisplayMode === "3d" ? "3D · Copernicus GLO-30 DSM" : "2D"}</dd></div><div><dt>Detailed model</dt><dd>{pilot ? "Aizawl pilot" : "Not available at this level"}</dd></div>{selectedRisk?.feature_provenance && Object.entries(selectedRisk.feature_provenance).map(([name, source]) => <div key={name}><dt>{name.replaceAll("_", " ")}</dt><dd>{source}</dd></div>)}</dl>
             <small>Availability and provenance are not model confidence.</small>
           </div>}
         </div>
