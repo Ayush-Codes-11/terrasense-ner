@@ -21,7 +21,20 @@ from models.hierarchy import (
 
 _BACKEND_DIR = Path(__file__).resolve().parent.parent
 _REPO_ROOT = _BACKEND_DIR.parent
-_DEFAULT_HIERARCHY_DIR = _REPO_ROOT / "data" / "geodata" / "ner"
+
+
+def _resolve_default_hierarchy_dir(backend_dir: Path = _BACKEND_DIR) -> Path:
+    repository_dir = backend_dir.parent / "data" / "geodata" / "ner"
+    bundled_dir = backend_dir / "data" / "geodata" / "ner"
+
+    if repository_dir.is_dir():
+        return repository_dir
+    if bundled_dir.is_dir():
+        return bundled_dir
+    return repository_dir
+
+
+_DEFAULT_HIERARCHY_DIR = _resolve_default_hierarchy_dir()
 
 class HierarchyDataError(Exception):
     """Raised when the hierarchy data is malformed or invalid."""
