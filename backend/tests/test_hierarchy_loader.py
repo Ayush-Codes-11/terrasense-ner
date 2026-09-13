@@ -6,7 +6,11 @@ import pytest
 from pathlib import Path
 
 from models.hierarchy import CoverageLevel, RiskModelStatus, HierarchyStatus
-from services.hierarchy_loader import HierarchyLoader, HierarchyDataError
+from services.hierarchy_loader import (
+    HierarchyDataError,
+    HierarchyLoader,
+    _resolve_default_hierarchy_dir,
+)
 
 FIXTURE_DIR = Path(__file__).resolve().parent / "fixtures" / "hierarchy"
 
@@ -28,6 +32,32 @@ def test_valid_hierarchy_loads():
     # Check relationships
     assert loader.states["IN-MZ"].region_id == "NER"
     assert loader.districts["TEST-AIZAWL"].state_id == "IN-MZ"
+
+
+def test_isolated_backend_root_resolves_bundled_hierarchy(tmp_path):
+    backend_root = tmp_path / "backend"
+    bundled_hierarchy = backend_root / "data" / "geodata" / "ner"
+    bundled_hierarchy.mkdir(parents=True)
+
+    for filename in ("metadata.json", "states.geojson", "districts.geojson"):
+        (bundled_hierarchy / filename).write_bytes(
+            (FIXTURE_DIR / filename).read_bytes()
+        )
+
+    repository_hierarchy = (
+        backend_root.parent / "data" / "geodata" / "ner"
+    )
+    assert not repository_hierarchy.exists()
+
+    resolved = _resolve_default_hierarchy_dir(backend_root)
+    assert resolved == bundled_hierarchy
+
+    loader = HierarchyLoader(data_dir=resolved)
+    assert loader.available
+    assert loader.status == HierarchyStatus.READY
+    assert "NER" in loader.regions
+    assert "IN-MZ" in loader.states
+    assert "TEST-AIZAWL" in loader.districts
 
 def test_administrative_geometries_accessible():
     loader = HierarchyLoader(data_dir=FIXTURE_DIR)

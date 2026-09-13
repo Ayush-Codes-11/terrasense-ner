@@ -47,6 +47,9 @@ def test_backend_bundle_self_contained():
     backend_ml = _BACKEND_DIR / "ml"
 
     required_files = [
+        backend_data / "geodata" / "ner" / "metadata.json",
+        backend_data / "geodata" / "ner" / "states.geojson",
+        backend_data / "geodata" / "ner" / "districts.geojson",
         backend_data / "sample" / "grid-risk.geojson",
         backend_data / "sample" / "sample_weather.json",
         backend_data / "real" / "terrain" / "zonal_terrain.json",
