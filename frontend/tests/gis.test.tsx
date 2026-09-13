@@ -12,6 +12,7 @@ vi.mock("../src/components/map/HierarchyMap", () => ({ default: ({ data, focus, 
   const id = feature.properties[`${level}_id`];
   return <button key={id} onClick={() => onSelect(id)}>{feature.properties[`${level}_name`] ?? id}</button>;
 })}</div> }));
+vi.mock("../src/components/map/TerrainMap3D", () => ({ default: ({ data, selected, basemap, onSelect, onFailure }: any) => <div data-testid="terrain-map" data-basemap={basemap} data-selected={selected}>3D: {data.features.length} features<button onClick={() => onSelect("C03")}>Select C03 in 3D</button><button onClick={() => onFailure("Aizawl terrain tiles are unavailable. The map has returned to 2D.")}>Fail terrain</button></div> }));
 const read = (path: string) => JSON.parse(readFileSync(new URL(path, import.meta.url), "utf8"));
 const states = read("../../data/geodata/ner/states.geojson");
 const districts = read("../../data/geodata/ner/districts.geojson");
@@ -29,6 +30,7 @@ function response(body: unknown, status = 200) { return Promise.resolve({ ok: st
 function mount(search = "") { return render(<MemoryRouter initialEntries={["/" + search]}><Dashboard /></MemoryRouter>); }
 beforeEach(() => {
   clearSpatialCache();
+  vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockImplementation(((kind: string) => kind === "webgl2" ? {} : null) as any);
   vi.stubGlobal("fetch", vi.fn((url: string) => {
     if (url.includes("/regions/NER/states")) return response(states);
     if (url.includes("/states/")) return response({ ...districts, features: districts.features.filter((f: any) => url.includes(f.properties.state_id)) });
@@ -39,7 +41,7 @@ beforeEach(() => {
     return response({}, 404);
   }));
 });
-afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
+afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
 describe("GIS command centre", () => {
   it("starts at eight states and navigates to 11 Mizoram districts", async () => {
@@ -113,14 +115,53 @@ describe("GIS command centre", () => {
     await spatialFetch("/regions/NER/states?include_geometry=true");
     expect(fetch).toHaveBeenCalledTimes(1);
   });
-  it("offers the recovered basemaps and keeps 3D deferred", async () => {
+  it("keeps 2D as default and offers all basemaps while 3D is limited to Aizawl", async () => {
     mount();
     await screen.findByText("state: 8 features");
+    expect(screen.queryByTestId("terrain-map")).toBeNull();
     await userEvent.click(screen.getByRole("button", { name: /Map View/ }));
     const menu = screen.getByRole("dialog", { name: "Map view settings" });
     expect(within(menu).getByRole("button", { name: /Street/ })).toBeTruthy();
     expect(within(menu).getByRole("button", { name: /Terrain/ })).toBeTruthy();
     expect(within(menu).getByRole("button", { name: /Satellite/ })).toBeTruthy();
-    expect((within(menu).getByRole("button", { name: /3D.*Coming in Phase 4B/ }) as HTMLButtonElement).disabled).toBe(true);
+    const threeD = within(menu).getByRole("button", { name: /3D.*Aizawl detailed pilot/ }) as HTMLButtonElement;
+    expect(threeD.disabled).toBe(true);
+  });
+  it("keeps basemap and mode independent and preserves C03 through 2D and 3D", async () => {
+    mount(`?state=IN-MZ&district=${AIZAWL}&zone=C03`);
+    expect(await screen.findByText("0.7103")).toBeTruthy();
+    expect(screen.getByTestId("map")).toBeTruthy();
+    await userEvent.click(screen.getByRole("button", { name: /Map View/ }));
+    await userEvent.click(within(screen.getByRole("dialog", { name: "Map view settings" })).getByRole("button", { name: /Satellite/ }));
+    await userEvent.click(screen.getByRole("button", { name: /Map View/ }));
+    await userEvent.click(within(screen.getByRole("dialog", { name: "Map view settings" })).getByRole("button", { name: /^3D/ }));
+    const terrain = await screen.findByTestId("terrain-map");
+    expect(terrain.getAttribute("data-basemap")).toBe("satellite");
+    expect(terrain.getAttribute("data-selected")).toBe("C03");
+    expect(screen.getByText("0.9276")).toBeTruthy();
+    expect(screen.getByText("REAL_SOIL_MOISTURE")).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Map View/ }).textContent).toContain("Satellite · 3D");
+    await userEvent.click(screen.getByRole("button", { name: /Map View/ }));
+    await userEvent.click(within(screen.getByRole("dialog", { name: "Map view settings" })).getByRole("button", { name: /^2D/ }));
+    expect(await screen.findByTestId("map")).toBeTruthy();
+    expect(screen.getByText("0.7103")).toBeTruthy();
+  });
+  it("returns explicitly to 2D when the terrain renderer fails", async () => {
+    mount(`?state=IN-MZ&district=${AIZAWL}&zone=C03`);
+    await screen.findByText("0.7103");
+    await userEvent.click(screen.getByRole("button", { name: /Map View/ }));
+    await userEvent.click(within(screen.getByRole("dialog", { name: "Map view settings" })).getByRole("button", { name: /^3D/ }));
+    await userEvent.click(await screen.findByRole("button", { name: "Fail terrain" }));
+    expect(await screen.findByTestId("map")).toBeTruthy();
+    expect(screen.getByRole("status").textContent).toContain("returned to 2D");
+    expect(screen.getByText("0.7103")).toBeTruthy();
+  });
+  it("does not offer 3D when WebGL2 is unavailable", async () => {
+    vi.mocked(HTMLCanvasElement.prototype.getContext).mockReturnValue(null);
+    mount(`?state=IN-MZ&district=${AIZAWL}`);
+    await screen.findByText("zone: 25 features");
+    await userEvent.click(screen.getByRole("button", { name: /Map View/ }));
+    const threeD = within(screen.getByRole("dialog", { name: "Map view settings" })).getByRole("button", { name: /3D.*unavailable on this device/ }) as HTMLButtonElement;
+    expect(threeD.disabled).toBe(true);
   });
 });

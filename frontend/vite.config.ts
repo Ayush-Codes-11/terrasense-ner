@@ -36,4 +36,9 @@ export default defineConfig({
   resolve: {
     dedupe: ["react", "react-dom"],
   },
+  // MapLibre owns a dedicated worker module that Vite's dev pre-bundler cannot
+  // safely relocate. The renderer remains code-split by MapSurface.
+  optimizeDeps: {
+    exclude: ["maplibre-gl"],
+  },
 });

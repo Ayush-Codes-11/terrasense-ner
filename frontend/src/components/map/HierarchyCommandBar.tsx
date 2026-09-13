@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import type { MapProperties } from "../../services/spatial";
-import type { BasemapId } from "./HierarchyMap";
+import { BASEMAP_OPTIONS } from "./mapConfig";
+import type { BasemapId, DisplayMode } from "./mapConfig";
 
 type MenuId = "region" | "state" | "district" | "map";
 
@@ -11,20 +12,18 @@ interface Props {
   stateId?: string;
   districtId?: string;
   basemap: BasemapId;
+  displayMode: DisplayMode;
+  threeDAvailable: boolean;
+  threeDUnavailableReason: string;
   pendingReports: number;
   onRegionChange: () => void;
   onStateChange: (stateId: string) => void;
   onDistrictChange: (districtId: string) => void;
   onBasemapChange: (basemap: BasemapId) => void;
+  onDisplayModeChange: (mode: DisplayMode) => void;
   onReportsOpen: () => void;
   onAlertsOpen: () => void;
 }
-
-const BASEMAPS: { id: BasemapId; label: string; detail: string }[] = [
-  { id: "street", label: "Street", detail: "OpenStreetMap" },
-  { id: "terrain", label: "Terrain", detail: "OpenTopoMap" },
-  { id: "satellite", label: "Satellite", detail: "Esri imagery" },
-];
 
 function Chevron() {
   return <svg aria-hidden="true" viewBox="0 0 20 20"><path d="m5 7.5 5 5 5-5" fill="none" stroke="currentColor" strokeWidth="1.7" /></svg>;
@@ -34,7 +33,7 @@ function LayersIcon() {
   return <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Zm-7.8 9L12 16.4 19.8 12M4.2 16 12 20.4 19.8 16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" /></svg>;
 }
 
-export default function HierarchyCommandBar({ states, districts, stateId, districtId, basemap, pendingReports, onRegionChange, onStateChange, onDistrictChange, onBasemapChange, onReportsOpen, onAlertsOpen }: Props) {
+export default function HierarchyCommandBar({ states, districts, stateId, districtId, basemap, displayMode, threeDAvailable, threeDUnavailableReason, pendingReports, onRegionChange, onStateChange, onDistrictChange, onBasemapChange, onDisplayModeChange, onReportsOpen, onAlertsOpen }: Props) {
   const [openMenu, setOpenMenu] = useState<MenuId>();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -95,15 +94,18 @@ export default function HierarchyCommandBar({ states, districts, stateId, distri
     <div className="gis-command-actions">
       <div className="gis-command-item gis-map-view-item">
         <button className="gis-toolbar-button gis-map-view-button" onClick={() => toggle("map")} aria-expanded={openMenu === "map"} aria-haspopup="dialog">
-          <LayersIcon /><span>Map View</span><small>{BASEMAPS.find(item => item.id === basemap)?.label} · 2D</small>
+          <LayersIcon /><span>Map View</span><small>{BASEMAP_OPTIONS.find(item => item.id === basemap)?.label} · {displayMode.toUpperCase()}</small>
         </button>
         {openMenu === "map" && <div className="gis-map-view-menu" role="dialog" aria-label="Map view settings">
           <p>Base map</p>
-          <div className="gis-basemap-options">{BASEMAPS.map(item => <button key={item.id} className={basemap === item.id ? "active" : ""} aria-pressed={basemap === item.id} onClick={() => { onBasemapChange(item.id); closeMenus(); }}>
+          <div className="gis-basemap-options">{BASEMAP_OPTIONS.map(item => <button key={item.id} className={basemap === item.id ? "active" : ""} aria-pressed={basemap === item.id} onClick={() => { onBasemapChange(item.id); closeMenus(); }}>
             <i className={`gis-basemap-preview ${item.id}`} aria-hidden="true" /><span>{item.label}<small>{item.detail}</small></span>{basemap === item.id && <b aria-label="Selected">✓</b>}
           </button>)}</div>
           <p>Display mode</p>
-          <div className="gis-display-options"><button className="active" aria-pressed="true">2D <b>✓</b></button><button disabled title="Coming in Phase 4B">3D <small>Coming in Phase 4B</small></button></div>
+          <div className="gis-display-options">
+            <button className={displayMode === "2d" ? "active" : ""} aria-pressed={displayMode === "2d"} onClick={() => { onDisplayModeChange("2d"); closeMenus(); }}>2D {displayMode === "2d" && <b>✓</b>}</button>
+            <button className={displayMode === "3d" ? "active" : ""} aria-pressed={displayMode === "3d"} disabled={!threeDAvailable} title={threeDAvailable ? "Use genuine Copernicus DEM terrain" : threeDUnavailableReason} onClick={() => { onDisplayModeChange("3d"); closeMenus(); }}>3D {displayMode === "3d" ? <b>✓</b> : !threeDAvailable && <small>{threeDUnavailableReason}</small>}</button>
+          </div>
         </div>}
       </div>
       <button className="gis-toolbar-button" onClick={onReportsOpen} aria-label="Open field reports"><span aria-hidden="true">📋</span><span className="gis-action-label">Field Reports</span>{pendingReports > 0 && <b className="gis-count">{pendingReports}</b>}</button>

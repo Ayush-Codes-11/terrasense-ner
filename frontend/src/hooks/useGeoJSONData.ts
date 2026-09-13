@@ -23,7 +23,7 @@ export interface GeoJSONData {
 
 const SAMPLE_BASE = "/data/sample";
 const API_BASE = (
-  (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "http://localhost:8000"
+  (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? ""
 ).replace(/\/+$/, "");
 
 async function fetchJSON<T>(url: string): Promise<T> {
@@ -63,6 +63,7 @@ export function useGeoJSONData(): GeoJSONData {
       let gridError: string | null = null;
 
       try {
+        if (!API_BASE) throw new Error("VITE_API_BASE_URL is not set");
         const backendZones = await fetchJSON<unknown>(`${API_BASE}/zones`);
         if (isValidRiskGrid(backendZones)) {
           gridRisk = backendZones;
@@ -92,6 +93,7 @@ export function useGeoJSONData(): GeoJSONData {
 
       // 2. Try loading real OSM layers from backend
       try {
+        if (!API_BASE) throw new Error("VITE_API_BASE_URL is not set");
         const [statusRes, roadsFc, settlementsFc, facilitiesFc] = await Promise.all([
           fetchJSON<{ status: string; is_real: boolean }>(`${API_BASE}/geodata/osm/status`),
           fetchJSON<FeatureCollection>(`${API_BASE}/geodata/osm/roads`),

@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "terrain_version": "aizawl-v1",
+  "source": {
+    "filename": "copernicus_glo30_aizawl.tif",
+    "sha256": "dcbfe1a282feade4c77bfbf0717bae7126a63eca31524fae1e61a974a7924ed9",
+    "product": "Copernicus DEM GLO-30 DSM",
+    "crs": "EPSG:4326",
+    "shape": [
+      342,
+      342
+    ],
+    "resolution_degrees": [
+      0.0002777777777777778,
+      0.0002777777777777778
+    ],
+    "bounds": [
+      92.66986111111112,
+      23.679583333333333,
+      92.76486111111112,
+      23.774583333333332
+    ],
+    "nodata_value": -999999.0,
+    "valid_elevation_range_m": [
+      174.43919372558594,
+      1380.772705078125
+    ]
+  },
+  "output": {
+    "bounds": [
+      92.66986111111112,
+      23.679583333333333,
+      92.76486111111112,
+      23.774583333333332
+    ],
+    "encoding": "Terrarium",
+    "encoding_formula": "height_m = R * 256 + G + B / 256 - 32768",
+    "tile_scheme": "Web Mercator XYZ",
+    "tile_size": 256,
+    "minzoom": 8,
+    "maxzoom": 13,
+    "tile_count": 21,
+    "total_compressed_tile_bytes": 950814,
+    "edge_padding_pixels": 1,
+    "edge_strategy": "sample each zoom on one shared Web Mercator grid with a one-pixel interpolation margin, then crop deterministic 256px tiles",
+    "nodata_handling": "generation fails for source nodata; pixels outside the rectangular source bounds are edge-clamped and hidden by TileJSON bounds",
+    "vertical_exaggeration": 1.0
+  },
+  "validation": {
+    "representative_pixel_count": 445457,
+    "average_round_trip_error_m": 0.0009765389149880978,
+    "maximum_round_trip_error_m": 0.0019531206689862302,
+    "maximum_tile_boundary_transition_error_m": 0.003869309734000126,
+    "maximum_tile_boundary_elevation_step_m": 60.7109375,
+    "maximum_adjacent_pixel_elevation_step_m": 397.3359375,
+    "decoded_elevation_range_m": [
+      177.02734375,
+      1379.99609375
+    ],
+    "all_tiles_intersect_declared_bounds": true,
+    "source_nodata_pixel_count": 0
+  },
+  "attribution": "© DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved. Distributed via AWS Open Data/Sinergise.",
+  "zoom_coverage": {
+    "8": {
+      "x_min": 193,
+      "x_max": 193,
+      "y_min": 110,
+      "y_max": 110,
+      "tile_count": 1
+    },
+    "9": {
+      "x_min": 387,
+      "x_max": 387,
+      "y_min": 221,
+      "y_max": 221,
+      "tile_count": 1
+    },
+    "10": {
+      "x_min": 775,
+      "x_max": 775,
+      "y_min": 442,
+      "y_max": 442,
+      "tile_count": 1
+    },
+    "11": {
+      "x_min": 1551,
+      "x_max": 1551,
+      "y_min": 884,
+      "y_max": 885,
+      "tile_count": 2
+    },
+    "12": {
+      "x_min": 3102,
+      "x_max": 3103,
+      "y_min": 1769,
+      "y_max": 1770,
+      "tile_count": 4
+    },
+    "13": {
+      "x_min": 6204,
+      "x_max": 6206,
+      "y_min": 3538,
+      "y_max": 3541,
+      "tile_count": 12
+    }
+  },
+  "generated_file_sha256": {
+    "10/775/442.png": "2dfbe7f81a8b02730c5fb5fcce64434d92acdf718c7ba070da6b5b3aa30eb598",
+    "11/1551/884.png": "19705b5c8eae33d672acc2a850aee611d20a737b5ca3c2e44da7bd37d0e965bb",
+    "11/1551/885.png": "ecfdb29193928abb07ca904065765df50a90c6ad4946500d960f70447c34ab96",
+    "12/3102/1769.png": "d4960083b18bc3af9666b5f51869c02dc073041764a196deb8919de778c4e771",
+    "12/3102/1770.png": "ea1b2979958fa5ab317a41eb45fe2e5985751d35ab99bb980878aa64458ea062",
+    "12/3103/1769.png": "6a5a558b23365508fb52c3f0c83d98ec85b87f6245c524911bc54d4043c1d00b",
+    "12/3103/1770.png": "fc72925fc0fc3e0c889647da7c8c0e3f65fe3509a4bf57faae3a414ccf72f163",
+    "13/6204/3538.png": "93fed6208faa4c50e55de891d0d4e7fea2f87e00fd31aba238bd91c7ac9131a7",
+    "13/6204/3539.png": "b7b45cd8a16813eb83b44caf2353518279e85c0da4a286e50ca189104c57b622",
+    "13/6204/3540.png": "bb98c96a789d6f1796cf3e0a0101099f6df41b207a2dc47b6adaebb240258743",
+    "13/6204/3541.png": "84815ab1067455476411aca1c36272cbddbd0e5c957f46b7962d01ac3991add2",
+    "13/6205/3538.png": "17f2d141cc8378c80082b4847acbc03848c5995904e2b7e91ce4f9c233d23a2c",
+    "13/6205/3539.png": "dc00d84bf7588c4b4a2d32dfcfff9c397cec6eff3130e118b22516587010d037",
+    "13/6205/3540.png": "96e2439bad6abb9e4fd75de4924d01313f1adf8cd86119681b46f82cf7f430a5",
+    "13/6205/3541.png": "93369c608f07df735a22ca0a74364a2427cf338e3c987fe852057ddabfa56529",
+    "13/6206/3538.png": "0710de81eed1ce2da0a055f50e7045a53cfd71763a9f4f5f9908e05123396975",
+    "13/6206/3539.png": "ff5063c321f20a703a414209004e384646c06659f0e43811684bc2bd7e03ba0c",
+    "13/6206/3540.png": "7e782e3089d15f818692c438175a39eb60e7cf3f4c393880ee2caf661b2211cf",
+    "13/6206/3541.png": "7c88aa4c7ab0c687f7938e0145a762b61e5ad611fcae6bc417797c486f9afc6d",
+    "8/193/110.png": "7d220d137fce3784f382d61aebf3bc97cbc63fe9524c134ac856127588cfae3d",
+    "9/387/221.png": "3e452b9c2e3a70a853889d2082558dee9564858e9fb801b53e20da663c6fc6ec",
+    "tiles.json": "aea2942a3283beba10558b3093cda7ade2e3fc6f0cbc562dd2ada4311daf78cc"
+  }
+}
