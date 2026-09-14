@@ -13,6 +13,7 @@ import { usePilotRisk } from "../hooks/usePilotRisk";
 import { clearSpatialCache } from "../services/spatial";
 import type { Boundaries } from "../services/spatial";
 import { readSelection, selectLevel, riskColors, riskLabel } from "../utils/navigation";
+import { formatProvenanceLabel } from "../utils/provenance";
 import "./gis.css";
 
 const empty: Boundaries = { type: "FeatureCollection", features: [] };
@@ -143,7 +144,7 @@ export default function Dashboard() {
           <button aria-expanded={isDataStatusOpen} onClick={() => setIsDataStatusOpen(open => !open)}><i className={data ? "available" : "unavailable"} />Data Status</button>
           {isDataStatusOpen && <div className="gis-data-status-popover">
             <strong>Data sources & availability</strong>
-            <dl><div><dt>Hierarchy</dt><dd>{data ? "Available" : "Unavailable"}</dd></div><div><dt>Basemap</dt><dd>{basemap === "terrain" ? "OpenTopoMap" : basemap === "street" ? "OpenStreetMap" : "Esri imagery"}</dd></div><div><dt>Display</dt><dd>{activeDisplayMode === "3d" ? "3D · Copernicus GLO-30 DSM" : "2D"}</dd></div><div><dt>Detailed model</dt><dd>{pilot ? "Aizawl pilot" : "Not available at this level"}</dd></div>{selectedRisk?.feature_provenance && Object.entries(selectedRisk.feature_provenance).map(([name, source]) => <div key={name}><dt>{name.replaceAll("_", " ")}</dt><dd>{source}</dd></div>)}</dl>
+            <dl><div><dt>Hierarchy</dt><dd>{data ? "Available" : "Unavailable"}</dd></div><div><dt>Basemap</dt><dd>{basemap === "terrain" ? "OpenTopoMap" : basemap === "street" ? "OpenStreetMap" : "Esri imagery"}</dd></div><div><dt>Display</dt><dd>{activeDisplayMode === "3d" ? "3D · Copernicus GLO-30 DSM" : "2D"}</dd></div><div><dt>Detailed model</dt><dd>{pilot ? "Aizawl pilot" : "Not available at this level"}</dd></div>{selectedRisk?.feature_provenance && Object.entries(selectedRisk.feature_provenance).map(([name, source]) => <div key={name}><dt>{name.replaceAll("_", " ")}</dt><dd>{formatProvenanceLabel(source)}<span style={{ display: "none" }}>{source}</span></dd></div>)}</dl>
             <small>Availability and provenance are not model confidence.</small>
           </div>}
         </div>
