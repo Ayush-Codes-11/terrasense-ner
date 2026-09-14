@@ -1,11 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as maplibregl from "maplibre-gl";
+import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
 import type { Feature, GeoJsonProperties, Geometry } from "geojson";
 import type { HierarchyMapProps } from "./HierarchyMap";
 import { BASEMAPS, TERRAIN_ATTRIBUTION, TERRAIN_TILEJSON_URL } from "./mapConfig";
 import type { BasemapId } from "./mapConfig";
 import { riskColors, riskLabel } from "../../utils/navigation";
 import "maplibre-gl/dist/maplibre-gl.css";
+
+maplibregl.setWorkerUrl(maplibreWorkerUrl);
 
 interface Props extends HierarchyMapProps {
   onFailure: (message: string) => void;
@@ -58,6 +61,10 @@ function basemapSource(id: BasemapId) {
   return { type: "raster" as const, tiles: [...source.maplibreTiles], tileSize: 256, maxzoom: source.maxZoom, attribution: source.attribution };
 }
 
+function terrainSource() {
+  return { type: "raster-dem" as const, url: TERRAIN_TILEJSON_URL, tileSize: 256, encoding: "terrarium" as const, attribution: TERRAIN_ATTRIBUTION };
+}
+
 function replaceBasemap(map: maplibregl.Map, id: BasemapId) {
   if (map.getLayer("basemap-raster")) map.removeLayer("basemap-raster");
   if (map.getSource("basemap")) map.removeSource("basemap");
@@ -73,21 +80,39 @@ function replaceBasemap(map: maplibregl.Map, id: BasemapId) {
 export default function TerrainMap3D({ data, focus, context, level, selected, risks, basemap, onSelect, onFailure }: Props) {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | undefined>(undefined);
+  const installHierarchyRef = useRef<() => void>(() => undefined);
+  const fitFocusRef = useRef<() => void>(() => undefined);
   const activeBasemap = useRef(basemap);
   const failed = useRef(false);
   const onSelectRef = useRef(onSelect);
+  const onFailureRef = useRef(onFailure);
   const [basemapUnavailable, setBasemapUnavailable] = useState(false);
-  const [styleReady, setStyleReady] = useState(false);
   const reducedMotion = useMemo(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches, []);
   const mappedData = useMemo(() => withRiskProperties(data, risks), [data, risks]);
+  const mappedDataRef = useRef(mappedData);
+  const focusRef = useRef(focus);
+  const contextRef = useRef(context);
+  const levelRef = useRef(level);
+  const selectedRef = useRef(selected);
+  const basemapRef = useRef(basemap);
   onSelectRef.current = onSelect;
+  onFailureRef.current = onFailure;
+  mappedDataRef.current = mappedData;
+  focusRef.current = focus;
+  contextRef.current = context;
+  levelRef.current = level;
+  selectedRef.current = selected;
+  basemapRef.current = basemap;
 
   useEffect(() => {
     if (!container.current) return;
+    let disposed = false;
+    let hierarchyHandlersInstalled = false;
+    let initialFitComplete = false;
     const fail = (message: string) => {
-      if (failed.current) return;
+      if (disposed || failed.current) return;
       failed.current = true;
-      onFailure(message);
+      onFailureRef.current(message);
     };
     let map: maplibregl.Map;
     try {
@@ -104,7 +129,7 @@ export default function TerrainMap3D({ data, focus, context, level, selected, ri
           version: 8,
           sources: {
             basemap: basemapSource(basemap),
-            aizawlDem: { type: "raster-dem", url: TERRAIN_TILEJSON_URL, tileSize: 256, encoding: "terrarium", attribution: TERRAIN_ATTRIBUTION },
+            aizawlDem: terrainSource(),
           },
           layers: [
             { id: "basemap-raster", type: "raster", source: "basemap" },
@@ -127,6 +152,7 @@ export default function TerrainMap3D({ data, focus, context, level, selected, ri
     };
     canvas.addEventListener("webglcontextlost", contextLost);
     const onError = (event: maplibregl.ErrorEvent) => {
+      if (disposed) return;
       const sourceId = (event as maplibregl.ErrorEvent & { sourceId?: string }).sourceId;
       const message = event.error?.message ?? "";
       if (sourceId === "aizawlDem" || message.includes("/terrain/aizawl/")) {
@@ -137,38 +163,104 @@ export default function TerrainMap3D({ data, focus, context, level, selected, ri
     };
     map.on("error", onError);
     const selectFeature = (event: maplibregl.MapMouseEvent & { features?: maplibregl.MapGeoJSONFeature[] }) => {
-      const property = `${level}_id`;
+      const property = `${levelRef.current}_id`;
       const id = event.features?.[0]?.properties?.[property];
       if (typeof id === "string") onSelectRef.current(id);
     };
     const pointer = () => { map.getCanvas().style.cursor = "pointer"; };
     const unpointer = () => { map.getCanvas().style.cursor = ""; };
 
-    map.once("load", () => {
-      if (failed.current) return;
-      if (context) {
-        map.addSource("hierarchy-context", { type: "geojson", data: context });
-        map.addLayer({ id: "hierarchy-context-line", type: "line", source: "hierarchy-context", paint: { "line-color": "#82919b", "line-width": 2, "line-dasharray": [2, 2] } });
-      }
-      map.addSource("hierarchy-data", { type: "geojson", data: mappedData });
-      map.addLayer({ id: "hierarchy-fill", type: "fill", source: "hierarchy-data", paint: {
-        "fill-color": level === "zone" ? ["coalesce", ["get", "terrain_risk_color"], "#8b98a6"] : "#4da7b6",
-        "fill-opacity": level === "zone" ? 0.67 : 0.16,
-      } });
-      map.addLayer({ id: "hierarchy-line", type: "line", source: "hierarchy-data", paint: { "line-color": "#26343d", "line-width": 1.4 } });
-      map.addLayer({ id: "hierarchy-selected", type: "line", source: "hierarchy-data", filter: ["==", ["get", `${level}_id`], selected ?? ""], paint: { "line-color": "#ffffff", "line-width": 3.4 } });
-      map.on("click", "hierarchy-fill", selectFeature);
-      map.on("mouseenter", "hierarchy-fill", pointer);
-      map.on("mouseleave", "hierarchy-fill", unpointer);
-      const bounds = boundsOf(focus.features as Feature[]);
+    const fitFocus = () => {
+      if (disposed || !map.isStyleLoaded()) return;
+      const bounds = boundsOf(focusRef.current.features as Feature[]);
       if (bounds) map.fitBounds(bounds, { padding: 52, maxZoom: 14, pitch: 54, bearing: -24, duration: reducedMotion ? 0 : 650 });
-      setStyleReady(true);
-    });
+    };
+    fitFocusRef.current = fitFocus;
+
+    const installHierarchy = () => {
+      if (disposed || failed.current || !map.isStyleLoaded()) return;
+
+      const currentBasemap = basemapRef.current;
+      if (activeBasemap.current !== currentBasemap && map.getSource("basemap")) {
+        replaceBasemap(map, currentBasemap);
+      } else {
+        if (!map.getSource("basemap")) map.addSource("basemap", basemapSource(currentBasemap));
+        if (!map.getLayer("basemap-raster")) map.addLayer({ id: "basemap-raster", type: "raster", source: "basemap" });
+      }
+      activeBasemap.current = currentBasemap;
+
+      if (!map.getSource("aizawlDem")) map.addSource("aizawlDem", terrainSource());
+      if (!map.getTerrain()) map.setTerrain({ source: "aizawlDem", exaggeration: 1 });
+
+      const currentContext = contextRef.current;
+      const contextSource = map.getSource("hierarchy-context") as maplibregl.GeoJSONSource | undefined;
+      if (currentContext) {
+        if (contextSource) {
+          contextSource.setData(currentContext as GeoJSON.FeatureCollection<Geometry, GeoJsonProperties>);
+        } else {
+          map.addSource("hierarchy-context", { type: "geojson", data: currentContext });
+        }
+        if (!map.getLayer("hierarchy-context-line")) {
+          map.addLayer({ id: "hierarchy-context-line", type: "line", source: "hierarchy-context", paint: { "line-color": "#82919b", "line-width": 2, "line-dasharray": [2, 2] } });
+        }
+      } else {
+        if (map.getLayer("hierarchy-context-line")) map.removeLayer("hierarchy-context-line");
+        if (contextSource) map.removeSource("hierarchy-context");
+      }
+
+      const hierarchySource = map.getSource("hierarchy-data") as maplibregl.GeoJSONSource | undefined;
+      if (hierarchySource) {
+        hierarchySource.setData(mappedDataRef.current as GeoJSON.FeatureCollection<Geometry, GeoJsonProperties>);
+      } else {
+        map.addSource("hierarchy-data", { type: "geojson", data: mappedDataRef.current });
+      }
+
+      const currentLevel = levelRef.current;
+      const fillColor = currentLevel === "zone"
+        ? ["coalesce", ["get", "terrain_risk_color"], "#8b98a6"] as maplibregl.ExpressionSpecification
+        : "#4da7b6";
+      const fillOpacity = currentLevel === "zone" ? 0.67 : 0.16;
+      if (!map.getLayer("hierarchy-fill")) {
+        map.addLayer({ id: "hierarchy-fill", type: "fill", source: "hierarchy-data", paint: { "fill-color": fillColor, "fill-opacity": fillOpacity } });
+      } else {
+        map.setPaintProperty("hierarchy-fill", "fill-color", fillColor);
+        map.setPaintProperty("hierarchy-fill", "fill-opacity", fillOpacity);
+      }
+      if (!map.getLayer("hierarchy-line")) {
+        map.addLayer({ id: "hierarchy-line", type: "line", source: "hierarchy-data", paint: { "line-color": "#26343d", "line-width": 1.4 } });
+      }
+      if (!map.getLayer("hierarchy-selected")) {
+        map.addLayer({ id: "hierarchy-selected", type: "line", source: "hierarchy-data", filter: ["==", ["get", `${currentLevel}_id`], selectedRef.current ?? ""], paint: { "line-color": "#ffffff", "line-width": 3.4 } });
+      } else {
+        map.setFilter("hierarchy-selected", ["==", ["get", `${currentLevel}_id`], selectedRef.current ?? ""]);
+      }
+
+      if (!hierarchyHandlersInstalled) {
+        map.on("click", "hierarchy-fill", selectFeature);
+        map.on("mouseenter", "hierarchy-fill", pointer);
+        map.on("mouseleave", "hierarchy-fill", unpointer);
+        hierarchyHandlersInstalled = true;
+      }
+      if (!initialFitComplete) {
+        initialFitComplete = true;
+        fitFocus();
+      }
+    };
+    installHierarchyRef.current = installHierarchy;
+    const onStyleReady = () => installHierarchy();
+    map.on("load", onStyleReady);
+    map.on("style.load", onStyleReady);
+    installHierarchy();
 
     return () => {
+      disposed = true;
+      installHierarchyRef.current = () => undefined;
+      fitFocusRef.current = () => undefined;
       canvas.removeEventListener("webglcontextlost", contextLost);
       map.off("error", onError);
-      if (map.getLayer("hierarchy-fill")) {
+      map.off("load", onStyleReady);
+      map.off("style.load", onStyleReady);
+      if (hierarchyHandlersInstalled) {
         map.off("click", "hierarchy-fill", selectFeature);
         map.off("mouseenter", "hierarchy-fill", pointer);
         map.off("mouseleave", "hierarchy-fill", unpointer);
@@ -181,22 +273,17 @@ export default function TerrainMap3D({ data, focus, context, level, selected, ri
   }, []);
 
   useEffect(() => {
-    const map = mapRef.current;
-    if (!map || !styleReady || activeBasemap.current === basemap) return;
-    replaceBasemap(map, basemap);
-    activeBasemap.current = basemap;
+    installHierarchyRef.current();
     setBasemapUnavailable(false);
-  }, [basemap, styleReady]);
+  }, [basemap]);
 
   useEffect(() => {
-    const map = mapRef.current;
-    const source = map?.getSource("hierarchy-data") as maplibregl.GeoJSONSource | undefined;
-    if (!source) return;
-    source.setData(mappedData as GeoJSON.FeatureCollection<Geometry, GeoJsonProperties>);
-    if (map?.getLayer("hierarchy-selected")) {
-      map.setFilter("hierarchy-selected", ["==", ["get", `${level}_id`], selected ?? ""]);
-    }
-  }, [level, mappedData, selected]);
+    installHierarchyRef.current();
+  }, [context, level, mappedData, selected]);
+
+  useEffect(() => {
+    fitFocusRef.current();
+  }, [focus]);
 
   return <div className="gis-map gis-map-3d">
     <div ref={container} className="gis-maplibre" aria-label="Interactive Aizawl 3D terrain map" />
