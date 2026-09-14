@@ -1,14 +1,43 @@
+import { useEffect, useState } from "react";
 import type { RiskRecord, WeatherContext } from "../../services/spatial";
 import { riskColors, riskLabel } from "../../utils/navigation";
 import { formatProvenanceLabel } from "../../utils/provenance";
+const API_BASE = (import.meta.env.VITE_API_BASE_URL ?? "").replace(/\/+$/, "");
 const value = (v?: number, unit = "") => typeof v === "number" && Number.isFinite(v) ? `${v.toFixed(2)}${unit}` : "Unavailable";
 export default function ZoneInspector({ zone, risk, weather, loading, retrieved, onClose }: { zone: string; risk?: RiskRecord; weather?: WeatherContext; loading: boolean; retrieved?: string; onClose?: () => void }) {
+  const [exposure, setExposure] = useState<any>(null);
+  const [expLoading, setExpLoading] = useState(false);
+
+  useEffect(() => {
+    if (!zone || !API_BASE) return;
+    let cancelled = false;
+    setExpLoading(true);
+    fetch(`${API_BASE}/exposure/${zone}`)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => { if (!cancelled) setExposure(data); })
+      .catch(() => { if (!cancelled) setExposure(null); })
+      .finally(() => { if (!cancelled) setExpLoading(false); });
+    return () => { cancelled = true; };
+  }, [zone]);
+
   return <section className="gis-inspector" aria-label={`Zone ${zone} details`}>
     <div className="gis-inspector-sticky"><div><p className="gis-eyebrow">SELECTED ANALYSIS ZONE</p><h2>{zone}</h2></div>{onClose && <button className="gis-close" aria-label="Close zone details" onClick={onClose}>Close <span aria-hidden="true">×</span></button>}</div>
     <div className="gis-inspector-body">
     <span className="gis-risk-pill" style={{ borderColor: riskColors[risk?.risk_category ?? ""] }}>{riskLabel(risk?.risk_category)}</span>
-    <div className="gis-score">{risk ? risk.risk_score.toFixed(4) : "—"}<small>Relative prototype risk score</small></div>
-    {loading && <p role="status">Refreshing risk…</p>}
+    <div className="gis-score">{risk ? risk.risk_score.toFixed(4) : "-"}<small>Relative prototype risk score</small></div>
+    
+    {/* Exposure & Access Panel */}
+    <h3>Exposure & Access</h3>
+    {expLoading ? <p role="status">Calculating exposure...</p> : exposure?.summary ? (
+      <dl className="gis-metrics">
+        <div><dt>Facilities located within selected zone</dt><dd>{exposure.summary.critical_facilities ?? 0}</dd></div>
+        <div><dt>Mapped road length within zone</dt><dd>{value(exposure.summary.total_road_km, " km")}</dd></div>
+        <div><dt>Road length intersecting flagged risk area</dt><dd>Unavailable</dd></div>
+        <div><dt>Road length outside flagged risk area</dt><dd>Unavailable</dd></div>
+      </dl>
+    ) : <p className="gis-muted">Exposure calculations temporarily unavailable.</p>}
+
+    {loading && <p role="status">Refreshing risk.</p>}
     {!risk && !loading && <p role="status">Risk data is temporarily unavailable.</p>}
     <p className="gis-muted">Prototype Analysis Grid · Detailed Pilot</p>
     <h3>Inputs used by the scorer</h3>
