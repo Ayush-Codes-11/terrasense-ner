@@ -6,6 +6,8 @@ import type { HierarchyMapProps } from "./HierarchyMap";
 import { BASEMAPS, TERRAIN_ATTRIBUTION, TERRAIN_TILEJSON_URL } from "./mapConfig";
 import type { BasemapId } from "./mapConfig";
 import { riskColors, riskLabel } from "../../utils/navigation";
+import { facilityCategory, facilityCategoryLabel, facilityColor } from "../../utils/operational";
+import type { OperationalFeatureCollection } from "../../services/spatial";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 maplibregl.setWorkerUrl(maplibreWorkerUrl);
@@ -77,7 +79,73 @@ function replaceBasemap(map: maplibregl.Map, id: BasemapId) {
   map.addLayer({ id: "basemap-raster", type: "raster", source: "basemap" }, before);
 }
 
-export default function TerrainMap3D({ data, focus, context, level, selected, risks, basemap, onSelect, onFailure }: Props) {
+function withFacilityProperties(data?: OperationalFeatureCollection): OperationalFeatureCollection | undefined {
+  if (!data) return undefined;
+  return {
+    ...data,
+    features: data.features.map(feature => {
+      const category = facilityCategory(feature.properties);
+      return { ...feature, properties: { ...feature.properties, operational_category: category, operational_color: facilityColor(category) } };
+    }),
+  };
+}
+
+interface OperationalInstallOptions {
+  roads?: OperationalFeatureCollection;
+  facilities?: OperationalFeatureCollection;
+  showRoads: boolean;
+  showFacilities: boolean;
+}
+
+function mapData(data: OperationalFeatureCollection): GeoJSON.FeatureCollection<Geometry, GeoJsonProperties> {
+  return { type: "FeatureCollection", features: data.features } as GeoJSON.FeatureCollection<Geometry, GeoJsonProperties>;
+}
+
+function installOperationalLayers(map: maplibregl.Map, options: OperationalInstallOptions) {
+  const roadsSource = map.getSource("operational-roads") as maplibregl.GeoJSONSource | undefined;
+  if (options.roads) {
+    const roadsData = mapData(options.roads);
+    if (roadsSource) roadsSource.setData(roadsData);
+    else map.addSource("operational-roads", { type: "geojson", data: roadsData });
+    if (!map.getLayer("operational-roads-line")) {
+      map.addLayer({
+        id: "operational-roads-line",
+        type: "line",
+        source: "operational-roads",
+        paint: {
+          "line-color": ["match", ["get", "highway"], ["motorway", "trunk", "primary", "secondary"], "#d6a45f", "#9aa8b5"],
+          "line-width": ["match", ["get", "highway"], ["motorway", "trunk", "primary", "secondary"], 1.8, 1.05],
+          "line-opacity": 0.48,
+        },
+      }, map.getLayer("hierarchy-line") ? "hierarchy-line" : undefined);
+    }
+    map.setLayoutProperty("operational-roads-line", "visibility", options.showRoads ? "visible" : "none");
+  }
+
+  const facilitiesSource = map.getSource("operational-facilities") as maplibregl.GeoJSONSource | undefined;
+  if (options.facilities) {
+    const facilitiesData = mapData(options.facilities);
+    if (facilitiesSource) facilitiesSource.setData(facilitiesData);
+    else map.addSource("operational-facilities", { type: "geojson", data: facilitiesData });
+    if (!map.getLayer("operational-facilities-circle")) {
+      map.addLayer({
+        id: "operational-facilities-circle",
+        type: "circle",
+        source: "operational-facilities",
+        paint: {
+          "circle-radius": 7,
+          "circle-color": ["coalesce", ["get", "operational_color"], "#14b8a6"],
+          "circle-stroke-color": "#f8fafc",
+          "circle-stroke-width": 1.5,
+          "circle-opacity": 0.95,
+        },
+      });
+    }
+    map.setLayoutProperty("operational-facilities-circle", "visibility", options.showFacilities ? "visible" : "none");
+  }
+}
+
+export default function TerrainMap3D({ data, focus, context, level, selected, risks, basemap, facilities, roads, showFacilities, showRoads, onSelect, onFailure }: Props) {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | undefined>(undefined);
   const installHierarchyRef = useRef<() => void>(() => undefined);
@@ -86,15 +154,21 @@ export default function TerrainMap3D({ data, focus, context, level, selected, ri
   const failed = useRef(false);
   const onSelectRef = useRef(onSelect);
   const onFailureRef = useRef(onFailure);
+  const activePopupRef = useRef<maplibregl.Popup | undefined>(undefined);
   const [basemapUnavailable, setBasemapUnavailable] = useState(false);
   const reducedMotion = useMemo(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches, []);
   const mappedData = useMemo(() => withRiskProperties(data, risks), [data, risks]);
+  const mappedFacilities = useMemo(() => withFacilityProperties(facilities), [facilities]);
   const mappedDataRef = useRef(mappedData);
   const focusRef = useRef(focus);
   const contextRef = useRef(context);
   const levelRef = useRef(level);
   const selectedRef = useRef(selected);
   const basemapRef = useRef(basemap);
+  const facilitiesRef = useRef(mappedFacilities);
+  const roadsRef = useRef(roads);
+  const showFacilitiesRef = useRef(showFacilities);
+  const showRoadsRef = useRef(showRoads);
   onSelectRef.current = onSelect;
   onFailureRef.current = onFailure;
   mappedDataRef.current = mappedData;
@@ -103,12 +177,18 @@ export default function TerrainMap3D({ data, focus, context, level, selected, ri
   levelRef.current = level;
   selectedRef.current = selected;
   basemapRef.current = basemap;
+  facilitiesRef.current = mappedFacilities;
+  roadsRef.current = roads;
+  showFacilitiesRef.current = showFacilities;
+  showRoadsRef.current = showRoads;
 
   useEffect(() => {
     if (!container.current) return;
     let disposed = false;
     let hierarchyHandlersInstalled = false;
+    let facilityHandlersInstalled = false;
     let initialFitComplete = false;
+    let styleReady = false;
     const fail = (message: string) => {
       if (disposed || failed.current) return;
       failed.current = true;
@@ -169,16 +249,40 @@ export default function TerrainMap3D({ data, focus, context, level, selected, ri
     };
     const pointer = () => { map.getCanvas().style.cursor = "pointer"; };
     const unpointer = () => { map.getCanvas().style.cursor = ""; };
+    const showFacilityPopup = (event: maplibregl.MapMouseEvent & { features?: maplibregl.MapGeoJSONFeature[] }) => {
+      const feature = event.features?.[0];
+      if (!feature) return;
+      const category = String(feature.properties?.operational_category ?? "facility");
+      const rawName = feature.properties?.name;
+      const name = typeof rawName === "string" && rawName.trim() ? rawName : `Unnamed ${category.replaceAll("_", " ")}`;
+      const content = document.createElement("div");
+      content.className = "gis-popup-content";
+      const heading = document.createElement("h3");
+      heading.className = "gis-popup-title";
+      heading.textContent = name;
+      const categoryLine = document.createElement("p");
+      categoryLine.className = "gis-popup-meta";
+      categoryLine.textContent = `Category: ${facilityCategoryLabel(category)}`;
+      const sourceLine = document.createElement("p");
+      sourceLine.className = "gis-popup-meta";
+      sourceLine.textContent = `Source: ${String(feature.properties?.source ?? facilitiesRef.current?.data_meta.source ?? "Unavailable")}`;
+      content.append(heading, categoryLine, sourceLine);
+      activePopupRef.current?.remove();
+      activePopupRef.current = new maplibregl.Popup({ offset: 12, className: "gis-popup" })
+        .setDOMContent(content)
+        .setLngLat(event.lngLat)
+        .addTo(map);
+    };
 
     const fitFocus = () => {
-      if (disposed || !map.isStyleLoaded()) return;
+      if (disposed || !styleReady) return;
       const bounds = boundsOf(focusRef.current.features as Feature[]);
       if (bounds) map.fitBounds(bounds, { padding: 52, maxZoom: 14, pitch: 54, bearing: -24, duration: reducedMotion ? 0 : 650 });
     };
     fitFocusRef.current = fitFocus;
 
     const installHierarchy = () => {
-      if (disposed || failed.current || !map.isStyleLoaded()) return;
+      if (disposed || failed.current || !styleReady) return;
 
       const currentBasemap = basemapRef.current;
       if (activeBasemap.current !== currentBasemap && map.getSource("basemap")) {
@@ -235,11 +339,23 @@ export default function TerrainMap3D({ data, focus, context, level, selected, ri
         map.setFilter("hierarchy-selected", ["==", ["get", `${currentLevel}_id`], selectedRef.current ?? ""]);
       }
 
+      installOperationalLayers(map, {
+        roads: roadsRef.current,
+        facilities: facilitiesRef.current,
+        showRoads: showRoadsRef.current,
+        showFacilities: showFacilitiesRef.current,
+      });
       if (!hierarchyHandlersInstalled) {
         map.on("click", "hierarchy-fill", selectFeature);
         map.on("mouseenter", "hierarchy-fill", pointer);
         map.on("mouseleave", "hierarchy-fill", unpointer);
         hierarchyHandlersInstalled = true;
+      }
+      if (map.getLayer("operational-facilities-circle") && !facilityHandlersInstalled) {
+        map.on("click", "operational-facilities-circle", showFacilityPopup);
+        map.on("mouseenter", "operational-facilities-circle", pointer);
+        map.on("mouseleave", "operational-facilities-circle", unpointer);
+        facilityHandlersInstalled = true;
       }
       if (!initialFitComplete) {
         initialFitComplete = true;
@@ -247,7 +363,14 @@ export default function TerrainMap3D({ data, focus, context, level, selected, ri
       }
     };
     installHierarchyRef.current = installHierarchy;
-    const onStyleReady = () => installHierarchy();
+    const onStyleLoading = () => {
+      styleReady = false;
+    };
+    const onStyleReady = () => {
+      styleReady = true;
+      installHierarchy();
+    };
+    map.on("styledataloading", onStyleLoading);
     map.on("load", onStyleReady);
     map.on("style.load", onStyleReady);
     installHierarchy();
@@ -258,6 +381,7 @@ export default function TerrainMap3D({ data, focus, context, level, selected, ri
       fitFocusRef.current = () => undefined;
       canvas.removeEventListener("webglcontextlost", contextLost);
       map.off("error", onError);
+      map.off("styledataloading", onStyleLoading);
       map.off("load", onStyleReady);
       map.off("style.load", onStyleReady);
       if (hierarchyHandlersInstalled) {
@@ -265,6 +389,13 @@ export default function TerrainMap3D({ data, focus, context, level, selected, ri
         map.off("mouseenter", "hierarchy-fill", pointer);
         map.off("mouseleave", "hierarchy-fill", unpointer);
       }
+      if (facilityHandlersInstalled) {
+        map.off("click", "operational-facilities-circle", showFacilityPopup);
+        map.off("mouseenter", "operational-facilities-circle", pointer);
+        map.off("mouseleave", "operational-facilities-circle", unpointer);
+      }
+      activePopupRef.current?.remove();
+      activePopupRef.current = undefined;
       map.remove();
       mapRef.current = undefined;
     };
@@ -279,7 +410,7 @@ export default function TerrainMap3D({ data, focus, context, level, selected, ri
 
   useEffect(() => {
     installHierarchyRef.current();
-  }, [context, level, mappedData, selected]);
+  }, [context, facilities, level, mappedData, mappedFacilities, roads, selected, showFacilities, showRoads]);
 
   useEffect(() => {
     fitFocusRef.current();

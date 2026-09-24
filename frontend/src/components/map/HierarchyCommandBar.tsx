@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import type { OperationalLayersState } from "../../hooks/useOperationalLayers";
 import type { MapProperties } from "../../services/spatial";
+import { operationalProvenance } from "../../utils/operational";
 import { BASEMAP_OPTIONS } from "./mapConfig";
 import type { BasemapId, DisplayMode } from "./mapConfig";
 
-type MenuId = "region" | "state" | "district" | "map";
+type MenuId = "region" | "state" | "district" | "map" | "layers";
 
 interface Props {
   states: MapProperties[];
@@ -16,6 +18,7 @@ interface Props {
   threeDAvailable: boolean;
   threeDUnavailableReason: string;
   pendingReports: number;
+  operationalLayers: OperationalLayersState;
   onRegionChange: () => void;
   onStateChange: (stateId: string) => void;
   onDistrictChange: (districtId: string) => void;
@@ -33,7 +36,7 @@ function LayersIcon() {
   return <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Zm-7.8 9L12 16.4 19.8 12M4.2 16 12 20.4 19.8 16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" /></svg>;
 }
 
-export default function HierarchyCommandBar({ states, districts, stateId, districtId, basemap, displayMode, threeDAvailable, threeDUnavailableReason, pendingReports, onRegionChange, onStateChange, onDistrictChange, onBasemapChange, onDisplayModeChange, onReportsOpen, onAlertsOpen }: Props) {
+export default function HierarchyCommandBar({ states, districts, stateId, districtId, basemap, displayMode, threeDAvailable, threeDUnavailableReason, pendingReports, operationalLayers, onRegionChange, onStateChange, onDistrictChange, onBasemapChange, onDisplayModeChange, onReportsOpen, onAlertsOpen }: Props) {
   const [openMenu, setOpenMenu] = useState<MenuId>();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -61,7 +64,7 @@ export default function HierarchyCommandBar({ states, districts, stateId, distri
   };
 
   return <div className="gis-command-bar" ref={root} aria-label="Map command bar">
-    <button className="gis-mobile-command-toggle" onClick={toggleMobile} aria-expanded={mobileOpen} aria-controls="gis-command-content"><LayersIcon /><span>Controls</span></button>
+    <button className="gis-mobile-command-toggle" onClick={toggleMobile} aria-label="Map controls" aria-expanded={mobileOpen} aria-controls="gis-command-content"><LayersIcon /><span>Controls</span></button>
     <div id="gis-command-content" className={`gis-command-content ${mobileOpen ? "open" : ""}`}>
     <div className="gis-command-selectors">
       <div className="gis-command-item">
@@ -106,6 +109,26 @@ export default function HierarchyCommandBar({ states, districts, stateId, distri
             <button className={displayMode === "2d" ? "active" : ""} aria-pressed={displayMode === "2d"} onClick={() => { onDisplayModeChange("2d"); closeMenus(); }}>2D {displayMode === "2d" && <b>✓</b>}</button>
             <button className={displayMode === "3d" ? "active" : ""} aria-pressed={displayMode === "3d"} disabled={!threeDAvailable} title={threeDAvailable ? "Use genuine Copernicus DEM terrain" : threeDUnavailableReason} onClick={() => { onDisplayModeChange("3d"); closeMenus(); }}>3D {displayMode === "3d" ? <b>✓</b> : !threeDAvailable && <small>{threeDUnavailableReason}</small>}</button>
           </div>
+        </div>}
+      </div>
+      <div className="gis-command-item gis-layers-item">
+        <button className="gis-toolbar-button gis-layers-button" onClick={() => toggle("layers")} aria-expanded={openMenu === "layers"} aria-haspopup="dialog">
+          <LayersIcon /><span>Layers</span><small>{[operationalLayers.facilities.enabled && operationalLayers.available && "Facilities", operationalLayers.roads.enabled && operationalLayers.available && "Roads"].filter(Boolean).join(", ") || "None"}</small>
+        </button>
+        {openMenu === "layers" && <div className="gis-layers-menu" role="dialog" aria-label="Operational layers">
+          <p>Operational overlays</p>
+          {!operationalLayers.available && <p className="gis-layer-unavailable" role="status">Available only for the Aizawl detailed pilot.</p>}
+          <label className="gis-layer-option">
+            <input type="checkbox" checked={operationalLayers.available && operationalLayers.facilities.enabled} disabled={!operationalLayers.available} onChange={operationalLayers.toggleFacilities} />
+            <span><strong>Essential facilities</strong><small>{operationalLayers.facilities.state === "loading" ? "Loading…" : operationalLayers.facilities.data ? operationalProvenance(operationalLayers.facilities.data) : "Whitelisted categories returned by the dataset"}</small></span>
+          </label>
+          {operationalLayers.facilities.state === "error" && <div className="gis-layer-error" role="status"><span>{operationalLayers.facilities.error}</span><button onClick={operationalLayers.retryFacilities}>Retry</button></div>}
+          <label className="gis-layer-option">
+            <input type="checkbox" checked={operationalLayers.available && operationalLayers.roads.enabled} disabled={!operationalLayers.available} onChange={operationalLayers.toggleRoads} />
+            <span><strong>Road network</strong><small>{operationalLayers.roads.state === "loading" ? "Loading…" : operationalLayers.roads.data ? operationalProvenance(operationalLayers.roads.data) : "Mapped roads · passability not verified"}</small></span>
+          </label>
+          {operationalLayers.roads.state === "error" && <div className="gis-layer-error" role="status"><span>{operationalLayers.roads.error}</span><button onClick={operationalLayers.retryRoads}>Retry</button></div>}
+          {operationalLayers.osmStatus?.retrieved_at && <p className="gis-layer-snapshot">Cached snapshot retrieved <time>{new Date(operationalLayers.osmStatus.retrieved_at).toLocaleDateString()}</time>. Not live.</p>}
         </div>}
       </div>
       <button className="gis-toolbar-button" onClick={onReportsOpen} aria-label="Open field reports"><span aria-hidden="true">📋</span><span className="gis-action-label">Field Reports</span>{pendingReports > 0 && <b className="gis-count">{pendingReports}</b>}</button>

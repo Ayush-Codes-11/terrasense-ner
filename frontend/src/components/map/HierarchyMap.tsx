@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { GeoJSON, MapContainer, TileLayer, useMap, ScaleControl } from "react-leaflet";
 import L from "leaflet";
 import type { Feature } from "geojson";
-import type { Boundaries, RiskRecord } from "../../services/spatial";
+import type { Boundaries, OperationalFeatureCollection, RiskRecord } from "../../services/spatial";
+import { facilityCategory, facilityCategoryLabel, facilityColor } from "../../utils/operational";
 import { riskColors, riskLabel } from "../../utils/navigation";
 import { BASEMAPS } from "./mapConfig";
 import type { BasemapId } from "./mapConfig";
@@ -23,8 +24,21 @@ function Viewport({ focus }: { focus: Boundaries }) {
   }, [map]);
   return null;
 }
-export interface HierarchyMapProps { data: Boundaries; focus: Boundaries; context?: Boundaries; level: "state" | "district" | "zone"; selected?: string; risks: RiskRecord[]; basemap: BasemapId; onSelect: (id: string) => void }
-export default function HierarchyMap({ data, focus, context, level, selected, risks, basemap, onSelect }: HierarchyMapProps) {
+export interface HierarchyMapProps {
+  data: Boundaries;
+  focus: Boundaries;
+  context?: Boundaries;
+  level: "state" | "district" | "zone";
+  selected?: string;
+  risks: RiskRecord[];
+  basemap: BasemapId;
+  facilities?: OperationalFeatureCollection;
+  roads?: OperationalFeatureCollection;
+  showFacilities: boolean;
+  showRoads: boolean;
+  onSelect: (id: string) => void;
+}
+export default function HierarchyMap({ data, focus, context, level, selected, risks, basemap, facilities, roads, showFacilities, showRoads, onSelect }: HierarchyMapProps) {
   const [tileErrorFor, setTileErrorFor] = useState<BasemapId>();
   const tileError = tileErrorFor === basemap;
   const riskMap = useMemo(() => new Map(risks.map(r => [r.zone_id, r])), [risks]);
@@ -39,6 +53,12 @@ export default function HierarchyMap({ data, focus, context, level, selected, ri
         eventHandlers={{ tileerror: () => setTileErrorFor(basemap) }} />
       <ScaleControl position="bottomleft" imperial={false} />
       <Viewport focus={focus} />
+      {showRoads && roads && <GeoJSON key={`operational-roads-${roads.features.length}-${roads.data_meta.data_type}`} data={roads}
+        interactive={false} style={feature => {
+          const highway = String(feature?.properties?.highway ?? feature?.properties?.road_type ?? "");
+          const major = ["motorway", "trunk", "primary", "secondary"].includes(highway);
+          return { color: major ? "#d6a45f" : "#9aa8b5", weight: major ? 1.8 : 1.05, opacity: 0.48 };
+        }} />}
       {context && <GeoJSON key={JSON.stringify(context.features.map(f => f.properties.district_id))} data={context} interactive={false}
         style={{ color: "#64717b", weight: 2, fillOpacity: 0, dashArray: "5 5" }} />}
       <GeoJSON key={layerKey} data={data} style={style} onEachFeature={(feature, layer) => {
@@ -62,6 +82,41 @@ export default function HierarchyMap({ data, focus, context, level, selected, ri
           });
         });
       }} />
+      {showFacilities && facilities && <GeoJSON key={`operational-facilities-${facilities.features.length}-${facilities.data_meta.data_type}`} data={facilities}
+        pointToLayer={(feature, latlng) => {
+          const category = facilityCategory(feature.properties);
+          return L.circleMarker(latlng, { radius: 5.5, color: "#f8fafc", weight: 1.5, fillColor: facilityColor(category), fillOpacity: 0.95 });
+        }}
+        onEachFeature={(feature, layer) => {
+          const category = facilityCategory(feature.properties);
+          const name = typeof feature.properties?.name === "string" && feature.properties.name.trim()
+            ? feature.properties.name
+            : `Unnamed ${category.replaceAll("_", " ")}`;
+          const popup = document.createElement("div");
+          popup.className = "gis-popup-content";
+          const heading = document.createElement("h3");
+          heading.className = "gis-popup-title";
+          heading.textContent = name;
+          const categoryLine = document.createElement("p");
+          categoryLine.className = "gis-popup-meta";
+          categoryLine.textContent = `Category: ${facilityCategoryLabel(category)}`;
+          const sourceLine = document.createElement("p");
+          sourceLine.className = "gis-popup-meta";
+          sourceLine.textContent = `Source: ${String(feature.properties?.source ?? facilities.data_meta.source)}`;
+          popup.append(heading, categoryLine, sourceLine);
+          layer.bindPopup(popup, { className: "gis-popup" });
+          if (layer instanceof L.Path) layer.on("add", () => {
+            const element = layer.getElement();
+            if (!element) return;
+            element.setAttribute("role", "button");
+            element.setAttribute("tabindex", "0");
+            element.setAttribute("aria-label", `${name} · ${facilityCategoryLabel(category)}`);
+            element.addEventListener("keydown", event => {
+              const key = (event as globalThis.KeyboardEvent).key;
+              if (key === "Enter" || key === " ") { event.preventDefault(); layer.openPopup(); }
+            });
+          });
+        }} />}
     </MapContainer>
     {tileError && <p className="gis-tile-notice" role="status">{BASEMAPS[basemap].attribution.includes("OpenStreetMap") ? "Basemap tiles unavailable. Boundary navigation remains available. OpenStreetMap attribution remains below." : "Basemap tiles unavailable. Boundary navigation remains available."}</p>}
   </div>;
