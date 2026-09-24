@@ -9,11 +9,13 @@ import { supportsWebGL2 } from "../components/map/webgl";
 import ReportList from "../components/reports/ReportList";
 import SideDrawer from "../components/ui/SideDrawer";
 import { useHierarchyMap } from "../hooks/useHierarchyMap";
+import { useOperationalLayers } from "../hooks/useOperationalLayers";
 import { usePilotRisk } from "../hooks/usePilotRisk";
 import { clearSpatialCache } from "../services/spatial";
 import type { Boundaries } from "../services/spatial";
-import { readSelection, selectLevel, riskColors, riskLabel } from "../utils/navigation";
+import { AIZAWL, readSelection, selectLevel, riskColors, riskLabel } from "../utils/navigation";
 import { formatProvenanceLabel } from "../utils/provenance";
+import { facilityCategories, facilityCategoryLabel, facilityColor, operationalProvenance } from "../utils/operational";
 import "./gis.css";
 
 const empty: Boundaries = { type: "FeatureCollection", features: [] };
@@ -35,7 +37,11 @@ export default function Dashboard() {
   const hierarchy = useHierarchyMap(selection, retry);
   const data = hierarchy.data;
   const pilot = Boolean(data?.detailed);
-  const risk = usePilotRisk(pilot, selection.zone);
+  const risk = usePilotRisk(selection.district === AIZAWL, selection.zone);
+  const operationalLayers = useOperationalLayers(pilot);
+  const visibleFacilities = pilot && operationalLayers.facilities.enabled && operationalLayers.facilities.state === "ready";
+  const visibleRoads = pilot && operationalLayers.roads.enabled && operationalLayers.roads.state === "ready";
+  const visibleFacilityCategories = facilityCategories(visibleFacilities ? operationalLayers.facilities.data : undefined);
 
   useEffect(() => {
     const update = () => setIsOnline(navigator.onLine);
@@ -110,13 +116,16 @@ export default function Dashboard() {
     <header className="gis-header">
       <a href="/" className="gis-brand" aria-label="TerraSense command centre home"><span aria-hidden="true">◈</span><div>TerraSense NER<small>LANDSLIDE DECISION SUPPORT · RESEARCH PROTOTYPE</small></div></a>
       <HierarchyCommandBar states={states} districts={districts} stateId={selection.state} districtId={selection.district} basemap={basemap} displayMode={activeDisplayMode} threeDAvailable={threeDAvailable} threeDUnavailableReason={threeDUnavailableReason} pendingReports={pendingReports}
+        operationalLayers={operationalLayers}
         onRegionChange={() => navigate("region")} onStateChange={id => navigate("state", id)} onDistrictChange={id => navigate("district", id)} onBasemapChange={setBasemap}
         onDisplayModeChange={selectDisplayMode}
         onReportsOpen={() => setIsReportsOpen(true)} onAlertsOpen={() => setIsAlertsOpen(true)} />
     </header>
     <main className="gis-workspace">
       <section className="gis-map-stage" aria-label="Spatial view">
-        {data ? <MapSurface data={features} focus={focus} context={pilot ? context : undefined} level={level} selected={selection.zone ?? selection.district} risks={risk.risks} basemap={basemap} displayMode={activeDisplayMode} onModeFailure={handleModeFailure} onSelect={id => navigate(level, id)} />
+        {data ? <MapSurface data={features} focus={focus} context={pilot ? context : undefined} level={level} selected={selection.zone ?? selection.district} risks={risk.risks} basemap={basemap} displayMode={activeDisplayMode}
+          facilities={operationalLayers.facilities.data} roads={operationalLayers.roads.data} showFacilities={visibleFacilities} showRoads={visibleRoads}
+          onModeFailure={handleModeFailure} onSelect={id => navigate(level, id)} />
           : <div className="gis-map-empty">{hierarchy.loading ? "Preparing North-East India…" : "Spatial data unavailable"}</div>}
 
         {modeNotice && <div className="gis-mode-notice" role="status"><span>{modeNotice}</span><button aria-label="Dismiss map mode message" onClick={() => setModeNotice(undefined)}>×</button></div>}
@@ -137,6 +146,12 @@ export default function Dashboard() {
         </div>
 
         {pilot && <div className="gis-legend" aria-label="Relative risk legend"><strong>Relative Risk</strong>{Object.entries(riskColors).map(([band, color]) => <span key={band}><i style={{ background: color }} />{riskLabel(band)}</span>)}<span><i style={{ background: "#8b98a6" }} />Unavailable</span></div>}
+        {pilot && (visibleRoads || visibleFacilityCategories.length > 0) && <div className="gis-operational-legend" aria-label="Operational overlay legend">
+          <strong>Mapped overlays</strong>
+          {visibleRoads && <span><i className="road" />Road network</span>}
+          {visibleFacilityCategories.map(category => <span key={category}><i style={{ background: facilityColor(category) }} />{facilityCategoryLabel(category)}</span>)}
+          <small>{operationalProvenance((visibleFacilities ? operationalLayers.facilities.data : undefined) ?? (visibleRoads ? operationalLayers.roads.data : undefined))}</small>
+        </div>}
         {pilot && risk.error && <div className="gis-risk-error" role="status">Risk data unavailable. Boundaries remain visible.</div>}
         <div className="gis-vintage">ADM1 2011 · ADM2 2021 prototype boundaries</div>
 

@@ -78,6 +78,34 @@
   .gis-data-status.with-inspector{bottom:calc(min(59dvh,530px) + 8px)}
 }
 
+/* Phase 4C operational overlays remain compact controls over the map surface. */
+.gis-layers-button{min-width:108px;justify-content:flex-start}
+.gis-layers-button>small{color:#6ee7da;font-size:8px;max-width:70px;overflow:hidden;text-overflow:ellipsis}
+.gis-layers-menu{position:absolute;top:calc(100% + 9px);right:0;z-index:1200;width:285px;padding:12px;background:#091523f5;border:1px solid #52617666;border-radius:9px;box-shadow:0 18px 46px #000c;backdrop-filter:blur(16px)}
+.gis-layers-menu>p:first-child{margin:2px 0 8px;color:#71849a;font-size:8px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.gis-layer-option{display:flex;align-items:flex-start;gap:9px;padding:10px 8px;border-top:1px solid #293b4f;color:#d8e3ec;cursor:pointer}
+.gis-layer-option input{width:16px;height:16px;flex:0 0 auto;margin:1px 0 0;accent-color:#22d3ee}
+.gis-layer-option input:disabled{cursor:not-allowed;opacity:.45}
+.gis-layer-option span{display:flex;min-width:0;flex-direction:column;gap:3px;font-size:10px}
+.gis-layer-option small{color:#8295a9;font-size:8px;line-height:1.35}
+.gis-layer-unavailable,.gis-layer-snapshot{margin:7px 0;color:#9aabbc;font-size:8px;line-height:1.45}
+.gis-layer-error{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 8px 5px;color:#f5c786;font-size:8px}
+.gis-layer-error button,.gis-inline-error button{border:1px solid #8b7048;border-radius:4px;background:#392a1e;color:#f5d7ad;padding:3px 6px;font-size:8px}
+.gis-inline-error{color:#b9c6d2;font-size:10px}.gis-inline-error p{margin:6px 0}
+.gis-operational-legend{position:absolute;z-index:710;left:14px;bottom:70px;display:flex;align-items:center;flex-wrap:wrap;gap:8px;max-width:calc(100% - 28px);padding:7px 9px;background:#091523df;border:1px solid #52617655;border-radius:7px;box-shadow:0 8px 24px #0009;backdrop-filter:blur(12px);font-size:8px;pointer-events:none}
+.gis-operational-legend strong{color:#9cacc0;font-size:8px;letter-spacing:.08em;text-transform:uppercase}.gis-operational-legend span{display:flex;align-items:center;gap:4px}.gis-operational-legend i{width:9px;height:9px;border:1px solid #f8fafc;border-radius:50%}.gis-operational-legend i.road{height:2px;border:0;border-radius:0;background:#d6a45f}.gis-operational-legend small{color:#7f93a7}
+.gis-popup-content{min-width:145px;color:#17212b}.gis-popup-title{margin:0 0 5px;font-size:13px}.gis-popup-meta{margin:3px 0;font-size:10px}.gis-shell .leaflet-popup-content{margin:11px 14px}.gis-map-3d .maplibregl-popup-content{padding:11px 14px}.gis-map-3d .maplibregl-popup-close-button{color:#17212b}
+
+@media(max-width:1180px){.gis-layers-button{width:auto;min-width:42px;padding:0 9px}.gis-layers-button>span{display:inline}.gis-layers-button>small{display:none}}
+@media(max-width:900px){
+  .gis-command-actions{grid-template-columns:minmax(112px,1.4fr) minmax(92px,1fr) repeat(3,42px)}
+  .gis-layers-button{width:100%;min-width:0;height:38px}
+  .gis-layers-menu{position:fixed;top:auto;left:8px;right:8px;bottom:8px;width:auto}
+  .gis-operational-legend{left:8px;bottom:69px;gap:6px;padding:6px 8px}
+  .gis-operational-legend small{width:100%}
+}
+@media(max-width:520px){.gis-command-actions{grid-template-columns:1fr 1fr repeat(3,38px)}.gis-layers-button>span,.gis-map-view-button>span{font-size:9px}}
+
 /* Phase 4B adds a separate lazy WebGL surface without changing the Leaflet shell. */
 .gis-maplibre{width:100%;height:100%;background:#172534}
 .gis-map-3d .maplibregl-canvas{outline:0}

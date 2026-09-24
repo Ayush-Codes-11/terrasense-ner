@@ -26,6 +26,16 @@ const info = { count: 25, detailed_zone_model_available: true, items: grid.featu
 const risk = { zone_id: "C03", risk_category: "HIGH", risk_score: .7103, slope: 22.01, rain_24h: 51.85, rain_3d: 105.69,
   soil_moisture: .62, soil_wetness_index: .62, normalized_features: { soil_wetness: .9276 },
   contributors: [{ feature: "Soil wetness index", contribution: .1391 }], feature_provenance: { soil_wetness: "REAL_SOIL_MOISTURE", slope: "REAL_DEM", rainfall: "REAL_GPM", forecast_rainfall: "REAL_FORECAST" } };
+const osmMeta = { data_type: "REAL_OSM", source: "OpenStreetMap contributors via Overpass API", is_live: false, attribution: "© OpenStreetMap contributors" };
+const facilities = { type: "FeatureCollection", data_meta: osmMeta, features: [
+  { type: "Feature", properties: { facility_id: "h1", name: "Civil Hospital", category: "hospital", source: "OpenStreetMap contributors" }, geometry: { type: "Point", coordinates: [92.72, 23.73] } },
+  { type: "Feature", properties: { facility_id: "c1", name: null, category: "clinic", source: "OpenStreetMap contributors" }, geometry: { type: "Point", coordinates: [92.71, 23.72] } },
+  { type: "Feature", properties: { facility_id: "p1", name: "Central Police", category: "police", source: "OpenStreetMap contributors" }, geometry: { type: "Point", coordinates: [92.73, 23.74] } },
+] };
+const roads = { type: "FeatureCollection", data_meta: osmMeta, features: [
+  { type: "Feature", properties: { osm_id: "r1", highway: "primary" }, geometry: { type: "LineString", coordinates: [[92.7, 23.7], [92.73, 23.74]] } },
+] };
+const exposure = { zone_id: "C03", summary: { osm_road_segments_count: 277, motorable_road_segments_count: 241, motorable_road_km: 49.85, total_road_km: 52.092, pedestrian_road_km: 2.242, track_road_km: 0, mapped_communities: 1, critical_facilities: 5, roads_blocked: 0, roads_exposed: 277, roads_exposed_km: 49.85, villages_exposed: 1, hospitals_exposed: 5 }, roads: [], settlements: [], critical_facilities: [], hazard_geometry: "SAMPLE_MOCK", exposure_features: "REAL_OSM", analysis_mode: "PROTOTYPE_MIXED_PROVENANCE", data_meta: { ...osmMeta, timestamp: "2026-09-23T10:00:00Z" } };
 function response(body: unknown, status = 200) { return Promise.resolve({ ok: status === 200, status, json: async () => body } as Response); }
 function mount(search = "") { return render(<MemoryRouter initialEntries={["/" + search]}><Dashboard /></MemoryRouter>); }
 beforeEach(() => {
@@ -38,6 +48,10 @@ beforeEach(() => {
     if (url.endsWith("/zones")) return response(grid);
     if (url.includes("/risk/current")) return response({ zones: [risk] });
     if (url.includes("/weather/")) return response({ forecast_interval_mm: { "0_24h": 10.9 }, observation_timestamp: "2026-09-08T23:59:59Z" });
+    if (url.includes("/exposure/")) return response({ ...exposure, zone_id: url.split("/").pop() });
+    if (url.includes("/geodata/osm/critical-facilities")) return response(facilities);
+    if (url.includes("/geodata/osm/roads")) return response(roads);
+    if (url.includes("/geodata/osm/status")) return response({ status: "OSM snapshot", is_real: true, retrieved_at: "2026-09-06T08:02:54Z", source: osmMeta.source, attribution: osmMeta.attribution, feature_counts: { roads: 1485, critical_facilities: 31, whitelisted_critical_facilities: 20 }, data_meta: osmMeta });
     return response({}, 404);
   }));
 });
@@ -153,7 +167,7 @@ describe("GIS command centre", () => {
     await userEvent.click(within(screen.getByRole("dialog", { name: "Map view settings" })).getByRole("button", { name: /^3D/ }));
     await userEvent.click(await screen.findByRole("button", { name: "Fail terrain" }));
     expect(await screen.findByTestId("map")).toBeTruthy();
-    expect(screen.getByRole("status").textContent).toContain("returned to 2D");
+    expect(screen.getByText(/returned to 2D/)).toBeTruthy();
     expect(screen.getByText("0.7103")).toBeTruthy();
   });
   it("does not offer 3D when WebGL2 is unavailable", async () => {
@@ -163,5 +177,77 @@ describe("GIS command centre", () => {
     await userEvent.click(screen.getByRole("button", { name: /Map View/ }));
     const threeD = within(screen.getByRole("dialog", { name: "Map view settings" })).getByRole("button", { name: /3D.*unavailable on this device/ }) as HTMLButtonElement;
     expect(threeD.disabled).toBe(true);
+  });
+  it("keeps an in-flight Aizawl risk request alive while selecting a zone", async () => {
+    const baseFetch = fetch;
+    let resolveRisk!: (value: Response) => void;
+    const delayedRisk = new Promise<Response>(resolve => { resolveRisk = resolve; });
+    vi.stubGlobal("fetch", vi.fn((url: any, options?: any) => String(url).includes("/risk/current") ? delayedRisk : baseFetch(url, options)));
+    mount(`?state=IN-MZ&district=${AIZAWL}`);
+    await screen.findByText("zone: 25 features");
+    await userEvent.click(screen.getByRole("button", { name: "C03" }));
+    resolveRisk(await response({ zones: [risk] }));
+    expect(await screen.findByText("0.7103")).toBeTruthy();
+    expect(vi.mocked(fetch).mock.calls.filter(([url]) => String(url).includes("/risk/current"))).toHaveLength(1);
+  });
+  it("invalidates an in-flight Aizawl risk response after leaving the pilot", async () => {
+    const baseFetch = fetch;
+    let resolveRisk!: (value: Response) => void;
+    const delayedRisk = new Promise<Response>(resolve => { resolveRisk = resolve; });
+    vi.stubGlobal("fetch", vi.fn((url: any, options?: any) => String(url).includes("/risk/current") ? delayedRisk : baseFetch(url, options)));
+    mount(`?state=IN-MZ&district=${AIZAWL}`);
+    await screen.findByText("zone: 25 features");
+    await userEvent.click(screen.getByRole("button", { name: /District.*Aizawl/ }));
+    await userEvent.click(screen.getByRole("option", { name: /Champhai/ }));
+    expect(await screen.findByText("district: 1 features")).toBeTruthy();
+    resolveRisk(await response({ zones: [risk] }));
+    await waitFor(() => expect(screen.queryByText("0.7103")).toBeNull());
+    expect(vi.mocked(fetch).mock.calls.filter(([url]) => String(url).includes("/risk/current"))).toHaveLength(1);
+  });
+  it("lazy-loads each operational dataset once and reuses it across 2D and 3D", async () => {
+    mount(`?state=IN-MZ&district=${AIZAWL}`);
+    await screen.findByText("zone: 25 features");
+    expect(vi.mocked(fetch).mock.calls.some(([url]) => String(url).includes("/geodata/osm/"))).toBe(false);
+
+    await userEvent.click(screen.getByRole("button", { name: /Layers/ }));
+    const menu = screen.getByRole("dialog", { name: "Operational layers" });
+    await userEvent.click(within(menu).getByRole("checkbox", { name: /Essential facilities/ }));
+    await userEvent.click(within(menu).getByRole("checkbox", { name: /Road network/ }));
+    expect(await screen.findByText("Hospital")).toBeTruthy();
+    expect(screen.getByText("Clinic")).toBeTruthy();
+    expect(screen.getByText("Police")).toBeTruthy();
+    expect(screen.queryByText(/Fire Station/i)).toBeNull();
+    expect(screen.queryByText(/Community Centre|Shelter/i)).toBeNull();
+
+    await userEvent.click(screen.getByRole("button", { name: /Map View/ }));
+    await userEvent.click(within(screen.getByRole("dialog", { name: "Map view settings" })).getByRole("button", { name: /^3D/ }));
+    await screen.findByTestId("terrain-map");
+    await userEvent.click(screen.getByRole("button", { name: /Map View/ }));
+    await userEvent.click(within(screen.getByRole("dialog", { name: "Map view settings" })).getByRole("button", { name: /^2D/ }));
+    await screen.findByTestId("map");
+
+    const urls = vi.mocked(fetch).mock.calls.map(([url]) => String(url));
+    expect(urls.filter(url => url.endsWith("/geodata/osm/critical-facilities"))).toHaveLength(1);
+    expect(urls.filter(url => url.endsWith("/geodata/osm/roads"))).toHaveLength(1);
+    expect(urls.some(url => url.includes("raw=true"))).toBe(false);
+
+    await userEvent.click(screen.getByRole("button", { name: /Layers/ }));
+    const reopened = screen.getByRole("dialog", { name: "Operational layers" });
+    await userEvent.click(within(reopened).getByRole("checkbox", { name: /Essential facilities/ }));
+    await userEvent.click(within(reopened).getByRole("checkbox", { name: /Essential facilities/ }));
+    expect(vi.mocked(fetch).mock.calls.map(([url]) => String(url)).filter(url => url.endsWith("/geodata/osm/critical-facilities"))).toHaveLength(1);
+  });
+  it("closes the Layers menu with Escape or an outside click and reports non-pilot unavailability", async () => {
+    mount();
+    await screen.findByText("state: 8 features");
+    await userEvent.click(screen.getByRole("button", { name: /Layers/ }));
+    expect(screen.getByText("Available only for the Aizawl detailed pilot.")).toBeTruthy();
+    expect((screen.getByRole("checkbox", { name: /Essential facilities/ }) as HTMLInputElement).disabled).toBe(true);
+    expect(vi.mocked(fetch).mock.calls.some(([url]) => String(url).includes("/geodata/osm/"))).toBe(false);
+    await userEvent.keyboard("{Escape}");
+    expect(screen.queryByRole("dialog", { name: "Operational layers" })).toBeNull();
+    await userEvent.click(screen.getByRole("button", { name: /Layers/ }));
+    await userEvent.click(document.body);
+    expect(screen.queryByRole("dialog", { name: "Operational layers" })).toBeNull();
   });
 });
