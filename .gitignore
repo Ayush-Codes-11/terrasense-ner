@@ -11,6 +11,7 @@ __pycache__/
 .Python
 venv/
 .venv/
+.venv-phase5b0/
 env/
 *.egg-info/
 dist/
@@ -21,6 +22,10 @@ build/
 ml/model.pkl
 ml/*.pkl
 ml/*.joblib
+artifacts/ml/susceptibility/
+
+# Local susceptibility data foundation (raw, work, derived, and training data)
+local-data/susceptibility/
 
 # Environment variables
 .env
