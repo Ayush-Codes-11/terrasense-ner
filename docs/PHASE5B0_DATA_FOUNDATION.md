@@ -27,6 +27,10 @@ TerraSense.
   <https://registry.opendata.aws/copernicus-dem/>
 - Product handbook: Copernicus DEM Product Handbook version 5.0, 2022-11-29
   <https://dataspace.copernicus.eu/sites/default/files/media/files/2024-06/geo1988-copernicusdem-spe-002_producthandbook_i5.0.pdf>
+- AWS COG conversion and grid-size notes:
+  <https://copernicus-dem-30m.s3.amazonaws.com/readme.html>
+- GDAL PixelIsPoint affine interpretation:
+  <https://gdal.org/en/stable/development/rfc/rfc33_gtiff_pixelispoint.html>
 - Horizontal reference: WGS 84, EPSG:4326
 - Vertical reference: EGM2008, EPSG:3855, metres
 
@@ -186,7 +190,15 @@ The acquisition utility:
   reserve before creating the raw-data directory;
 - rejects HTML, XML, JSON, and non-TIFF signatures;
 - validates raster readability, one-band float32 content, EPSG:4326, dimensions,
-  and geographic bounds;
+  and the exact `RasterPixelIsPoint` grid declared by `AREA_OR_POINT=Point`;
+- keeps the one-degree plan bounds as nominal tile-selection bounds while deriving
+  GDAL's area-oriented affine footprint by shifting the point-posted northwest
+  sample half a pixel west and north; the AWS COG conversion removes the shared
+  east and south posts, so a 3600 x 3600 one-degree tile at nominal bounds
+  `(W, S, E, N)` has resolution `d = 1/3600` degree and affine bounds
+  `(W - d/2, S + d/2, E - d/2, N + d/2)`; arbitrary bounds tolerances,
+  missing/contradictory grid semantics, rotation, shear, or translated grids
+  are rejected;
 - refuses to overwrite an existing file whose size differs or whose SHA-256
   differs from an existing acquisition manifest;
 - calculates local SHA-256 after full validation and records UTC retrieval time;
