@@ -13,7 +13,8 @@ from pathlib import Path
 import numpy as np
 import pytest
 import rasterio
-from rasterio.transform import from_origin
+from rasterio.transform import Affine, from_origin
+from rasterio.windows import Window
 from shapely.geometry import box
 
 
@@ -71,6 +72,43 @@ def _write_small_raster(
         nodata=nodata,
     ) as destination:
         destination.write(data.astype(np.float32), 1)
+
+
+def _write_validation_raster(
+    path: Path,
+    *,
+    nominal_bounds: tuple[float, float, float, float] = (92, 21, 93, 22),
+    width: int = 4,
+    height: int = 4,
+    transform: Affine | None = None,
+    area_or_point: str | None = "Point",
+    crs: str = "EPSG:4326",
+    dtype: str = "float32",
+    count: int = 1,
+) -> None:
+    transform = transform or acquisition.expected_point_grid_transform(
+        nominal_bounds,
+        width,
+        height,
+    )
+    with rasterio.open(
+        path,
+        "w",
+        driver="GTiff",
+        width=width,
+        height=height,
+        count=count,
+        dtype=dtype,
+        crs=crs,
+        transform=transform,
+        compress="DEFLATE",
+    ) as destination:
+        if area_or_point is not None:
+            destination.update_tags(AREA_OR_POINT=area_or_point)
+        destination.write(
+            np.zeros((count, 1, 1), dtype=dtype),
+            window=Window(0, 0, 1, 1),
+        )
 
 
 def test_current_mizoram_geometry_produces_exact_eight_tile_plan():
@@ -212,7 +250,7 @@ def test_html_xml_and_json_responses_are_rejected(content_type: str):
 
 def test_existing_file_is_validated_and_checksum_mismatch_refuses_overwrite(tmp_path: Path):
     path = tmp_path / "tile.tif"
-    _write_small_raster(path, np.arange(16, dtype=np.float32).reshape(4, 4))
+    _write_validation_raster(path)
     tile = {
         "expected_size_bytes": path.stat().st_size,
         "bounds_epsg4326": [92, 21, 93, 22],
@@ -229,6 +267,153 @@ def test_existing_file_is_validated_and_checksum_mismatch_refuses_overwrite(tmp_
     wrong_size = {**tile, "expected_size_bytes": path.stat().st_size + 1}
     with pytest.raises(acquisition.AcquisitionError, match="Refusing to overwrite"):
         acquisition.validate_existing_file(path, wrong_size, expected_dimension=4)
+
+
+def test_valid_point_grid_uses_exact_half_pixel_affine_footprint(tmp_path: Path):
+    path = tmp_path / "point-grid.tif"
+    _write_validation_raster(path)
+
+    result = acquisition.validate_dem_tile(path, (92, 21, 93, 22), expected_dimension=4)
+
+    assert result["grid_semantics"] == "Point"
+    assert result["transform"] == pytest.approx([0.25, 0.0, 91.875, 0.0, -0.25, 22.125])
+    assert result["bounds"] == pytest.approx([91.875, 21.125, 92.875, 22.125])
+    assert result["nominal_bounds"] == [92.0, 21.0, 93.0, 22.0]
+
+
+def test_observed_n21_e092_point_grid_transform_is_accepted(tmp_path: Path):
+    path = tmp_path / "observed-n21-e092.tif"
+    _write_validation_raster(path, width=3600, height=3600)
+
+    result = acquisition.validate_dem_tile(path, (92, 21, 93, 22))
+
+    assert result["transform"] == pytest.approx(
+        [
+            1 / 3600,
+            0.0,
+            92 - 1 / 7200,
+            0.0,
+            -1 / 3600,
+            22 + 1 / 7200,
+        ],
+        abs=1e-12,
+    )
+    assert result["bounds"] == pytest.approx(
+        [92 - 1 / 7200, 21 + 1 / 7200, 93 - 1 / 7200, 22 + 1 / 7200],
+        abs=1e-12,
+    )
+
+
+def test_area_grid_is_rejected_for_point_posted_copernicus_product(tmp_path: Path):
+    path = tmp_path / "area-grid.tif"
+    _write_validation_raster(
+        path,
+        transform=from_origin(92, 22, 0.25, 0.25),
+        area_or_point="Area",
+    )
+
+    with pytest.raises(acquisition.AcquisitionError, match="AREA_OR_POINT.*'Point'"):
+        acquisition.validate_dem_tile(path, (92, 21, 93, 22), expected_dimension=4)
+
+
+@pytest.mark.parametrize("column_shift,row_shift", [(1, 0), (0, 1)])
+def test_one_full_pixel_translated_point_grid_is_rejected(
+    tmp_path: Path,
+    column_shift: int,
+    row_shift: int,
+):
+    path = tmp_path / "translated.tif"
+    expected = acquisition.expected_point_grid_transform((92, 21, 93, 22), 4, 4)
+    translated = Affine(
+        expected.a,
+        0.0,
+        expected.c + column_shift * expected.a,
+        0.0,
+        expected.e,
+        expected.f + row_shift * expected.e,
+    )
+    _write_validation_raster(path, transform=translated)
+
+    with pytest.raises(acquisition.AcquisitionError, match="point-grid origin"):
+        acquisition.validate_dem_tile(path, (92, 21, 93, 22), expected_dimension=4)
+
+
+def test_incorrect_dimensions_fail_even_with_matching_point_footprint(tmp_path: Path):
+    path = tmp_path / "wrong-dimensions.tif"
+    _write_validation_raster(path, width=5, height=5)
+
+    with pytest.raises(acquisition.AcquisitionError, match="is 5x5; expected 4x4"):
+        acquisition.validate_dem_tile(path, (92, 21, 93, 22), expected_dimension=4)
+
+
+def test_incorrect_point_grid_resolution_is_rejected(tmp_path: Path):
+    path = tmp_path / "wrong-resolution.tif"
+    _write_validation_raster(
+        path,
+        transform=Affine(0.2, 0.0, 91.9, 0.0, -0.2, 22.1),
+    )
+
+    with pytest.raises(acquisition.AcquisitionError, match="resolution"):
+        acquisition.validate_dem_tile(path, (92, 21, 93, 22), expected_dimension=4)
+
+
+@pytest.mark.parametrize(
+    "transform",
+    [
+        Affine(0.25, 0.01, 91.875, 0.0, -0.25, 22.125),
+        Affine(0.25, 0.0, 91.875, 0.01, -0.25, 22.125),
+    ],
+)
+def test_rotation_or_shear_is_rejected(tmp_path: Path, transform: Affine):
+    path = tmp_path / "rotated-or-sheared.tif"
+    _write_validation_raster(path, transform=transform)
+
+    with pytest.raises(acquisition.AcquisitionError, match="rotation or shear"):
+        acquisition.validate_dem_tile(path, (92, 21, 93, 22), expected_dimension=4)
+
+
+@pytest.mark.parametrize("area_or_point", [None, "Area"])
+def test_missing_or_contradictory_grid_semantics_are_rejected(
+    tmp_path: Path,
+    area_or_point: str | None,
+):
+    path = tmp_path / f"semantics-{area_or_point or 'missing'}.tif"
+    _write_validation_raster(path, area_or_point=area_or_point)
+
+    with pytest.raises(acquisition.AcquisitionError, match="AREA_OR_POINT"):
+        acquisition.validate_dem_tile(path, (92, 21, 93, 22), expected_dimension=4)
+
+
+@pytest.mark.parametrize("nominal_bounds", [(93, 21, 94, 22), (92, 22, 93, 23)])
+def test_incorrect_nominal_tile_bounds_are_rejected(
+    tmp_path: Path,
+    nominal_bounds: tuple[int, int, int, int],
+):
+    path = tmp_path / "wrong-nominal-tile.tif"
+    _write_validation_raster(path)
+
+    with pytest.raises(acquisition.AcquisitionError, match="point-grid origin"):
+        acquisition.validate_dem_tile(path, nominal_bounds, expected_dimension=4)
+
+
+@pytest.mark.parametrize(
+    ("overrides", "message"),
+    [
+        ({"crs": "EPSG:3857"}, "CRS"),
+        ({"count": 2}, "bands"),
+        ({"dtype": "int16"}, "dtype"),
+    ],
+)
+def test_core_raster_contract_checks_remain_effective(
+    tmp_path: Path,
+    overrides: dict[str, object],
+    message: str,
+):
+    path = tmp_path / f"wrong-{message.lower()}.tif"
+    _write_validation_raster(path, **overrides)
+
+    with pytest.raises(acquisition.AcquisitionError, match=message):
+        acquisition.validate_dem_tile(path, (92, 21, 93, 22), expected_dimension=4)
 
 
 def test_completed_partial_is_validated_without_another_request(monkeypatch, tmp_path: Path):

@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import Any, Callable, Iterable
 
 import rasterio
+from rasterio.transform import Affine, array_bounds
 from rasterio.windows import Window
 from shapely.geometry import box, shape
 
@@ -80,6 +81,8 @@ MAX_DOWNLOAD_ATTEMPTS = 3
 DOWNLOAD_CHUNK_BYTES = 1024 * 1024
 REQUIRED_DISK_RESERVE_BYTES = 2 * 1024**3
 EXPECTED_RASTER_DIMENSION = 3600
+EXPECTED_GRID_SEMANTICS = "Point"
+AFFINE_ABS_TOLERANCE = 1e-12
 TILE_IDENTIFIER_PATTERN = re.compile(
     r"^Copernicus_DSM_COG_10_[NS](?:[0-8]\d|90)_00_"
     r"[EW](?:[01]\d\d|180)_00_DEM$"
@@ -374,6 +377,46 @@ def validate_response_type(content_type: str | None, prefix: bytes) -> None:
         raise AcquisitionError("Remote response does not begin with a TIFF signature")
 
 
+def expected_point_grid_transform(
+    nominal_bounds: Iterable[float],
+    width: int,
+    height: int,
+) -> Affine:
+    """Return GDAL's area-oriented affine for a point-posted geographic grid.
+
+    Copernicus DGED coordinates identify sample centres. GDAL's affine transform
+    identifies pixel corners, so the outer affine footprint begins half a sample
+    west and north of the nominal northwest point.
+    """
+    bounds = tuple(float(value) for value in nominal_bounds)
+    if len(bounds) != 4:
+        raise AcquisitionError(f"Expected four nominal bounds, received {bounds}")
+    west, south, east, north = bounds
+    if width <= 0 or height <= 0 or east <= west or north <= south:
+        raise AcquisitionError(
+            f"Invalid point-grid dimensions or nominal bounds: {width}x{height}, {bounds}"
+        )
+    pixel_width = (east - west) / width
+    pixel_height = (north - south) / height
+    return Affine(
+        pixel_width,
+        0.0,
+        west - pixel_width / 2.0,
+        0.0,
+        -pixel_height,
+        north + pixel_height / 2.0,
+    )
+
+
+def _affine_value_matches(actual: float, expected: float) -> bool:
+    return math.isclose(
+        actual,
+        expected,
+        rel_tol=0.0,
+        abs_tol=AFFINE_ABS_TOLERANCE,
+    )
+
+
 def validate_dem_tile(
     path: Path,
     expected_bounds: Iterable[float],
@@ -383,6 +426,11 @@ def validate_dem_tile(
     with path.open("rb") as stream:
         validate_response_type(None, stream.read(4))
     bounds = tuple(float(value) for value in expected_bounds)
+    expected_transform = expected_point_grid_transform(
+        bounds,
+        expected_dimension,
+        expected_dimension,
+    )
     try:
         with rasterio.open(path) as dataset:
             if dataset.count != 1:
@@ -400,10 +448,49 @@ def validate_dem_tile(
                 raise AcquisitionError(
                     f"{path.name} nodata is {dataset.nodata}; expected unset or -32767"
                 )
-            actual_bounds = tuple(dataset.bounds)
-            if any(abs(actual - expected) > 1e-6 for actual, expected in zip(actual_bounds, bounds)):
+
+            grid_semantics = dataset.tags().get("AREA_OR_POINT")
+            if grid_semantics != EXPECTED_GRID_SEMANTICS:
+                rendered = repr(grid_semantics) if grid_semantics is not None else "missing"
                 raise AcquisitionError(
-                    f"{path.name} bounds are {actual_bounds}; expected {bounds}"
+                    f"{path.name} AREA_OR_POINT is {rendered}; expected explicit "
+                    f"{EXPECTED_GRID_SEMANTICS!r} for Copernicus GLO-30 DGED"
+                )
+
+            transform = dataset.transform
+            if not _affine_value_matches(transform.b, 0.0) or not _affine_value_matches(
+                transform.d, 0.0
+            ):
+                raise AcquisitionError(
+                    f"{path.name} transform has rotation or shear: {transform}"
+                )
+            if not _affine_value_matches(
+                transform.a, expected_transform.a
+            ) or not _affine_value_matches(transform.e, expected_transform.e):
+                raise AcquisitionError(
+                    f"{path.name} resolution is ({transform.a}, {abs(transform.e)}); "
+                    f"expected ({expected_transform.a}, {abs(expected_transform.e)})"
+                )
+            if not _affine_value_matches(
+                transform.c, expected_transform.c
+            ) or not _affine_value_matches(transform.f, expected_transform.f):
+                raise AcquisitionError(
+                    f"{path.name} point-grid origin is ({transform.c}, {transform.f}); "
+                    f"expected ({expected_transform.c}, {expected_transform.f}) from "
+                    f"nominal bounds {bounds}"
+                )
+
+            actual_bounds = tuple(dataset.bounds)
+            expected_affine_bounds = tuple(
+                array_bounds(expected_dimension, expected_dimension, expected_transform)
+            )
+            if any(
+                not _affine_value_matches(actual, expected)
+                for actual, expected in zip(actual_bounds, expected_affine_bounds)
+            ):
+                raise AcquisitionError(
+                    f"{path.name} affine bounds are {actual_bounds}; expected "
+                    f"{expected_affine_bounds} for nominal tile bounds {bounds}"
                 )
             dataset.read(1, window=Window(0, 0, 1, 1))
             return {
@@ -412,6 +499,10 @@ def validate_dem_tile(
                 "crs": dataset.crs.to_string(),
                 "dtype": dataset.dtypes[0],
                 "bounds": list(actual_bounds),
+                "nominal_bounds": list(bounds),
+                "transform": list(transform)[:6],
+                "resolution": [transform.a, abs(transform.e)],
+                "grid_semantics": grid_semantics,
                 "nodata": dataset.nodata,
             }
     except rasterio.errors.RasterioIOError as exc:
