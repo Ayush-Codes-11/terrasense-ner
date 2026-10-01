@@ -1,0 +1,1169 @@
+{
+  "accessed_on": "2026-09-28",
+  "canonicalization": {
+    "array_order": "sources sorted by source_id; other arrays preserve semantic order",
+    "encoding": "UTF-8",
+    "json_key_order": "lexicographic",
+    "newline": "LF",
+    "whitespace": "two-space indentation"
+  },
+  "decision": {
+    "architecture_readiness": "CONDITIONAL_GO",
+    "rationale": "No source supplies enough legally usable, verified, precise and timestamped Mizoram events for temporal training.",
+    "temporal_model_training": "NO_GO"
+  },
+  "permission_values": [
+    "explicitly_permitted",
+    "explicitly_prohibited",
+    "ambiguous_not_stated",
+    "source_not_found"
+  ],
+  "registry_version": "1.0.0",
+  "sources": [
+    {
+      "access": {
+        "authentication": "none",
+        "format": [
+          "XLSX",
+          "CSV"
+        ],
+        "method": "Zenodo versioned deposit",
+        "public_access": "PUBLIC_DATA",
+        "rate_limits": "not stated",
+        "update_cadence": "no recurring cadence"
+      },
+      "accessed_on": "2026-09-28",
+      "biases": [
+        "19 events only",
+        "Aizawl-centred",
+        "Cyclone Remal cluster",
+        "mixed provenance",
+        "not complete surveillance"
+      ],
+      "blocking_reason": "Record-level upstream rights, row-level date/coordinate quality, verification, and overlap with GSI/NASA remain unverified.",
+      "canonical_landing_page": "https://zenodo.org/records/20783995",
+      "citation": {
+        "creators": [
+          "Pritom Sarma",
+          "Krishnendu Paul"
+        ],
+        "doi": "10.5281/zenodo.20783995",
+        "possible_gsi_nasa_overlap": "unverified",
+        "raw_inventory_available": true,
+        "raw_inventory_file": "Aizawl_Landslide_Inventory_2015_2025.xlsx",
+        "raw_inventory_file_bytes": 15507,
+        "raw_inventory_inspected": false,
+        "title": "Dataset for \"Frictional timescales of landslides in Mizoram under climate extremes]{Frictional timescales and the impact of climate change-driven extreme weather on rainfall-triggered landslides in Mizoram, NE India\"",
+        "version": "v1"
+      },
+      "counts": {
+        "exact_date": null,
+        "exact_time_with_known_zone": 0,
+        "partial_date": null,
+        "spatially_valid_mizoram": null
+      },
+      "coverage": {
+        "geography": "Aizawl and nearby Mizoram",
+        "global": null,
+        "india": 19,
+        "mizoram": null,
+        "northeast_india": 19,
+        "temporal": "2016-2025"
+      },
+      "documentation_url": "https://zenodo.org/api/records/20783995",
+      "evidence_notes": [
+        "evaluation and human-review candidate",
+        "The compiled inventory cites GSI, official reports, literature and media; record-level upstream rights and GSI permission need review."
+      ],
+      "latest_update": "2026-06-21",
+      "licence": {
+        "identifier": "CC-BY-4.0",
+        "permissions": {
+          "automated_recurring_retrieval": "ambiguous_not_stated",
+          "commercial_or_operational_use": "explicitly_permitted",
+          "derived_features_or_models": "explicitly_permitted",
+          "model_training": "explicitly_permitted",
+          "note": "CC BY 4.0 describes the deposit only; effective TerraSense rights are blocked pending upstream GSI and record-level provenance review.",
+          "raw_redistribution": "explicitly_permitted"
+        },
+        "url": "https://zenodo.org/records/20783995"
+      },
+      "owner": "Sarma and Paul; Zenodo host",
+      "project_permissions": {
+        "automated_retrieval_permission": "ambiguous_not_stated",
+        "derived_model_publication_permission": "ambiguous_not_stated",
+        "model_training_permission": "ambiguous_not_stated",
+        "raw_redistribution_permission": "ambiguous_not_stated"
+      },
+      "rank": 3,
+      "role": "evaluation and human-review candidate",
+      "schema": {
+        "coordinates": "present; some are approximate locality centroids",
+        "event_type": [
+          "type",
+          "trigger"
+        ],
+        "severity": [
+          "fatalities"
+        ],
+        "spatial_precision": "mixed and unquantified",
+        "time_zone_convention": "not established",
+        "timestamp": "19 events described with dates; workbook not inspected, so row-level completeness unverified",
+        "timestamp_precision": "DATE claimed by deposit; individual rows unverified",
+        "verification": [
+          "mixed literature/GSI/government/media compilation; record-level verification unverified"
+        ]
+      },
+      "source_id": "aizawl_rsf_zenodo_20783995",
+      "source_name": "Aizawl landslide inventory 2016-2025",
+      "status": "BLOCKED_PENDING_PROVENANCE_REVIEW",
+      "urls": {
+        "api": "https://zenodo.org/api/records/20783995",
+        "landing": "https://zenodo.org/records/20783995",
+        "paper": "https://arxiv.org/abs/2606.23281"
+      }
+    },
+    {
+      "access": {
+        "authentication": "none for public databases",
+        "format": [
+          "web query",
+          "XML where offered"
+        ],
+        "method": "database-specific public pages",
+        "public_access": "PUBLIC_METADATA_ONLY",
+        "rate_limits": "not stated",
+        "update_cadence": "database-dependent"
+      },
+      "accessed_on": "2026-09-28",
+      "biases": [
+        "subnational coverage",
+        "owner-specific methods",
+        "no public Mizoram database"
+      ],
+      "blocking_reason": "No public India/Mizoram occurrence database and no applicable dataset licence were found.",
+      "canonical_landing_page": "https://www.desinventar.net/DesInventar/",
+      "counts": {
+        "exact_date": null,
+        "exact_time_with_known_zone": null,
+        "partial_date": null,
+        "spatially_valid_mizoram": 0
+      },
+      "coverage": {
+        "geography": "Public India entries found only for Orissa, Tamil Nadu and Uttarakhand",
+        "global": null,
+        "india": null,
+        "mizoram": 0,
+        "northeast_india": 0,
+        "temporal": "database-dependent"
+      },
+      "documentation_url": "https://www.desinventar.net/DesInventar/",
+      "evidence_notes": [
+        "screened alternative",
+        "The Apache-like software licence does not license contributed databases."
+      ],
+      "latest_update": "database-dependent; public list accessed 2026-09-28",
+      "licence": {
+        "identifier": "dataset-owner-specific",
+        "permissions": {
+          "automated_recurring_retrieval": "ambiguous_not_stated",
+          "commercial_or_operational_use": "ambiguous_not_stated",
+          "derived_features_or_models": "ambiguous_not_stated",
+          "model_training": "ambiguous_not_stated",
+          "note": "The Apache-like software licence does not license contributed databases.",
+          "raw_redistribution": "ambiguous_not_stated"
+        },
+        "url": "https://www.desinventar.net/download.html"
+      },
+      "owner": "UNDRR DesInventar and contributing owners",
+      "project_permissions": {
+        "automated_retrieval_permission": "ambiguous_not_stated",
+        "derived_model_publication_permission": "ambiguous_not_stated",
+        "model_training_permission": "ambiguous_not_stated",
+        "raw_redistribution_permission": "ambiguous_not_stated"
+      },
+      "rank": 11,
+      "role": "screened alternative",
+      "schema": {
+        "coordinates": "database-dependent",
+        "event_type": [
+          "hazard",
+          "cause"
+        ],
+        "severity": [
+          "deaths",
+          "injuries",
+          "damage"
+        ],
+        "spatial_precision": "source-dependent",
+        "time_zone_convention": "source-dependent",
+        "timestamp": "date-level where present",
+        "timestamp_precision": "source-dependent",
+        "verification": []
+      },
+      "source_id": "desinventar_india",
+      "source_name": "DesInventar Sendai public India databases",
+      "status": "UNUSABLE_NO_MIZORAM_DATABASE",
+      "urls": {
+        "documentation": "https://www.desinventar.net/documentation.html",
+        "download": "https://www.desinventar.net/download.html",
+        "landing": "https://www.desinventar.net/DesInventar/"
+      }
+    },
+    {
+      "access": {
+        "authentication": "none",
+        "format": [
+          "article supplement",
+          "ArcGIS viewer"
+        ],
+        "method": "published research/viewer",
+        "public_access": "PUBLIC_METADATA_ONLY",
+        "rate_limits": "not stated",
+        "update_cadence": "historical"
+      },
+      "accessed_on": "2026-09-28",
+      "biases": [
+        "fatal-only",
+        "English-language media bias",
+        "remote and low-fatality underreporting",
+        "coarse positions"
+      ],
+      "blocking_reason": "Underlying dataset rights and usable Mizoram coverage are unverified; fatal-event selection and coarse locations limit use.",
+      "canonical_landing_page": "https://nhess.copernicus.org/articles/18/2161/2018/",
+      "counts": {
+        "exact_date": null,
+        "exact_time_with_known_zone": 0,
+        "partial_date": null,
+        "spatially_valid_mizoram": null
+      },
+      "coverage": {
+        "geography": "global",
+        "global": 4862,
+        "india": null,
+        "mizoram": null,
+        "northeast_india": null,
+        "temporal": "2004-2016"
+      },
+      "documentation_url": "https://nhess.copernicus.org/articles/18/2161/2018/",
+      "evidence_notes": [
+        "published comparator",
+        "The article licence does not establish rights to the underlying database."
+      ],
+      "latest_update": "2018-08-23 publication; no current release found",
+      "licence": {
+        "identifier": "article CC-BY-4.0; data terms not established",
+        "permissions": {
+          "automated_recurring_retrieval": "source_not_found",
+          "commercial_or_operational_use": "ambiguous_not_stated",
+          "derived_features_or_models": "ambiguous_not_stated",
+          "model_training": "ambiguous_not_stated",
+          "note": "The article licence does not establish rights to the underlying database.",
+          "raw_redistribution": "ambiguous_not_stated"
+        },
+        "url": "https://nhess.copernicus.org/articles/18/2161/2018/"
+      },
+      "owner": "Froude and Petley, University of Sheffield",
+      "project_permissions": {
+        "automated_retrieval_permission": "source_not_found",
+        "derived_model_publication_permission": "ambiguous_not_stated",
+        "model_training_permission": "ambiguous_not_stated",
+        "raw_redistribution_permission": "ambiguous_not_stated"
+      },
+      "rank": 10,
+      "role": "published comparator",
+      "schema": {
+        "coordinates": "approximate points",
+        "event_type": [
+          "trigger"
+        ],
+        "severity": [
+          "fatalities",
+          "injuries"
+        ],
+        "spatial_precision": "published median 681 square kilometres",
+        "time_zone_convention": "not established",
+        "timestamp": "occurrence date; no exact time",
+        "timestamp_precision": "DATE",
+        "verification": [
+          "source triangulation"
+        ]
+      },
+      "source_id": "global_fatal_landslide_database",
+      "source_name": "Global Fatal Landslide Database",
+      "status": "BLOCKED_PENDING_DATA_RIGHTS",
+      "urls": {
+        "paper": "https://nhess.copernicus.org/articles/18/2161/2018/",
+        "viewer": "https://shefuni.maps.arcgis.com/apps/webappviewer/index.html?id=98462998953c4f1fbd7caaa166373f63"
+      }
+    },
+    {
+      "access": {
+        "authentication": "permission by email required for reproduction",
+        "format": [
+          "web portal",
+          "report form"
+        ],
+        "method": "no documented public export API",
+        "public_access": "PUBLIC_METADATA_ONLY",
+        "rate_limits": "not stated",
+        "update_cadence": "not stated"
+      },
+      "accessed_on": "2026-09-28",
+      "biases": [
+        "no dates",
+        "unknown positional accuracy",
+        "unresolved rights"
+      ],
+      "blocking_reason": "Training, transformation, automation, raw redistribution, and derived-output rights require written permission; repository copy lacks occurrence dates.",
+      "canonical_landing_page": "https://bhusanket.gsi.gov.in/",
+      "counts": {
+        "exact_date": 0,
+        "exact_time_with_known_zone": 0,
+        "partial_date": 0,
+        "spatially_valid_mizoram": 2046
+      },
+      "coverage": {
+        "geography": "India; repository snapshot is Mizoram",
+        "global": null,
+        "india": null,
+        "mizoram": 2046,
+        "northeast_india": null,
+        "temporal": "unknown in repository snapshot"
+      },
+      "documentation_url": "https://bhusanket.gsi.gov.in/terms.html",
+      "evidence_notes": [
+        "official candidate and current undated repository inventory",
+        "Public accessibility and GSI's own ML use do not grant TerraSense rights."
+      ],
+      "latest_update": "not established for repository snapshot; portal accessed 2026-09-28",
+      "licence": {
+        "identifier": "GSI permission-required terms",
+        "permissions": {
+          "automated_recurring_retrieval": "ambiguous_not_stated",
+          "commercial_or_operational_use": "ambiguous_not_stated",
+          "derived_features_or_models": "ambiguous_not_stated",
+          "model_training": "ambiguous_not_stated",
+          "note": "Public accessibility and GSI's own ML use do not grant TerraSense rights.",
+          "raw_redistribution": "ambiguous_not_stated"
+        },
+        "url": "https://bhusanket.gsi.gov.in/terms.html"
+      },
+      "owner": "Geological Survey of India",
+      "project_permissions": {
+        "automated_retrieval_permission": "ambiguous_not_stated",
+        "derived_model_publication_permission": "ambiguous_not_stated",
+        "model_training_permission": "ambiguous_not_stated",
+        "raw_redistribution_permission": "ambiguous_not_stated"
+      },
+      "rank": 2,
+      "role": "official candidate and current undated repository inventory",
+      "schema": {
+        "coordinates": "2,046 repository records geolocated",
+        "event_type": [
+          "landslide attributes",
+          "trigger/activity"
+        ],
+        "severity": [
+          "deaths",
+          "injuries",
+          "damage"
+        ],
+        "spatial_precision": "not documented",
+        "time_zone_convention": "not established in repository snapshot",
+        "timestamp": "public form requests date/time; repository copy has zero usable dates",
+        "timestamp_precision": "UNKNOWN",
+        "verification": []
+      },
+      "source_id": "gsi_bhusanket",
+      "source_name": "GSI BhooSanket inventory",
+      "status": "BLOCKED_PENDING_PERMISSION",
+      "urls": {
+        "contact": "https://bhusanket.gsi.gov.in/contactUs.html",
+        "landing": "https://bhusanket.gsi.gov.in/",
+        "report_form": "https://bhusanket.gsi.gov.in/LandslideReport_new.html",
+        "terms": "https://bhusanket.gsi.gov.in/terms.html"
+      }
+    },
+    {
+      "access": {
+        "authentication": "account or endpoint approval may be required",
+        "format": [
+          "JSON",
+          "bulletins"
+        ],
+        "method": "official API platform",
+        "public_access": "PUBLIC_METADATA_ONLY",
+        "rate_limits": "not stated",
+        "update_cadence": "operational"
+      },
+      "accessed_on": "2026-09-28",
+      "biases": [
+        "not an occurrence catalogue",
+        "coverage varies"
+      ],
+      "blocking_reason": "Weather observations and warnings are predictors or context, not landslide occurrence labels; reuse terms require review.",
+      "canonical_landing_page": "https://api.imd.gov.in/public/index.php",
+      "counts": {
+        "exact_date": null,
+        "exact_time_with_known_zone": null,
+        "partial_date": null,
+        "spatially_valid_mizoram": null
+      },
+      "coverage": {
+        "geography": "India",
+        "global": null,
+        "india": null,
+        "mizoram": null,
+        "northeast_india": null,
+        "temporal": "current observations, forecasts and warnings"
+      },
+      "documentation_url": "https://api.imd.gov.in/public/index.php",
+      "evidence_notes": [
+        "future dynamic predictor and official weather context",
+        "Weather can be an approved predictor, never an occurrence label."
+      ],
+      "latest_update": "operational; reference accessed 2026-09-28",
+      "licence": {
+        "identifier": "reuse terms not established",
+        "permissions": {
+          "automated_recurring_retrieval": "ambiguous_not_stated",
+          "commercial_or_operational_use": "ambiguous_not_stated",
+          "derived_features_or_models": "ambiguous_not_stated",
+          "model_training": "ambiguous_not_stated",
+          "note": "Weather can be an approved predictor, never an occurrence label.",
+          "raw_redistribution": "ambiguous_not_stated"
+        },
+        "url": "https://api.imd.gov.in/public/api_reference.html"
+      },
+      "owner": "India Meteorological Department",
+      "project_permissions": {
+        "automated_retrieval_permission": "ambiguous_not_stated",
+        "derived_model_publication_permission": "ambiguous_not_stated",
+        "model_training_permission": "ambiguous_not_stated",
+        "raw_redistribution_permission": "ambiguous_not_stated"
+      },
+      "rank": 12,
+      "role": "future dynamic predictor and official weather context",
+      "schema": {
+        "coordinates": "product-dependent",
+        "event_type": [],
+        "severity": [
+          "warning category",
+          "warning colour"
+        ],
+        "spatial_precision": "station, district or grid",
+        "time_zone_convention": "product-dependent; fields may use UTC or IST as documented",
+        "timestamp": "issue and observation times documented",
+        "timestamp_precision": "product-dependent",
+        "verification": []
+      },
+      "source_id": "imd_public_weather_api",
+      "source_name": "IMD public weather APIs",
+      "status": "NOT_AN_EVENT_LABEL_SOURCE",
+      "urls": {
+        "documentation": "https://api.imd.gov.in/public/api_reference.html",
+        "landing": "https://api.imd.gov.in/public/index.php"
+      }
+    },
+    {
+      "access": {
+        "authentication": "none for browsing",
+        "format": [
+          "HTML"
+        ],
+        "method": "public archive; no documented API",
+        "public_access": "PUBLIC_METADATA_ONLY",
+        "rate_limits": "not stated",
+        "update_cadence": "event-driven publication"
+      },
+      "accessed_on": "2026-09-28",
+      "biases": [
+        "publication-selection bias",
+        "narrative format",
+        "not complete"
+      ],
+      "blocking_reason": "Narrative publication times are not event times; no reusable structured dataset or automation permission found.",
+      "canonical_landing_page": "https://dipr.mizoram.gov.in/",
+      "counts": {
+        "exact_date": null,
+        "exact_time_with_known_zone": null,
+        "partial_date": null,
+        "spatially_valid_mizoram": null
+      },
+      "coverage": {
+        "geography": "Mizoram",
+        "global": null,
+        "india": null,
+        "mizoram": null,
+        "northeast_india": null,
+        "temporal": "multi-year archive"
+      },
+      "documentation_url": "https://dipr.mizoram.gov.in/",
+      "evidence_notes": [
+        "official discovery and verification lead",
+        "Never substitute publication time for occurrence time; scraping needs permission."
+      ],
+      "latest_update": "ongoing archive; accessed 2026-09-28",
+      "licence": {
+        "identifier": "no reusable-data licence found",
+        "permissions": {
+          "automated_recurring_retrieval": "ambiguous_not_stated",
+          "commercial_or_operational_use": "ambiguous_not_stated",
+          "derived_features_or_models": "ambiguous_not_stated",
+          "model_training": "ambiguous_not_stated",
+          "note": "Never substitute publication time for occurrence time; scraping needs permission.",
+          "raw_redistribution": "ambiguous_not_stated"
+        },
+        "url": "https://dipr.mizoram.gov.in/"
+      },
+      "owner": "Mizoram Directorate of Information and Public Relations",
+      "project_permissions": {
+        "automated_retrieval_permission": "ambiguous_not_stated",
+        "derived_model_publication_permission": "ambiguous_not_stated",
+        "model_training_permission": "ambiguous_not_stated",
+        "raw_redistribution_permission": "ambiguous_not_stated"
+      },
+      "rank": 13,
+      "role": "official discovery and verification lead",
+      "schema": {
+        "coordinates": "usually place descriptions",
+        "event_type": [
+          "narrative"
+        ],
+        "severity": [
+          "casualties",
+          "damage"
+        ],
+        "spatial_precision": "variable",
+        "time_zone_convention": "publication zone does not establish occurrence zone",
+        "timestamp": "publication time; occurrence time only when stated",
+        "timestamp_precision": "source-dependent",
+        "verification": [
+          "official publication"
+        ]
+      },
+      "source_id": "mizoram_dipr_archive",
+      "source_name": "Mizoram DIPR press-release archive",
+      "status": "BLOCKED_PENDING_PERMISSION",
+      "urls": {
+        "archive": "https://dipr.mizoram.gov.in/category/english-press-releases",
+        "landing": "https://dipr.mizoram.gov.in/"
+      }
+    },
+    {
+      "access": {
+        "authentication": "agency authorization",
+        "format": [
+          "official records"
+        ],
+        "method": "direct agreement required",
+        "public_access": "NO_PUBLIC_STRUCTURED_DATA",
+        "rate_limits": "not applicable",
+        "update_cadence": "event-driven if negotiated"
+      },
+      "accessed_on": "2026-09-28",
+      "biases": [
+        "damaging incidents may dominate",
+        "historical digitization incomplete",
+        "coordinate precision unknown"
+      ],
+      "blocking_reason": "No public structured event feed or licence; a negotiated agreement and verified data dictionary are required.",
+      "canonical_landing_page": "https://aizawl.nic.in/disaster-management-rehabilitation-branch/",
+      "counts": {
+        "exact_date": null,
+        "exact_time_with_known_zone": null,
+        "partial_date": null,
+        "spatially_valid_mizoram": null
+      },
+      "coverage": {
+        "geography": "Mizoram and districts",
+        "global": null,
+        "india": null,
+        "mizoram": null,
+        "northeast_india": null,
+        "temporal": "plan confirms records for 2013-2019; ongoing handling"
+      },
+      "documentation_url": "https://aizawl.nic.in/disaster-management-rehabilitation-branch/",
+      "evidence_notes": [
+        "highest-priority future gold-label source",
+        "Agreement must cover automation, retention, privacy, training, publication and redistribution."
+      ],
+      "latest_update": "ongoing; state plan and district page accessed 2026-09-28",
+      "licence": {
+        "identifier": "no public dataset licence found",
+        "permissions": {
+          "automated_recurring_retrieval": "ambiguous_not_stated",
+          "commercial_or_operational_use": "ambiguous_not_stated",
+          "derived_features_or_models": "ambiguous_not_stated",
+          "model_training": "ambiguous_not_stated",
+          "note": "Agreement must cover automation, retention, privacy, training, publication and redistribution.",
+          "raw_redistribution": "ambiguous_not_stated"
+        },
+        "url": "https://aizawl.nic.in/disaster-management-rehabilitation-branch/"
+      },
+      "owner": "Mizoram DMR Department, SEOC and DDMAs",
+      "project_permissions": {
+        "automated_retrieval_permission": "ambiguous_not_stated",
+        "derived_model_publication_permission": "ambiguous_not_stated",
+        "model_training_permission": "ambiguous_not_stated",
+        "raw_redistribution_permission": "ambiguous_not_stated"
+      },
+      "rank": 1,
+      "role": "highest-priority future gold-label source",
+      "schema": {
+        "coordinates": "not established for unpublished records",
+        "event_type": [
+          "natural calamity type"
+        ],
+        "severity": [
+          "damage",
+          "relief"
+        ],
+        "spatial_precision": "not established",
+        "time_zone_convention": "expected jurisdiction-local but unverified",
+        "timestamp": "Aizawl guidance requires date, time and place",
+        "timestamp_precision": "potentially exact but unverified",
+        "verification": [
+          "first-hand spot verification"
+        ]
+      },
+      "source_id": "mizoram_dmr_seoc_ddma",
+      "source_name": "Mizoram DMR/SEOC/DDMA verified incident records",
+      "status": "BLOCKED_PENDING_DATA_SHARING_AGREEMENT",
+      "urls": {
+        "aizawl_ddma": "https://aizawl.nic.in/disaster-management-rehabilitation-branch/",
+        "state_plan": "https://dmr.mizoram.gov.in/uploads/attachments/2022/03/353f4dfd194ec41b10171dafa25a1d7e/sdmp-2021-final.pdf"
+      }
+    },
+    {
+      "access": {
+        "authentication": "none",
+        "format": [
+          "ArcGIS JSON",
+          "GeoJSON"
+        ],
+        "method": "public feature service",
+        "public_access": "PUBLIC_DATA",
+        "rate_limits": "not documented",
+        "update_cadence": "irregular"
+      },
+      "accessed_on": "2026-09-28",
+      "biases": [
+        "imagery availability",
+        "case-by-case mapping",
+        "automatic false positives",
+        "zero Mizoram records"
+      ],
+      "blocking_reason": "Current canonical Mizoram polygon query returned zero records.",
+      "canonical_landing_page": "https://science.nasa.gov/citizen-science/landslide-reporter/",
+      "counts": {
+        "exact_date": null,
+        "exact_time_with_known_zone": 0,
+        "partial_date": null,
+        "spatially_valid_mizoram": 0
+      },
+      "coverage": {
+        "geography": "global mapped inventories",
+        "global": 40154,
+        "india": 176,
+        "mizoram": 0,
+        "northeast_india": null,
+        "temporal": "event-dependent"
+      },
+      "documentation_url": "https://gis.earthdata.nasa.gov/portal/rest/services/Landslides/COOLR_Events_Points/FeatureServer",
+      "evidence_notes": [
+        "lawful global source with no current Mizoram coverage",
+        "Redistribution requires notices, modification marking and attribution; automation terms are unstated."
+      ],
+      "latest_update": "portal item modified 2026-09-05",
+      "licence": {
+        "identifier": "NASA Permission to Use, Reproduce, and Distribute",
+        "permissions": {
+          "automated_recurring_retrieval": "ambiguous_not_stated",
+          "commercial_or_operational_use": "explicitly_permitted",
+          "derived_features_or_models": "explicitly_permitted",
+          "model_training": "explicitly_permitted",
+          "note": "Redistribution requires notices, modification marking and attribution; automation terms are unstated.",
+          "raw_redistribution": "explicitly_permitted"
+        },
+        "url": "https://gis.earthdata.nasa.gov/portal/home/item.html?id=521b98e18e684b529da498624c6335b2"
+      },
+      "owner": "NASA Goddard Space Flight Center",
+      "project_permissions": {
+        "automated_retrieval_permission": "ambiguous_not_stated",
+        "derived_model_publication_permission": "explicitly_permitted",
+        "model_training_permission": "explicitly_permitted",
+        "raw_redistribution_permission": "explicitly_permitted"
+      },
+      "rank": 5,
+      "role": "lawful global source with no current Mizoram coverage",
+      "schema": {
+        "coordinates": "points",
+        "event_type": [
+          "category",
+          "trigger",
+          "method"
+        ],
+        "severity": [],
+        "spatial_precision": "method-dependent",
+        "time_zone_convention": "not documented",
+        "timestamp": "date and optional approximate time; timezone undocumented",
+        "timestamp_precision": "source-dependent",
+        "verification": [
+          "method",
+          "citation"
+        ]
+      },
+      "source_id": "nasa_coolr_events",
+      "source_name": "NASA COOLR Events Points",
+      "status": "UNUSABLE_ZERO_MIZORAM_RECORDS",
+      "urls": {
+        "api": "https://gis.earthdata.nasa.gov/portal/rest/services/Landslides/COOLR_Events_Points/FeatureServer",
+        "item": "https://gis.earthdata.nasa.gov/portal/home/item.html?id=521b98e18e684b529da498624c6335b2",
+        "landing": "https://science.nasa.gov/citizen-science/landslide-reporter/"
+      }
+    },
+    {
+      "access": {
+        "authentication": "none",
+        "format": [
+          "ArcGIS JSON",
+          "GeoJSON"
+        ],
+        "method": "public feature service",
+        "public_access": "PUBLIC_DATA",
+        "rate_limits": "not documented",
+        "update_cadence": "irregular"
+      },
+      "accessed_on": "2026-09-28",
+      "biases": [
+        "online-reporting bias",
+        "not official verification",
+        "large spatial uncertainty",
+        "absence is not non-occurrence"
+      ],
+      "blocking_reason": "Only 41 heterogeneous reports, including 39 dated and two exact-location claims; no official verification or known exact instants.",
+      "canonical_landing_page": "https://science.nasa.gov/citizen-science/landslide-reporter/",
+      "counts": {
+        "duplicate_coordinate_groups": 0,
+        "duplicate_event_candidate_pairs_same_date_within_10km": 4,
+        "exact_date": 39,
+        "exact_location_claims": 2,
+        "exact_time_with_known_zone": 0,
+        "partial_date": 0,
+        "spatially_valid_method": "41 valid WGS84 geometries strictly inside current geoBoundaries gbOpen India ADM1 Mizoram polygon; zero boundary and zero outside; boundary SHA-256 8f1b1341d6cedd97eb5324cb6f4d73cddb8639822c73df8241fe6ca24bc73ec2",
+        "spatially_valid_mizoram": 41
+      },
+      "coverage": {
+        "geography": "global reports",
+        "global": 14750,
+        "india": 1741,
+        "mizoram": 41,
+        "northeast_india": 504,
+        "temporal": "Mizoram sample 2007-07-30 through 2021-06-12"
+      },
+      "documentation_url": "https://gis.earthdata.nasa.gov/portal/rest/services/Landslides/COOLR_Reports_Points/FeatureServer",
+      "evidence_notes": [
+        "lawful discovery, review and limited evaluation",
+        "Preserve source links and distinguish reports from authority verification."
+      ],
+      "latest_update": "portal item modified 2026-09-05",
+      "licence": {
+        "identifier": "NASA Permission to Use, Reproduce, and Distribute",
+        "permissions": {
+          "automated_recurring_retrieval": "ambiguous_not_stated",
+          "commercial_or_operational_use": "explicitly_permitted",
+          "derived_features_or_models": "explicitly_permitted",
+          "model_training": "explicitly_permitted",
+          "note": "Preserve source links and distinguish reports from authority verification.",
+          "raw_redistribution": "explicitly_permitted"
+        },
+        "url": "https://gis.earthdata.nasa.gov/portal/home/item.html?id=b1b68a19b51342bf83260fbb3d9588f5"
+      },
+      "owner": "NASA Goddard Space Flight Center",
+      "project_permissions": {
+        "automated_retrieval_permission": "ambiguous_not_stated",
+        "derived_model_publication_permission": "explicitly_permitted",
+        "model_training_permission": "explicitly_permitted",
+        "raw_redistribution_permission": "explicitly_permitted"
+      },
+      "rank": 4,
+      "role": "lawful discovery, review and limited evaluation",
+      "schema": {
+        "coordinates": "41/41 valid",
+        "event_type": [
+          "category",
+          "trigger",
+          "size"
+        ],
+        "severity": [
+          "fatalities",
+          "injuries"
+        ],
+        "spatial_precision": "2 exact; 10 at 1km; 12 at 5km; 4 at 10km; 7 at 25km; 5 at 50km; 1 at 100km",
+        "time_zone_convention": "not documented",
+        "timestamp": "39 dates; 12 clock-like values plus one unknown; timezone undocumented",
+        "timestamp_precision": "DATE or UNKNOWN; zero exact instants",
+        "verification": [
+          "source",
+          "source link",
+          "import source"
+        ]
+      },
+      "source_id": "nasa_coolr_reports",
+      "source_name": "NASA COOLR Reports Points",
+      "status": "INSUFFICIENT_FOR_TEMPORAL_TRAINING",
+      "urls": {
+        "api": "https://gis.earthdata.nasa.gov/portal/rest/services/Landslides/COOLR_Reports_Points/FeatureServer",
+        "item": "https://gis.earthdata.nasa.gov/portal/home/item.html?id=b1b68a19b51342bf83260fbb3d9588f5",
+        "landing": "https://science.nasa.gov/citizen-science/landslide-reporter/"
+      }
+    },
+    {
+      "access": {
+        "authentication": "none",
+        "format": [
+          "historical export"
+        ],
+        "method": "one-time export",
+        "public_access": "PUBLIC_METADATA_ONLY",
+        "rate_limits": "not stated",
+        "update_cadence": "none"
+      },
+      "accessed_on": "2026-09-28",
+      "biases": [
+        "stale",
+        "reporting bias",
+        "legacy terms"
+      ],
+      "blocking_reason": "Stale one-time export with unverified export terms; current COOLR service is preferred.",
+      "canonical_landing_page": "https://data.nasa.gov/dataset/global-landslide-catalog-export",
+      "counts": {
+        "exact_date": null,
+        "exact_time_with_known_zone": null,
+        "partial_date": null,
+        "spatially_valid_mizoram": null
+      },
+      "coverage": {
+        "geography": "global",
+        "global": null,
+        "india": null,
+        "mizoram": null,
+        "northeast_india": null,
+        "temporal": "2007 to 2016-03-07"
+      },
+      "documentation_url": "https://data.nasa.gov/dataset/global-landslide-catalog-export",
+      "evidence_notes": [
+        "historical reference",
+        "Use current licensed COOLR services."
+      ],
+      "latest_update": "2016-03-07",
+      "licence": {
+        "identifier": "legacy export terms not retained in inspected page",
+        "permissions": {
+          "automated_recurring_retrieval": "source_not_found",
+          "commercial_or_operational_use": "ambiguous_not_stated",
+          "derived_features_or_models": "ambiguous_not_stated",
+          "model_training": "ambiguous_not_stated",
+          "note": "Use current licensed COOLR services.",
+          "raw_redistribution": "ambiguous_not_stated"
+        },
+        "url": "https://data.nasa.gov/dataset/global-landslide-catalog-export"
+      },
+      "owner": "NASA Goddard Space Flight Center",
+      "project_permissions": {
+        "automated_retrieval_permission": "source_not_found",
+        "derived_model_publication_permission": "ambiguous_not_stated",
+        "model_training_permission": "ambiguous_not_stated",
+        "raw_redistribution_permission": "ambiguous_not_stated"
+      },
+      "rank": 9,
+      "role": "historical reference",
+      "schema": {
+        "coordinates": "yes",
+        "event_type": [
+          "category",
+          "trigger"
+        ],
+        "severity": [],
+        "spatial_precision": "heterogeneous",
+        "time_zone_convention": "not established",
+        "timestamp": "date and sometimes approximate time",
+        "timestamp_precision": "source-dependent",
+        "verification": [
+          "source"
+        ]
+      },
+      "source_id": "nasa_glc_legacy_export",
+      "source_name": "NASA GLC one-time export",
+      "status": "SUPERSEDED",
+      "urls": {
+        "landing": "https://data.nasa.gov/dataset/global-landslide-catalog-export",
+        "successor": "https://science.nasa.gov/citizen-science/landslide-reporter/"
+      }
+    },
+    {
+      "access": {
+        "authentication": "public integration documented",
+        "format": [
+          "CAP XML"
+        ],
+        "method": "ETag-aware agency feed",
+        "public_access": "PUBLIC_METADATA_ONLY",
+        "rate_limits": "ETag caching required",
+        "update_cadence": "operational"
+      },
+      "accessed_on": "2026-09-28",
+      "biases": [
+        "alerts may precede non-events",
+        "broad areas",
+        "not a confirmed-event catalogue"
+      ],
+      "blocking_reason": "CAP warnings are not verified landslide occurrences; TerraSense automation/reuse authorization is unconfirmed.",
+      "canonical_landing_page": "https://sachet.ndma.gov.in/",
+      "counts": {
+        "exact_date": null,
+        "exact_time_with_known_zone": null,
+        "partial_date": null,
+        "spatially_valid_mizoram": null
+      },
+      "coverage": {
+        "geography": "India",
+        "global": null,
+        "india": null,
+        "mizoram": null,
+        "northeast_india": null,
+        "temporal": "current official alerts"
+      },
+      "documentation_url": "https://sachet.ndma.gov.in/docs/Integration_Guide_For_Agencies.pdf",
+      "evidence_notes": [
+        "official alert context and interoperability",
+        "Alerts are context, not occurrence labels."
+      ],
+      "latest_update": "operational; integration guide accessed 2026-09-28",
+      "licence": {
+        "identifier": "integration allowed; reuse/training unstated",
+        "permissions": {
+          "automated_recurring_retrieval": "ambiguous_not_stated",
+          "commercial_or_operational_use": "ambiguous_not_stated",
+          "derived_features_or_models": "ambiguous_not_stated",
+          "model_training": "ambiguous_not_stated",
+          "note": "Alerts are context, not occurrence labels.",
+          "raw_redistribution": "ambiguous_not_stated"
+        },
+        "url": "https://sachet.ndma.gov.in/docs/Integration_Guide_For_Agencies.pdf"
+      },
+      "owner": "National Disaster Management Authority",
+      "project_permissions": {
+        "automated_retrieval_permission": "ambiguous_not_stated",
+        "derived_model_publication_permission": "ambiguous_not_stated",
+        "model_training_permission": "ambiguous_not_stated",
+        "raw_redistribution_permission": "ambiguous_not_stated"
+      },
+      "rank": 8,
+      "role": "official alert context and interoperability",
+      "schema": {
+        "coordinates": "CAP area/geocode dependent",
+        "event_type": [
+          "CAP event"
+        ],
+        "severity": [
+          "severity",
+          "urgency",
+          "certainty"
+        ],
+        "spatial_precision": "alert-area dependent",
+        "time_zone_convention": "CAP timestamp offset/source-dependent",
+        "timestamp": "issued/effective/expiry, not occurrence",
+        "timestamp_precision": "INSTANT for alert lifecycle",
+        "verification": [
+          "official issuer"
+        ]
+      },
+      "source_id": "ndma_sachet_cap",
+      "source_name": "NDMA Sachet CAP feed",
+      "status": "NOT_AN_EVENT_LABEL_SOURCE",
+      "urls": {
+        "guide": "https://sachet.ndma.gov.in/docs/Integration_Guide_For_Agencies.pdf",
+        "landing": "https://sachet.ndma.gov.in/"
+      }
+    },
+    {
+      "access": {
+        "authentication": "portal-specific",
+        "format": [
+          "PDF",
+          "map services"
+        ],
+        "method": "atlas and Bhuvan/NDEM",
+        "public_access": "PUBLIC_METADATA_ONLY",
+        "rate_limits": "bulk feeds prohibited without authorization",
+        "update_cadence": "irregular"
+      },
+      "accessed_on": "2026-09-28",
+      "biases": [
+        "not a complete time series",
+        "many failures share a trigger window",
+        "individual times absent",
+        "mapping effort varies"
+      ],
+      "blocking_reason": "Mapped seasonal/event-window features lack individual occurrence times; Bhuvan bulk/reuse restrictions require written authorization.",
+      "canonical_landing_page": "https://www.nrsc.gov.in/nrscnew/resources_atlas_landslide.php",
+      "counts": {
+        "exact_date": null,
+        "exact_time_with_known_zone": null,
+        "partial_date": null,
+        "spatially_valid_mizoram": null
+      },
+      "coverage": {
+        "geography": "17 states and 2 UTs",
+        "global": null,
+        "india": 80933,
+        "mizoram": 12385,
+        "northeast_india": 42547,
+        "temporal": "1998-2022 mapping; Mizoram 2014 and 2017"
+      },
+      "documentation_url": "https://www.nrsc.gov.in/nrscnew/assets/pdf/atlas/landslide/Landslides_Atlas_of_India_Updated_25Aug2023.pdf",
+      "evidence_notes": [
+        "large official spatial inventory",
+        "Written dataset-specific authorization is required."
+      ],
+      "latest_update": "atlas updated 2023-08-25; terms accessed 2026-09-28",
+      "licence": {
+        "identifier": "NRSC general terms plus restrictive Bhuvan agreement",
+        "permissions": {
+          "automated_recurring_retrieval": "explicitly_prohibited",
+          "commercial_or_operational_use": "explicitly_prohibited",
+          "derived_features_or_models": "ambiguous_not_stated",
+          "model_training": "ambiguous_not_stated",
+          "note": "Written dataset-specific authorization is required.",
+          "raw_redistribution": "explicitly_prohibited"
+        },
+        "url": "https://bhuvan-app1.nrsc.gov.in/2dresources/documents/1_Bhuvan_User_Handbook.pdf"
+      },
+      "owner": "National Remote Sensing Centre, ISRO",
+      "project_permissions": {
+        "automated_retrieval_permission": "explicitly_prohibited",
+        "derived_model_publication_permission": "ambiguous_not_stated",
+        "model_training_permission": "ambiguous_not_stated",
+        "raw_redistribution_permission": "explicitly_prohibited"
+      },
+      "rank": 7,
+      "role": "large official spatial inventory",
+      "schema": {
+        "coordinates": "mapped inventory; raw coordinates not inspected",
+        "event_type": [
+          "inventory type"
+        ],
+        "severity": [
+          "selected damage"
+        ],
+        "spatial_precision": "imagery-dependent",
+        "time_zone_convention": "not applicable to seasonal/event-window inventory",
+        "timestamp": "season or event association, not individual time",
+        "timestamp_precision": "SEASON_OR_EVENT_WINDOW",
+        "verification": [
+          "some field/mobile validation"
+        ]
+      },
+      "source_id": "nrsc_landslide_atlas",
+      "source_name": "NRSC Landslide Atlas of India",
+      "status": "BLOCKED_PENDING_PERMISSION",
+      "urls": {
+        "bhuvan_terms": "https://bhuvan-app1.nrsc.gov.in/2dresources/documents/1_Bhuvan_User_Handbook.pdf",
+        "landing": "https://www.nrsc.gov.in/nrscnew/resources_atlas_landslide.php",
+        "pdf": "https://www.nrsc.gov.in/nrscnew/assets/pdf/atlas/landslide/Landslides_Atlas_of_India_Updated_25Aug2023.pdf",
+        "terms": "https://www.nrsc.gov.in/nrscnew/termsConditions.php"
+      }
+    },
+    {
+      "access": {
+        "authentication": "none",
+        "format": [
+          "CSV",
+          "GeoPackage"
+        ],
+        "method": "Zenodo release",
+        "public_access": "PUBLIC_DATA",
+        "rate_limits": "repository-dependent",
+        "update_cadence": "yearly update check"
+      },
+      "accessed_on": "2026-09-28",
+      "biases": [
+        "29 heterogeneous sources",
+        "not observationally homogeneous",
+        "completeness inherited",
+        "reliability is not validated accuracy"
+      ],
+      "blocking_reason": "Non-commercial licence and heterogeneous source rights/quality; Mizoram subset was not inspected.",
+      "canonical_landing_page": "https://doi.org/10.5281/zenodo.18643456",
+      "counts": {
+        "exact_date": null,
+        "exact_time_with_known_zone": null,
+        "partial_date": null,
+        "spatially_valid_mizoram": null
+      },
+      "coverage": {
+        "geography": "global",
+        "global": 1061450,
+        "india": null,
+        "mizoram": null,
+        "northeast_india": null,
+        "temporal": "about 1700-2023"
+      },
+      "documentation_url": "https://essd.copernicus.org/articles/18/4697/2026/",
+      "evidence_notes": [
+        "non-commercial discovery and research",
+        "Non-commercial restriction blocks assumed operational use; input licences differ."
+      ],
+      "latest_update": "2026-07-07",
+      "licence": {
+        "identifier": "CC-BY-NC-4.0",
+        "permissions": {
+          "automated_recurring_retrieval": "ambiguous_not_stated",
+          "commercial_or_operational_use": "explicitly_prohibited",
+          "derived_features_or_models": "explicitly_permitted",
+          "model_training": "explicitly_permitted",
+          "note": "Non-commercial restriction blocks assumed operational use; input licences differ.",
+          "raw_redistribution": "explicitly_permitted"
+        },
+        "url": "https://essd.copernicus.org/articles/18/4697/2026/"
+      },
+      "owner": "University of Bari and collaborators",
+      "project_permissions": {
+        "automated_retrieval_permission": "ambiguous_not_stated",
+        "derived_model_publication_permission": "explicitly_permitted",
+        "model_training_permission": "explicitly_permitted",
+        "raw_redistribution_permission": "explicitly_permitted"
+      },
+      "rank": 6,
+      "role": "non-commercial discovery and research",
+      "schema": {
+        "coordinates": "points and polygons",
+        "event_type": [
+          "type",
+          "physical factor"
+        ],
+        "severity": [
+          "source-dependent"
+        ],
+        "spatial_precision": "source-derived",
+        "time_zone_convention": "source-derived",
+        "timestamp": "heterogeneous; acquisition ranges are not occurrence dates",
+        "timestamp_precision": "source-derived",
+        "verification": [
+          "source reference",
+          "reliability indicator"
+        ]
+      },
+      "source_id": "uglc_2026",
+      "source_name": "Unified Global Landslide Catalogue",
+      "status": "RESEARCH_ONLY_NONCOMMERCIAL",
+      "urls": {
+        "dataset": "https://doi.org/10.5281/zenodo.18643456",
+        "paper": "https://essd.copernicus.org/articles/18/4697/2026/"
+      }
+    }
+  ]
+}
